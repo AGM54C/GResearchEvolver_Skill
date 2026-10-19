@@ -36,12 +36,25 @@
 # 1. 重跑风格统计：与 kghalubench-stats.json 逐数值一致（E6 幂等）
 cd workspace/paper/style-profiles
 python style_stats.py ../../literature/inbox/fulltext/kghalubench.txt 233 505
+cd ../../..
 
-# 2. 抽查归档哈希：artifacts.json 里的 sha256 与对应文件实算值一致
-python -c "import json,hashlib; arts=json.load(open('../../archives/archive-002/artifacts.json')); print(sum(1 for a in arts if hashlib.sha256(open('../../'+a['path'],'rb').read()).hexdigest()==a['sha256']), '/', len(arts))"
+# 2. 归档哈希抽查（注意：Windows 下必须 -X utf8，否则中文路径被 GBK 误读产生假报错）
+python -X utf8 -c "
+import json,hashlib,os
+SKIP={'.html','codeartsagent-llms.txt'}          # 有意未入库：原始 html（txt 已含清洗后全文）+ 无效残留
+LIVE={'memory/evolution-log.md'}                  # 活文件：归档后已追加新轮进化记录（快照 vs 现行，属预期）
+ok=skip=bad=0
+for a in json.load(open('archives/archive-003/artifacts.json',encoding='utf-8')):
+    if a['path'].endswith('.html') or os.path.basename(a['path']) in SKIP or a['path'] in LIVE: skip+=1; continue
+    p=a['path'].replace('workspace/','workspace/').replace('memory/','memory/')
+    h=hashlib.sha256(open(p,'rb').read()).hexdigest()
+    ok+=h==a['sha256']; bad+=h!=a['sha256']
+print(f'哈希一致 {ok} / 不符 {bad} / 预期跳过 {skip}（应 80 项中 71 一致 + 0 不符 + 9 跳过）')"
 
 # 3. 对照实验回查：traceback.json 里每条 broken 论断标注了原文位置，可人工核
 ```
+
+> 说明：归档清单（artifacts.json）是归档时刻的全量快照（含 8 篇原始 html 与 1 个无效残留文件，本仓库有意未带入，故验证命令按 SKIP 跳过）；`evolution-log.md` 在归档后持续追加新进化轮记录，哈希与快照不符属预期——这正是「归档不可变（P2）+ 记忆可进化」的活例子。
 
 ## 与 skill 集合的关系
 
