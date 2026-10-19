@@ -11,6 +11,7 @@ import shutil
 import sqlite3
 import time
 import uuid
+import tempfile
 from contextlib import contextmanager
 
 
@@ -44,11 +45,31 @@ def read_json(path):
 
 
 def write_json(path, value):
+    atomic_bytes(path, (canonical(value) + '\n').encode('utf-8'))
+
+
+def sync_directory(path):
+    if os.name != 'nt':
+        fd = os.open(path, os.O_RDONLY)
+        try:
+            os.fsync(fd)
+        finally:
+            os.close(fd)
+
+
+def atomic_bytes(path, data):
     path = native_path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(path.name + "." + uuid.uuid4().hex + ".tmp")
-    tmp.write_text(canonical(value) + "\n", encoding="utf-8")
-    os.replace(tmp, path)
+    try:
+        with tmp.open('xb') as f:
+            f.write(data)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+        sync_directory(path.parent)
+    finally:
+        tmp.unlink(missing_ok=True)
 
 
 def safe_path(root, name):
@@ -77,16 +98,18 @@ def finite(value, name="number", minimum=None):
 
 
 def validate_manifest(m):
-    if m.get("version") != 2 or not m.get("objective"):
+    if not isinstance(m, dict) or m.get("version") != 2 or not isinstance(m.get('objective'), str) or not m['objective'].strip():
         raise ResearchError("Manifest requires version=2 and objective")
     stages = m.get("stages", [])
-    if not stages:
+    if not isinstance(stages, list) or not stages or any(not isinstance(s, dict) for s in stages):
         raise ResearchError("No stages")
     ids = [valid_id(s["id"]) for s in stages]
     if len(ids) != len(set(ids)):
         raise ResearchError("Duplicate stage IDs; iterations need distinct IDs")
     seen, outputs = set(), set()
     for s in stages:
+        if not isinstance(s.get('needs', []), list):
+            raise ResearchError('needs must be a list')
         for field in ('milestone', 'milestone_id'):
             if field in s and (not isinstance(s[field], str) or not s[field].strip()):
                 raise ResearchError(f'{field} must be a nonempty string')
@@ -96,7 +119,10 @@ def validate_manifest(m):
             if not isinstance(s.get(key, []), list):
                 raise ResearchError(f'{key} must be a list')
             for p in s.get(key, []):
+                if not isinstance(p, str): raise ResearchError('Artifact paths must be strings')
                 safe_path(Path.cwd(), p)
+            if len(s.get(key, [])) != len(set(s.get(key, []))):
+                raise ResearchError('Duplicate paths in ' + key)
         if not s.get("outputs"):
             raise ResearchError(f"{s['id']}: declare outputs")
         if outputs.intersection(s["outputs"]):
@@ -109,10 +135,30 @@ def validate_manifest(m):
             raise ResearchError("Unknown effect")
         finite(s.get("timeout", 300), "timeout", 0.01)
         finite(s.get("cost_estimate", 0), "cost_estimate", 0)
-        if not isinstance(s.get("retries", 0), int) or not 0 <= s.get("retries", 0) <= 2:
+        if type(s.get("retries", 0)) is not int or not 0 <= s.get("retries", 0) <= 2:
             raise ResearchError("retries must be 0..2; retries require idempotent=true")
-        if s.get("retries", 0) and not s.get("idempotent", False):
+        if s.get("retries", 0) and s.get("idempotent") is not True:
             raise ResearchError("Retries require an explicitly idempotent operation")
+        if s.get('retries') and (s.get('effect') == 'external_write' or s.get('ssh')):
+            raise ResearchError('Automatic retries of remote/external writes require provider reconciliation; use explicit recovery')
+        codes = s.get('retry_exit_codes', [])
+        if not isinstance(codes, list) or any(type(c) is not int or c == 0 for c in codes):
+            raise ResearchError('retry_exit_codes must be an array of nonzero integer codes')
+        finite(s.get('retry_backoff', .25), 'retry_backoff', 0)
+        for key, default in (('max_log_bytes', 10_000_000), ('max_output_bytes', 100_000_000)):
+            if type(s.get(key, default)) is not int or s.get(key, default) < 1:
+                raise ResearchError(key + ' must be a positive integer')
+        env = s.get('env_from', {})
+        if not isinstance(env, dict) or any(not isinstance(v, str) or not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', k) for k, v in env.items()):
+            raise ResearchError('env_from must map variable names to source variable names')
+        if 'seed' in s and (type(s['seed']) is not int or not 0 <= s['seed'] < 2**32):
+            raise ResearchError('seed must be an integer in 0..2**32-1')
+        if s.get('ssh'):
+            from .ssh_runner import validate
+            validate(s['ssh'])
+        for check in s.get('checks', []):
+            if not isinstance(check, dict) or check.get('path') not in s['outputs'] or 'equals' not in check:
+                raise ResearchError('Acceptance checks require a declared output path and equals')
     while len(seen) < len(ids):
         ready = [s["id"] for s in stages if s["id"] not in seen and set(s.get("needs", [])).issubset(seen)]
         if not ready:
@@ -133,6 +179,11 @@ def validate_manifest(m):
         raise ResearchError("Declare authorization.effects including local")
     finite(m.get("budget", {}).get("seconds", 3600), "budget.seconds", 0.01)
     finite(m.get("budget", {}).get("cost", 0), "budget.cost", 0)
+    policy = m.get('reproducibility', {})
+    if not isinstance(policy, dict) or policy.get('mode', 'record') not in {'record', 'strict'}:
+        raise ResearchError('reproducibility.mode must be record or strict')
+    if policy.get('mode') == 'strict' and not policy.get('lock'):
+        raise ResearchError('Strict reproducibility requires an environment lock')
     return m
 
 
@@ -145,12 +196,28 @@ class Store:
         self.db = sqlite3.connect(self.root / "state.sqlite3", timeout=30)
         self.db.row_factory = sqlite3.Row
         self.db.execute("PRAGMA journal_mode=WAL")
+        self.db.execute('PRAGMA synchronous=FULL')
+        version = self.db.execute('PRAGMA user_version').fetchone()[0]
+        if version > 1:
+            self.db.close()
+            raise ResearchError('Store schema is newer than this runtime; refusing to downgrade')
         self.db.executescript("""
         CREATE TABLE IF NOT EXISTS runs(id TEXT PRIMARY KEY, manifest TEXT NOT NULL, state TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS events(seq INTEGER PRIMARY KEY AUTOINCREMENT, run TEXT NOT NULL,
             kind TEXT NOT NULL, payload TEXT NOT NULL, previous TEXT NOT NULL, hash TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS values_store(key TEXT PRIMARY KEY, value TEXT NOT NULL);
+        CREATE TABLE IF NOT EXISTS memory_graphs(project TEXT PRIMARY KEY, revision INTEGER NOT NULL, snapshot TEXT NOT NULL);
+        CREATE TABLE IF NOT EXISTS memory_versions(project TEXT NOT NULL, revision INTEGER NOT NULL, snapshot TEXT NOT NULL,
+            PRIMARY KEY(project, revision));
+        CREATE TABLE IF NOT EXISTS memory_nodes(project TEXT NOT NULL, id TEXT NOT NULL, body TEXT NOT NULL, PRIMARY KEY(project,id));
+        CREATE TABLE IF NOT EXISTS memory_edges(project TEXT NOT NULL, id TEXT NOT NULL, source TEXT NOT NULL, target TEXT NOT NULL,
+            relation TEXT NOT NULL, body TEXT NOT NULL, PRIMARY KEY(project,id));
+        CREATE INDEX IF NOT EXISTS memory_edge_source ON memory_edges(project,source);
+        CREATE INDEX IF NOT EXISTS memory_edge_target ON memory_edges(project,target);
+        CREATE TABLE IF NOT EXISTS memory_outbox(snapshot TEXT NOT NULL, destination TEXT NOT NULL, body TEXT NOT NULL,
+            PRIMARY KEY(snapshot,destination));
         """)
+        self.db.execute('PRAGMA user_version=1')
 
     def close(self):
         self.db.close()
@@ -168,14 +235,29 @@ class Store:
     def put(self, data):
         key = digest(data)
         p = self.objects / key
-        try:
-            with p.open("xb") as f:
-                f.write(data)
-                f.flush()
-                os.fsync(f.fileno())
-        except FileExistsError:
+        if p.exists():
             if digest(p.read_bytes()) != key:
                 raise ResearchError("Corrupt content-addressed object")
+        else:
+            # Only a complete fsynced object is published under its content hash.
+            # Staging lives outside objects so crashes cannot poison a hash name.
+            staging = self.root / 'staging'
+            staging.mkdir(exist_ok=True)
+            fd, name = tempfile.mkstemp(dir=staging, prefix='cas-')
+            try:
+                with os.fdopen(fd, 'wb') as f:
+                    f.write(data)
+                    f.flush()
+                    os.fsync(f.fileno())
+                # Concurrent publishers hold identical bytes for this hash.
+                if p.exists():
+                    if digest(p.read_bytes()) != key:
+                        raise ResearchError('Corrupt content-addressed object')
+                else:
+                    os.replace(name, p)
+                    sync_directory(self.objects)
+            finally:
+                Path(name).unlink(missing_ok=True)
         return key
 
     def blob(self, key):
@@ -234,7 +316,7 @@ class Store:
         for name, key in files.items():
             p = safe_path(dest, name)
             p.parent.mkdir(parents=True, exist_ok=True)
-            p.write_bytes(self.blob(key))
+            atomic_bytes(p, self.blob(key))
 
     def create(self, manifest, run=None, inputs=None):
         manifest = validate_manifest(manifest)
@@ -285,6 +367,10 @@ class Store:
             elif action == "retry":
                 if s.get("worker") or stage not in s["stages"] or s["stages"][stage]["status"] != "failed":
                     raise ResearchError("Retry requires an idle failed stage")
+                if s['stages'][stage].get('cleanup_pending') or s['stages'][stage].get('active_attempt'):
+                    raise ResearchError('Recover and verify job cleanup before retrying')
+                history = s['stages'][stage].setdefault('history', [])
+                history.append({k: v for k, v in s['stages'][stage].items() if k != 'history'})
                 s["stages"][stage]["status"] = "pending"
                 s["status"] = "ready"
             else:
@@ -332,6 +418,8 @@ class Store:
             p = safe_path(self.work(run), name)
             if not p.is_file() or p.stat().st_size == 0:
                 raise ResearchError(f"Missing or empty output: {name}")
+            if p.stat().st_size > spec.get('max_output_bytes', 100_000_000):
+                raise ResearchError(f'Output exceeds declared byte limit: {name}')
             if p.suffix == ".json":
                 read_json(p)
             result[name] = self.put(p.read_bytes())
@@ -349,8 +437,13 @@ class Store:
         return result
 
     def fork(self, run, stage, changes=None, child=None):
+        from .locking import resource_lock
+        with resource_lock(self, 'run', run):
+            return self._fork(run, stage, changes, child)
+
+    def _fork(self, run, stage, changes=None, child=None):
         m, s = self.get(run)
-        if s.get("worker"):
+        if s.get("worker") or any(v.get('active_attempt') or v.get('cleanup_pending') for v in s['stages'].values()):
             raise ResearchError("Pause and wait before forking")
         if stage not in s["stages"]:
             raise ResearchError("Unknown fork stage")
@@ -415,6 +508,9 @@ class Store:
 
     def verify(self):
         previous, errors = "0" * 64, []
+        integrity = [r[0] for r in self.db.execute('PRAGMA quick_check')]
+        if integrity != ['ok']:
+            errors.extend('sqlite:' + v for v in integrity)
         for e in self.events():
             h = fingerprint([e["run"], e["kind"], e["payload"], previous])
             if e["previous"] != previous or h != e["hash"]:
@@ -423,11 +519,28 @@ class Store:
         for p in self.objects.iterdir():
             if not p.is_file() or digest(p.read_bytes()) != p.name:
                 errors.append(f"object:{p.name}")
+        for row in self.db.execute('SELECT id,state FROM runs'):
+            state = json.loads(row['state'])
+            maps = [state.get('inputs', {}), state.get('artifacts', {})]
+            for stage in state['stages'].values():
+                maps.extend(stage.get(k, {}) for k in ('checkpoint', 'outputs', 'log_hashes'))
+            for hashes in maps:
+                for key in hashes.values():
+                    try: self.blob(key)
+                    except (ResearchError, OSError): errors.append('missing_or_corrupt_reference:' + row['id'] + ':' + str(key))
+        for row in self.db.execute('SELECT snapshot FROM memory_versions'):
+            try: self.blob(row['snapshot'])
+            except (ResearchError, OSError): errors.append('memory_snapshot:' + row['snapshot'])
         return {"valid": not errors, "errors": errors, "integrity_only": True, "security_seal": False}
 
     def archive(self, run):
+        from .locking import resource_lock
+        with resource_lock(self, 'run', run):
+            return self._archive(run)
+
+    def _archive(self, run):
         m, s = self.get(run)
-        if s.get("worker"):
+        if s.get("worker") or any(v.get('active_attempt') or v.get('cleanup_pending') for v in s['stages'].values()):
             raise ResearchError("Pause worker before archiving")
         files = self.files(self.work(run))
         # Archive bookkeeping does not change the scientific snapshot. Preserve historical CAS

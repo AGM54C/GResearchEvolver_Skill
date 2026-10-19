@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from contextlib import ExitStack
 from pathlib import Path
 import re
 import shutil
@@ -10,13 +11,14 @@ import time
 import uuid
 
 from .core import ResearchError, digest, finite, fingerprint, safe_path, write_json
-from .execution import run_workflow
+from .execution import run_workflow, recover
+from .locking import resource_lock, LockBusy
 
 
 def enqueue(store, run, resources, priority=0):
     store.get(run)
     for key in ('cpu', 'gpu'):
-        if not isinstance(resources.get(key, 0), int) or resources.get(key, 0) < 0:
+        if type(resources.get(key, 0)) is not int or resources.get(key, 0) < 0:
             raise ResearchError('Resources must be nonnegative integer CPU/GPU counts')
     if not isinstance(priority, int): raise ResearchError('Priority must be an integer')
     with store.tx():
@@ -33,31 +35,53 @@ def enqueue(store, run, resources, priority=0):
 
 def queue_next(store, capacity):
     for key in ('cpu', 'gpu'):
-        if not isinstance(capacity.get(key, 0), int) or capacity.get(key, 0) < 0:
+        if type(capacity.get(key, 0)) is not int or capacity.get(key, 0) < 0:
             raise ResearchError('Capacity must be nonnegative integer CPU/GPU counts')
-    with store.tx():
-        queue = store.get_value('queue', [])
-        used = {k: sum(q['resources'].get(k, 0) for q in queue if q['status'] == 'running') for k in ('cpu', 'gpu')}
-        ready = sorted([q for q in queue if q['status'] == 'queued' and all(q['resources'].get(k, 0) <= capacity.get(k, 0) - used[k] for k in used)],
-                       key=lambda q: (-q['priority'], q['created']))
-        if not ready: return {'status': 'no_fitting_job', 'used': used}
-        item = ready[0]
-        item['status'] = 'running'
-        store.set_value('queue', queue)
-        store.event(item['run'], 'queue_started', item)
-    try:
-        status = run_workflow(store, item['run'])['status']
-    except Exception as exc:
-        status = 'failed'
-        item['error'] = str(exc)
-    with store.tx():
-        queue = store.get_value('queue', [])
-        target = next(q for q in queue if q['id'] == item['id'])
-        target.update(status=status, finished=time.time())
-        if 'error' in item: target['error'] = item['error']
-        store.set_value('queue', queue)
-        store.event(item['run'], 'queue_finished', target)
-    return target
+    with ExitStack() as locks:
+        with store.tx():
+            queue = store.get_value('queue', [])
+            used = {k: sum(q['resources'].get(k, 0) for q in queue if q['status'] == 'running') for k in ('cpu', 'gpu')}
+            ready = sorted([q for q in queue if q['status'] == 'queued' and all(q['resources'].get(k, 0) <= capacity.get(k, 0) - used[k] for k in used)],
+                           key=lambda q: (-q['priority'], q['created']))
+            if not ready: return {'status': 'no_fitting_job', 'used': used}
+            item = ready[0]
+            locks.enter_context(resource_lock(store, 'queue', item['id']))
+            item.update(status='running', owner=uuid.uuid4().hex, started=time.time())
+            store.set_value('queue', queue)
+            store.event(item['run'], 'queue_started', item)
+        try:
+            state = run_workflow(store, item['run'])
+            status = state['status']
+            if any(s.get('cleanup_pending') for s in state['stages'].values()):
+                # Keep resources charged until explicit recovery verifies cleanup.
+                return {**item, 'recovery_required': True}
+        except Exception as exc:
+            # Unknown execution state keeps the reservation for queue-recover.
+            return {**item, 'recovery_required': True, 'error': str(exc)}
+        with store.tx():
+            queue = store.get_value('queue', [])
+            target = next(q for q in queue if q['id'] == item['id'])
+            if target.get('owner') != item['owner']:
+                raise ResearchError('Queue ownership changed')
+            target.update(status=status, finished=time.time())
+            store.set_value('queue', queue)
+            store.event(item['run'], 'queue_finished', target)
+        return target
+
+
+def queue_recover(store, job, reconciliation=None):
+    with resource_lock(store, 'queue', job):
+        item = next((q for q in store.get_value('queue', []) if q['id'] == job), None)
+        if not item or item['status'] != 'running':
+            raise ResearchError('Recovery requires a running queue entry whose owner has exited')
+        state = recover(store, item['run'], reconciliation)
+        with store.tx():
+            queue = store.get_value('queue', [])
+            target = next(q for q in queue if q['id'] == job)
+            target.update(status=state['status'] if state['status'] in {'completed', 'cancelled'} else 'interrupted', finished=time.time())
+            store.set_value('queue', queue)
+            store.event(item['run'], 'queue_recovered', {'job': job, 'status': target['status'], 'requeued': False})
+        return target
 
 
 def queue_cancel(store, job):

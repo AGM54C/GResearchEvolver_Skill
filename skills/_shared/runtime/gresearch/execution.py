@@ -6,29 +6,14 @@ from pathlib import Path
 import platform
 import re
 import shlex
-import signal
 import subprocess
 import sys
 import time
 import uuid
 
-from .core import ResearchError, Store, digest, fingerprint, safe_path, write_json
-
-
-def terminate(process):
-    if process.poll() is not None:
-        return
-    if os.name == "nt":
-        subprocess.run(["taskkill", "/PID", str(process.pid), "/T", "/F"], capture_output=True, timeout=15)
-    else:
-        os.killpg(process.pid, signal.SIGTERM)
-    try:
-        process.wait(timeout=3)
-    except subprocess.TimeoutExpired:
-        if os.name != "nt":
-            os.killpg(process.pid, signal.SIGKILL)
-        process.kill()
-        process.wait(timeout=3)
+from .core import ResearchError, Store, digest, fingerprint, safe_path, write_json, read_json
+from .locking import LockBusy, file_lock, resource_lock
+from .reproducibility import inspect_run, executable_receipt
 
 
 def command_argv(spec):
@@ -48,14 +33,31 @@ def command_argv(spec):
 
 
 def run_workflow(store: Store, run):
+    with resource_lock(store, 'run', run):
+        return _run_workflow(store, run)
+
+
+def _run_workflow(store, run):
     owner = str(os.getpid()) + "-" + uuid.uuid4().hex[:8]
     with store.tx():
         m, s = store.get(run)
         if s.get("worker"):
             raise ResearchError("Run has a worker; use status/control, or recover after confirming that worker exited")
+        if any(v.get('active_attempt') or v.get('cleanup_pending') for v in s['stages'].values()):
+            raise ResearchError('Recover unsettled attempts before starting more stages')
         if s["status"] not in {"ready", "blocked"}:
             return s
+        observed, check = inspect_run(store, run, m)
+        s['environment'] = observed
+        store.event(run, 'environment_checked', {'observed': observed, 'check': check})
+        if m.get('reproducibility', {}).get('mode') == 'strict' and not check['matches']:
+            s.update(status='blocked', environment_error=check)
+            store.save(run, s)
+            return s
         s["worker"] = owner
+        s['worker_lock_version'] = 1
+        s['generation'] = s.get('generation', 0) + 1
+        s['heartbeat'] = time.time()
         s["status"] = "running"
         store.save(run, s)
         store.event(run, "worker_started", {"owner": owner, "platform": platform.platform(), "python": sys.version,
@@ -64,6 +66,8 @@ def run_workflow(store: Store, run):
         while True:
             with store.tx():
                 m, s = store.get(run)
+                if s.get('worker') != owner:
+                    raise ResearchError('Worker ownership changed; refusing stale state commit')
                 if s["status"] in {"pause_requested", "cancel_requested"}:
                     s["status"] = "paused" if s["status"] == "pause_requested" else "cancelled"
                     store.save(run, s)
@@ -119,16 +123,25 @@ def run_workflow(store: Store, run):
                     # Independent ready stages may run in a subsequent worker invocation.
                     break
                 s["stages"][sid]["status"] = "running"
+                s['stages'][sid]['started_at'] = time.time()
                 s["reserved_cost"] += reservation
+                store.event(run, 'stage_started', {'stage': sid, 'generation': s['generation'], 'owner': owner})
                 store.save(run, s)
+            stage_started = time.monotonic()
             try:
                 outcome = execute_stage(store, run, spec)
             except Exception as exc:
-                outcome = {'status': 'failed', 'error': str(exc), 'seconds': 0}
+                outcome = {'status': 'failed', 'error': str(exc), 'seconds': time.monotonic() - stage_started,
+                           'failure': {'category': 'runtime_error', 'type': type(exc).__name__, 'retryable': False}}
             with store.tx():
                 _, s = store.get(run)
+                if s.get('worker') != owner:
+                    raise ResearchError('Worker ownership changed; refusing stale result')
+                if s['stages'][sid].get('active_attempt'):
+                    outcome['cleanup_pending'] = True
                 s["seconds"] += outcome["seconds"]
                 s["stages"][sid].update(outcome)
+                s['stages'][sid]['finished_at'] = time.time()
                 if outcome["status"] == "completed":
                     s["artifacts"].update(outcome["outputs"])
                 store.event(run, "stage_finished", {"stage": sid, **outcome})
@@ -136,16 +149,21 @@ def run_workflow(store: Store, run):
                     s["status"] = "paused"
                     s["single_step"] = False
                 store.save(run, s)
+                if outcome.get('cleanup_pending'):
+                    s['status'] = 'blocked'
+                    store.save(run, s)
+                    break
                 if s["status"] == "paused":
                     break
     finally:
         with store.tx():
             _, s = store.get(run)
-            s["worker"] = None
-            if s["status"] == "running":
-                s["status"] = "blocked"
-            store.save(run, s)
-            store.event(run, "worker_stopped", {"owner": owner, "status": s["status"]})
+            if s.get('worker') == owner:
+                s["worker"] = None
+                if s["status"] == "running":
+                    s["status"] = "blocked"
+                store.save(run, s)
+                store.event(run, "worker_stopped", {"owner": owner, "status": s["status"]})
     return store.get(run)[1]
 
 
@@ -156,16 +174,27 @@ def execute_stage(store, run, spec):
     started = time.monotonic()
     m, state = store.get(run)
     limit = min(spec.get("timeout", 300), m.get("budget", {}).get("seconds", 3600) - state["seconds"])
+    deadline = started + limit
     invocation = command_argv(spec)
     env = os.environ.copy()
     # Host environment is inherited. env_from maps names; the runtime does not persist
     # their values, but trusted subprocesses can read/print them in captured raw logs.
     for target, source in spec.get("env_from", {}).items():
         if source not in os.environ:
-            return {"status": "failed", "error": f"Missing environment variable: {source}", "seconds": 0}
+            return {"status": "failed", "error": f"Missing environment variable: {source}", "seconds": 0,
+                    'failure': {'category': 'configuration', 'retryable': False}}
         env[target] = os.environ[source]
+    if 'seed' in spec:
+        env.update(GRESEARCH_SEED=str(spec['seed']), PYTHONHASHSEED=str(spec['seed']))
     result = {"status": "failed", "seconds": 0}
+    attempts = []
     for attempt in range(spec.get("retries", 0) + 1):
+        if time.monotonic() >= deadline:
+            result.update(status='failed', timeout=True, failure={'category': 'deadline', 'retryable': False})
+            break
+        if store.get(run)[1]['status'] == 'cancel_requested':
+            result.update(status='failed', cancelled=True, failure={'category': 'cancelled', 'retryable': False})
+            break
         clear_outputs(store, run, spec)
         logdir = store.work(run) / "logs" / spec["id"] / uuid.uuid4().hex[:12]
         logdir.mkdir(parents=True)
@@ -175,47 +204,77 @@ def execute_stage(store, run, spec):
             store.event(run, "invocation", {"stage": spec["id"], "argv": invocation, "cwd": str(store.work(run)),
                         "input_hashes": before, "env_names": list(spec.get("env_from", {})), "attempt": attempt + 1,
                         "timeout": limit, "effect": spec.get("effect", "local"), "ssh": spec.get("ssh"),
-                        "nondeterministic": spec.get("nondeterministic", True)})
-        timed_out = cancelled = False
-        process = None
+                        "nondeterministic": spec.get("nondeterministic", True), 'seed': spec.get('seed'),
+                        'executable': executable_receipt(invocation, store.work(run))})
         try:
-            if spec.get('ssh'):
-                remote_transfer(store, run, spec, 'upload', max(0.1, limit - (time.monotonic() - started)))
-            with (logdir / "stdout.txt").open("wb") as stdout, (logdir / "stderr.txt").open("wb") as stderr:
-                process = subprocess.Popen(invocation, cwd=store.work(run), env=env, stdout=stdout, stderr=stderr,
-                                           stdin=subprocess.DEVNULL, start_new_session=os.name != "nt",
-                                           creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == "nt" else 0)
-                while process.poll() is None:
-                    if store.get(run)[1]["status"] == "cancel_requested":
-                        cancelled = True
-                        terminate(process)
-                        break
-                    if time.monotonic() - started >= limit:
-                        timed_out = True
-                        terminate(process)
-                        break
-                    time.sleep(0.05)
-                rc = process.wait()
+            receipt = supervised_attempt(store, run, spec, invocation, env, logdir, deadline)
+            rc = receipt['exit_code']
+            timed_out = receipt.get('reason') == 'timeout'
+            cancelled = receipt.get('reason') == 'cancelled'
             mutated = [p for p, h in before.items() if (digest(safe_path(store.work(run), p).read_bytes()) if safe_path(store.work(run), p).is_file() else None) != h]
             result = {"status": "failed", "exit_code": rc, "timeout": timed_out, "cancelled": cancelled,
-                      "attempts": attempt + 1, "logs": logdir.relative_to(store.work(run)).as_posix(), "mutated_inputs": mutated}
-            if rc == 0 and not timed_out and not cancelled and not mutated:
-                if spec.get('ssh'):
-                    remote_transfer(store, run, spec, 'download', max(0.1, limit - (time.monotonic() - started)))
+                      "attempts": attempt + 1, "logs": logdir.relative_to(store.work(run)).as_posix(), "mutated_inputs": mutated,
+                      'supervisor': receipt, 'cleanup_pending': not receipt.get('cleanup_verified', False),
+                      'log_hashes': {p.name: store.put(p.read_bytes()) for p in logdir.glob('*.txt')}}
+            if receipt['status'] == 'completed' and not mutated:
                 result.update(status="completed", outputs=store.output_hashes(run, spec))
+                attempts.append(dict(result))
                 break
-            if cancelled or timed_out or mutated or rc not in spec.get("retry_exit_codes", []):
+            retryable = (not receipt.get('reason') and receipt.get('cleanup_verified') and not mutated
+                         and rc in spec.get('retry_exit_codes', []) and attempt < spec.get('retries', 0))
+            result['failure'] = {'category': 'input_mutation' if mutated else receipt.get('reason') or 'exit_code', 'retryable': bool(retryable)}
+            attempts.append(dict(result))
+            if not retryable:
+                break
+            delay = spec.get('retry_backoff', .25) * 2**attempt
+            if time.monotonic() + delay >= deadline:
+                result['failure']['retryable'] = False
+                result['failure']['retry_suppressed'] = 'insufficient_remaining_budget'
                 break
             with store.tx():
-                store.event(run, "retry", {"stage": spec["id"], "exit_code": rc, "reason": "predeclared transient code", "stderr": store.put((logdir / "stderr.txt").read_bytes())})
+                store.event(run, "retry", {"stage": spec["id"], "exit_code": rc, "reason": "predeclared transient code", 'delay_seconds': delay})
+            until = time.monotonic() + delay
+            while time.monotonic() < until and store.get(run)[1]['status'] != 'cancel_requested':
+                time.sleep(min(.05, max(0, until - time.monotonic())))
         except (OSError, ResearchError, subprocess.SubprocessError) as exc:
-            result["error"] = str(exc)
+            result.update(status='failed', error=str(exc), failure={'category': 'validation_or_io', 'type': type(exc).__name__, 'retryable': False})
+            attempts.append(dict(result))
             break
-        finally:
-            if process and process.poll() is None:
-                terminate(process)
+    result['attempt_history'] = attempts
     result["seconds"] = time.monotonic() - started
     return result
+
+
+def supervised_attempt(store, run, spec, argv, env, logdir, deadline):
+    from .process_runner import run as managed_run
+    heartbeat = time.monotonic()
+
+    def prepare(request):
+        with store.tx():
+            _, state = store.get(run)
+            state['stages'][spec['id']]['active_attempt'] = {'id': request['attempt_id'], 'directory': logdir.relative_to(store.work(run)).as_posix()}
+            store.save(run, state)
+            store.event(run, 'attempt_prepared', {'stage': spec['id'], 'attempt_id': request['attempt_id'], 'request_hash': fingerprint(request)})
+
+    def tick():
+        nonlocal heartbeat
+        if time.monotonic() - heartbeat >= 1:
+            with store.tx():
+                _, state = store.get(run)
+                state['heartbeat'] = time.time()
+                store.save(run, state)
+            heartbeat = time.monotonic()
+        return store.get(run)[1]['status'] == 'cancel_requested'
+
+    receipt = managed_run(argv, store.work(run), logdir, deadline, env=env,
+                          max_log_bytes=spec.get('max_log_bytes', 10_000_000), prepare=prepare, tick=tick)
+    with store.tx():
+        _, state = store.get(run)
+        if receipt.get('cleanup_verified'):
+            state['stages'][spec['id']]['active_attempt'] = None
+        store.save(run, state)
+        store.event(run, 'attempt_settled', {'stage': spec['id'], 'attempt_id': receipt['attempt_id'], 'receipt': receipt})
+    return receipt
 
 
 def clear_outputs(store, run, spec):
@@ -226,47 +285,6 @@ def clear_outputs(store, run, spec):
                 raise ResearchError(f'Output is not a regular file: {name}')
             store.put(p.read_bytes())
             p.unlink()
-
-
-def remote_transfer(store, run, spec, direction, timeout):
-    """OpenSSH adapter: explicit files only; remote POSIX paths restricted for SCP safety.
-
-    Remote cwd must be a dedicated workspace. Cancellation stops the SSH client;
-    remote descendants require host-specific scheduler cancellation and are not assumed stopped.
-    """
-    command_argv(spec)  # validates host and cwd
-    remote = spec['ssh']
-    host, cwd = remote['host'], remote['cwd']
-    names = spec.get('requires', []) + spec.get('optional', []) if direction == 'upload' else spec['outputs']
-    deadline = time.monotonic() + timeout
-    def remaining():
-        value = deadline - time.monotonic()
-        if value <= 0: raise ResearchError('SSH transfer budget exhausted')
-        if store.get(run)[1]['status'] == 'cancel_requested': raise ResearchError('Cancelled during SSH transfer; inspect remote state')
-        return value
-    for name in names:
-        if not re.fullmatch(r'[A-Za-z0-9_./-]+', name):
-            raise ResearchError('SSH transfer paths must use letters, digits, _, -, ., /')
-        local = safe_path(store.work(run), name)
-        target = cwd.rstrip('/') + '/' + name
-        if direction == 'upload':
-            if not local.is_file():
-                continue
-            parent = target.rsplit('/', 1)[0]
-            subprocess.run(['ssh', '-o', 'BatchMode=yes', '--', host, 'mkdir -p -- ' + shlex.quote(parent)],
-                           check=True, capture_output=True, timeout=remaining())
-            pair = ['./' + name, host + ':' + target]
-        else:
-            local.parent.mkdir(parents=True, exist_ok=True)
-            pair = [host + ':' + target, './' + name]
-        subprocess.run(['scp', '-B', '-o', 'ConnectTimeout=15', '--', *pair], cwd=store.work(run), check=True, capture_output=True, timeout=remaining())
-    if direction == 'upload':
-        # Ensure old remote results cannot pass a fresh execution. Only explicitly declared files.
-        paths = [cwd.rstrip('/') + '/' + p for p in spec['outputs']]
-        if any(not re.fullmatch(r'/[A-Za-z0-9_./-]+', p) for p in paths):
-            raise ResearchError('Unsafe remote output path')
-        subprocess.run(['ssh', '-o', 'BatchMode=yes', '--', host,
-                        'rm -f -- ' + ' '.join(shlex.quote(p) for p in paths)], check=True, capture_output=True, timeout=remaining())
 
 
 def process_exists(pid):
@@ -299,18 +317,51 @@ def process_exists(pid):
         raise ResearchError('Cannot establish worker liveness') from exc
 
 
-def recover(store, run):
-    """Explicit recovery: never infer that a running worker is dead from elapsed time."""
+def recover(store, run, reconciliation=None):
+    """Recover only after OS lock release and verified attempt cleanup.
+
+    Legacy stores still use conservative PID checks. Explicit reconciliation is
+    an operator record for uncertain local/remote side effects, not an automatic
+    claim of exactly-once execution.
+    """
+    with resource_lock(store, 'run', run):
+        return _recover(store, run, reconciliation)
+
+
+def _recover(store, run, reconciliation=None):
     with store.tx():
         _, s = store.get(run)
-        if s.get("worker"):
+        if s.get("worker") and not s.get('worker_lock_version'):
             pid = int(s["worker"].split("-", 1)[0])
             if process_exists(pid):
                 raise ResearchError("Worker process still exists; cancel or wait")
+        if reconciliation is not None and (not isinstance(reconciliation, dict) or not all(reconciliation.get(k) for k in ('actor', 'reason', 'effects_checked'))):
+            raise ResearchError('Reconciliation requires actor, reason and effects_checked')
+        recovered = []
         for item in s["stages"].values():
+            active = item.get('active_attempt')
+            if active:
+                directory = safe_path(store.work(run), active['directory'])
+                (directory / 'cancel').touch()
+                with file_lock(directory / 'supervisor.lock'):
+                    receipt = read_json(directory / 'result.json') if (directory / 'result.json').is_file() else None
+                    clean = receipt and receipt.get('attempt_id') == active['id'] and receipt.get('cleanup_verified') is True
+                    if not clean and not reconciliation:
+                        raise ResearchError('Attempt cleanup is uncertain; inspect the job, then supply explicit reconciliation')
+                    recovered.append({'attempt_id': active['id'], 'receipt': receipt, 'reconciliation': reconciliation})
+                    item.update(active_attempt=None, cleanup_pending=False)
+            elif item.get('cleanup_pending'):
+                if not reconciliation:
+                    raise ResearchError('External cleanup is unconfirmed; inspect effects and supply reconciliation')
+                item['cleanup_pending'] = False
             if item["status"] == "running":
-                item.update(status="failed", error="interrupted; inspect possible side effects before retry")
-        s.update(status="blocked", worker=None)
+                item.update(status="failed", error="interrupted; inspect possible side effects before retry",
+                            failure={'category': 'controller_interrupted', 'retryable': False})
+                elapsed = max(0, time.time() - item.get('started_at', time.time()))
+                s['seconds'] += elapsed
+        if s['status'] not in {'completed', 'cancelled'}:
+            s['status'] = 'cancelled' if s['status'] == 'cancel_requested' else 'blocked'
+        s.update(worker=None)
         store.save(run, s)
-        store.event(run, "recovered", {"side_effects": "not_assumed_reversible"})
+        store.event(run, "recovered", {"side_effects": "not_assumed_reversible", 'attempts': recovered, 'reconciliation': reconciliation})
     return s

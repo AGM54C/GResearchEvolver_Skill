@@ -2,6 +2,8 @@
 
 在完整源码目录运行 Python 3.10+。不需要先启动云服务；大部分辅助工具只用标准库。PDF 摄取需要项目环境中的 PyMuPDF。
 
+受管本地 DAG/RSI 命令执行当前支持 Windows 与 Linux。OpenViking 可选，以独立 HTTP 服务接入，不安装全局记忆 hooks；配置、恢复、备份和科研图结构见 [运维与记忆手册](skills/_shared/harness-operations.md)。
+
 ```text
 python install.py --dest /absolute/path/to/host/skills
 python install.py --project

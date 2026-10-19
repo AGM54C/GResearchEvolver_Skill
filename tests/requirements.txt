@@ -1,0 +1,5 @@
+# Offline suite dependencies; exact versions used for this harness validation.
+# Production experiment environments supply their own lockfiles and environment-lock receipts.
+cryptography==46.0.3
+numpy==2.2.6
+PyMuPDF==1.26.5

@@ -73,7 +73,7 @@ python skills/_shared/runtime/research.py --store research-state compare study-1
 
 跨运行比较先对齐两侧唯一的 `milestone_id`；没有 ID 时使用唯一的相同 milestone 标签，再回退到 stage ID。重复声明不强行一对一匹配。同 stage ID 但双方显式 milestone_id 冲突时保持未匹配并输出 `alignment_conflicts`。这些都是声明匹配，不能自动证明科学目标或估计量等价；变更目标应改 ID 并人工解释。
 
-程序崩溃后 `recover RUN` 只在 worker 已退出时恢复状态；不会因等待久而擅自抢占。检查可能遗留的外部效果后再 retry。手工结束服务不代表远程实验已停止。
+程序崩溃后 `recover RUN` 要求 worker 的 OS 锁释放、活跃 attempt 清理回执通过；不会因等待久而抢占。未知外部效果需实际检查后提交 reconciliation，再 retry。手工结束服务不代表远程实验已停止。恢复、队列资源回收、环境锁、完整备份和 OpenViking 科研节点/边记忆见 [harness-operations.md](harness-operations.md)。
 
 ## 科研工具：结构化请求
 

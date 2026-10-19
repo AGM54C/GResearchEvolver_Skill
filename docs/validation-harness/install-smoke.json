@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "skills": 25,
+  "graph_roundtrip": true,
+  "nodes": 2,
+  "edges": 1,
+  "doctor_integrity": true,
+  "new_modules_included": [
+    "local_worker.py",
+    "process_runner.py",
+    "locking.py",
+    "maintenance.py",
+    "memory.py",
+    "openviking.py",
+    "reproducibility.py"
+  ],
+  "source_hashes": {
+    "install.py": "0e41197e4c73f546bb4e57ecab892f34895cd7cfd5e4c48697a9396aac9d0c58",
+    "HARNESS.md": "9165a603fcd45df3b8d4c1633930c66f380ad7aca10a76dec2b79d1309044bf9",
+    "skills/_shared/harness-operations.md": "c2ffb228d13e46255babfb5447d09a1a1207d72131605950cf24ff4325665c8b"
+  }
+}

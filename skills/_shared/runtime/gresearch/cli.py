@@ -5,6 +5,7 @@ import argparse
 import json
 from pathlib import Path
 import sys
+import sqlite3
 
 from .core import ResearchError, Store, canonical, compare_runs, read_json, verify_archive, write_json
 
@@ -14,13 +15,35 @@ OPERATIONS = (
     'search', 'import', 'dedup', 'export', 'citation', 'zotero', 'monitor', 'notes', 'local-index', 'local-search', 'invalidate',
     'review-freeze', 'screen', 'adjudicate', 'review-report', 'quality', 'intervention',
     'rsi-freeze', 'rsi-evaluate', 'rsi-rollback', 'rsi-recover', 'rsi-export', 'rsi-compare', 'rsi-status',
-    'enqueue', 'queue-next', 'queue-cancel', 'queue-status', 'proof', 'grant',
+    'enqueue', 'queue-next', 'queue-cancel', 'queue-status', 'queue-recover', 'proof', 'grant',
+    'environment-lock', 'environment-check', 'memory-put', 'memory-get', 'memory-search', 'memory-neighbors',
+    'memory-invalidate', 'memory-export', 'memory-import', 'memory-sync', 'memory-remote-search', 'memory-pull',
     'model', 'embeddings', 'semantic-review', 'semantic-graph', 'semantic-metrics', 's2-bulk', 'isolated-run',
     'signing-keygen', 'receipt-accept', 'representations', 'critic-fit', 'critic-predict', 'study-plan', 'study-analyze')
 
 
 def operation(store, name, data):
     from . import statistics as st, evidence as ev, literature as lit, review as rv, evolution as rs, projects as pr, retrieval as rt
+    if name.startswith('memory-'):
+        from . import memory
+        if name == 'memory-put': return memory.put(store, data['project'], data['graph'], data['expected_revision'], actor=data['actor'], reason=data['reason'])
+        if name == 'memory-get': return memory.get(store, data['project'], data.get('revision'))
+        if name == 'memory-neighbors': return memory.neighbors(store, data['project'], data['nodes'], **data.get('options', {}))
+        if name == 'memory-search': return memory.search(store, data['project'], data['query'], **data.get('options', {}))
+        if name == 'memory-invalidate': return memory.invalidate_sources(store, data['project'], data['source_ids'], data['expected_revision'], actor=data['actor'], reason=data['reason'])
+        if name == 'memory-export': return memory.export(store, data['project'], data['destination'], data.get('revision'))
+        if name == 'memory-import': return memory.import_snapshot(store, read_json(data['path']), data['project'], data['expected_revision'], actor=data['actor'], reason=data['reason'])
+        if name == 'memory-sync': return memory.sync(store, data['project'], data['config'], data.get('revision'))
+        if name == 'memory-remote-search': return memory.remote_search(store, data['project'], data['config'], data['query'], data.get('limit', 10), data.get('revision'))
+        if name == 'memory-pull':
+            from .openviking import Client
+            snapshot = Client(data['config']).load(data['source_project'], data['snapshot'])
+            return memory.import_snapshot(store, snapshot, data['project'], data['expected_revision'], actor=data['actor'], reason=data['reason'])
+    if name in {'environment-lock', 'environment-check'}:
+        from .reproducibility import capture, compare
+        lock = data.get('lock')
+        observed = capture(data['root'], lock['packages'] if lock else data.get('packages'), lock['files'] if lock else data.get('files', []))
+        return observed if name == 'environment-lock' else compare(lock, observed)
     if name in {'study-plan','study-analyze'}:
         from . import study
         return study.initialize(data['destination'],data.get('participants',12),data.get('seed',20261019)) if name=='study-plan' else study.analyze(data['protocol'],data['observations'])
@@ -74,7 +97,7 @@ def operation(store, name, data):
     if name == 'rsi-freeze': return rs.freeze(store, data['name'], data['protocol'], data['evaluator_dir'], data['incumbent_dir'], data['incumbent_command'])
     if name == 'rsi-evaluate': return rs.evaluate(store, data['name'], data['candidate_dir'], data['candidate_command'], split=data.get('split', 'audit'), promote=data.get('promote', False))
     if name == 'rsi-rollback': return rs.rollback(store, data['name'], data['index'], data['reason'])
-    if name == 'rsi-recover': return rs.recover_epoch(store, data['name'], data['reason'])
+    if name == 'rsi-recover': return rs.recover_epoch(store, data['name'], data['reason'], data.get('reconciliation'))
     if name == 'rsi-export': return rs.materialize(store, data['name'], data['destination'])
     if name == 'rsi-compare': return rs.epoch_comparison(store, data['left'], data['right'])
     if name == 'rsi-status': return store.get_value('rsi:' + data['name'])
@@ -82,6 +105,7 @@ def operation(store, name, data):
     if name == 'queue-next': return pr.queue_next(store, data['capacity'])
     if name == 'queue-cancel': return pr.queue_cancel(store, data['job'])
     if name == 'queue-status': return store.get_value('queue', [])
+    if name == 'queue-recover': return pr.queue_recover(store, data['job'], data.get('reconciliation'))
     if name == 'proof': return pr.proof_check(data, data['destination'])
     if name == 'grant': return pr.grant_plan(data)
     raise ResearchError('Unknown operation')
@@ -96,8 +120,13 @@ def main(argv=None):
     init.add_argument('manifest'); init.add_argument('--inputs', help='JSON mapping workspace paths to source paths'); init.add_argument('--id')
     for name in ('run', 'status', 'events', 'archive', 'recover'):
         p = commands.add_parser(name); p.add_argument('run')
+        if name == 'recover': p.add_argument('--reconciliation', help='JSON operator record for uncertain effects: actor, reason, effects_checked')
     commands.add_parser('list')
     commands.add_parser('verify')
+    commands.add_parser('doctor')
+    p = commands.add_parser('backup'); p.add_argument('destination')
+    p = commands.add_parser('verify-backup'); p.add_argument('path')
+    p = commands.add_parser('restore-backup'); p.add_argument('path'); p.add_argument('destination')
     p = commands.add_parser('verify-archive'); p.add_argument('path')
     p = commands.add_parser('import-archive'); p.add_argument('path'); p.add_argument('--id')
     p = commands.add_parser('control'); p.add_argument('run'); p.add_argument('action', choices=['pause', 'resume', 'step', 'cancel', 'breakpoint', 'retry']); p.add_argument('--stage'); p.add_argument('--reason', default='human control')
@@ -119,7 +148,13 @@ def main(argv=None):
             m, s = store.get(args.run); result = {'run': args.run, 'manifest': m, 'state': s, 'work': str(store.work(args.run))}
         elif args.command == 'events': result = store.events(args.run)
         elif args.command == 'archive': result = store.archive(args.run)
-        elif args.command == 'recover': result = recover(store, args.run)
+        elif args.command == 'recover': result = recover(store, args.run, read_json(args.reconciliation) if args.reconciliation else None)
+        elif args.command in {'doctor', 'backup', 'verify-backup', 'restore-backup'}:
+            from . import maintenance
+            if args.command == 'doctor': result = maintenance.health(store)
+            elif args.command == 'backup': result = maintenance.backup(store, args.destination)
+            elif args.command == 'verify-backup': result = maintenance.verify_backup(args.path)
+            else: result = maintenance.restore_backup(args.path, args.destination)
         elif args.command == 'list': result = [{'run': r['id'], 'state': json.loads(r['state'])} for r in store.db.execute('SELECT id,state FROM runs ORDER BY rowid')]
         elif args.command == 'verify': result = store.verify()
         elif args.command == 'verify-archive': result = verify_archive(args.path)
@@ -140,9 +175,11 @@ def main(argv=None):
         # A valid computation with a negative scientific result is still a successful command.
         # Workflow execution failure and integrity/audit failures have distinct nonzero exit status.
         if args.command == 'run' and result.get('status') != 'completed': return 3
-        if args.command in {'verify', 'verify-archive'} and not result['valid']: return 2
+        if args.command in {'verify', 'verify-archive', 'verify-backup'} and not result['valid']: return 2
+        if args.command == 'doctor' and not result['integrity']['valid']: return 2
+        if args.command == 'tool' and args.operation == 'memory-sync' and result['status'] != 'synced': return 3
         return 0
-    except (ResearchError, OSError, KeyError, TypeError, json.JSONDecodeError) as exc:
+    except (ResearchError, OSError, KeyError, TypeError, json.JSONDecodeError, sqlite3.Error) as exc:
         print(canonical({'error': str(exc), 'type': type(exc).__name__}), file=sys.stderr)
         return 2
     finally:

@@ -15,4 +15,6 @@ PDF 用 `tool pdf` 保存原文件哈希、逐页文本和低文本量警告。�
 
 旧四类关系可保留在 `semantic_relation` 字段；执行校验使用 [证据格式](../_shared/evidence-contracts.md) 的 typed edges。
 
+需要跨会话保存时，将原始证据图通过 `memory-put` 版本化，科研条目仍为节点，支持/反驳/限定等仍为边，完整保留引文、页码、哈希和裁决。来源被撤回或改动时用 `memory-invalidate` 传播复查状态。OpenViking 的摘要与向量命中不能替代此图，接口见 [记忆手册](../_shared/harness-operations.md)。
+
 按需读取 [共享运行规则](../_shared/README.md) 与 [接口示例](../_shared/runtime-guide.md)。旧评分 rubric 是启发式质量清单，不能代替实际证据和独立验收。

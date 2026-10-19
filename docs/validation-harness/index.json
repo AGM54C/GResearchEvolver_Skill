@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-19",
+  "records": {
+    "windows-offline.json": {
+      "sha256": "f0ce84f858611326b5dc647f77782a9173af0e316fc8f56ad97d71eef3b3162e",
+      "tests": 92,
+      "python": "3.13.3",
+      "platform": "Windows-11-10.0.22631-SP0",
+      "seconds": 102.46538170002168,
+      "skips": 0
+    },
+    "linux-offline.json": {
+      "sha256": "bdbbc1602b829b2e3bf297996f8a95aa001bf5166b1a07990f72bc7593d32dde",
+      "tests": 92,
+      "python": "3.11.10",
+      "platform": "Linux-5.15.153.1-microsoft-standard-WSL2-x86_64-with-glibc2.36",
+      "seconds": 166.49637754200012,
+      "skips": 0
+    },
+    "openviking-live.json": {
+      "sha256": "a02f83ace30ca62c63c57bd927105c878307d494c67ec3c8b3a921a62e82c878"
+    },
+    "install-smoke.json": {
+      "sha256": "7258d883420de40d22dbf234c16421eb500d70edb6baa3bf0f417159243b24c3"
+    }
+  },
+  "openviking_source_association": {
+    "note": "Associated after the completed live test; these integration and adapter sources were unchanged since that run. Later fixes affect local process cancellation and backup manifest validation.",
+    "source_hashes": {
+      "tests/live_openviking.py": "bf5a05392a4c1a6b8624a99766db2f0af18f68bcf226f0f5b4c2076cf92ce10c",
+      "skills/_shared/runtime/gresearch/core.py": "abcae4c744480f38d82302c3f48b6731f5685edd7c47c5c329d97113be5cf6ba",
+      "skills/_shared/runtime/gresearch/locking.py": "597550ab324e7208a6d94438127551cf0972bac3d4ac5b4730e315d1ca3a51c7",
+      "skills/_shared/runtime/gresearch/memory.py": "88f8e81893d8b6aba2b467fd946308a12b376392a6c9f365508131c1d8b6021c",
+      "skills/_shared/runtime/gresearch/openviking.py": "5e0e0294dec5f64b8673ea0205a5ce8852ceddd218a0358fd741d3be3e033237",
+      "skills/_shared/runtime/gresearch/retrieval.py": "c93b82bafebfdc8fca7387e85e5016c4a946d56e407780a991714baf13b59806"
+    }
+  },
+  "scope": "Engineering fault recovery and graph storage/retrieval validation; not scientific quality, user study, load/soak or production ACL validation"
+}

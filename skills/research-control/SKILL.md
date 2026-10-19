@@ -7,6 +7,8 @@ description: 让研究者查看原始证据并暂停、单步、批注、修改�
 
 pause 在阶段边界生效；step 执行一阶段；cancel 终止受管本地进程树。host skill 进入 awaiting_artifact，由宿主交付后 finish；恢复前核查输入哈希。外部 SSH、数据库、仪器或服务状态不能假定已经回滚。
 
+崩溃后先 `doctor/status/events`，再 `recover`；资源队列用 `queue-recover`。不删除锁文件、清空失败历史或跳过 cleanup_pending。失去回执时保留未知状态，实际核对后记录 reconciliation。严格复现用 environment-lock，迁移前用完整 backup/restore-backup；操作格式见 [运维手册](../_shared/harness-operations.md)。
+
 SSH Linux 监督器提供取消、超时、心跳租约和后代清理回执；断线而未取到回执时，界面应显示清理未确认。研究 HCI 效果时使用 `study-plan` 冻结平衡交叉分配、`study-analyze` 分析真实观测；便利样本、专家审查和软件操作测试分别报告，空观测不能产生研究结果。
 
 fork 从干预点前的文件 checkpoint 创建新 run，修改受影响阶段的 command/requires/optional/outputs/instructions/milestone/milestone_id，并重跑下游；原轨迹保留。跨运行先用唯一稳定 milestone_id 对齐，无 ID 时可匹配相同标签，再回退到 stage ID；显式 ID 冲突输出 alignment_conflicts 并保留未匹配项。声明匹配不证明语义等价，人工仍需核对科学目标。

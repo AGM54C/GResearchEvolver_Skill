@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-import subprocess
 import sys
 import time
 import uuid
@@ -98,23 +97,22 @@ def verify_epoch(store, record):
 def invoke(command, directory, extra, timeout, log):
     argv = [sys.executable if x == '{python}' else x for x in command] + extra
     start = time.monotonic()
-    with log.with_suffix('.stdout').open('wb') as out, log.with_suffix('.stderr').open('wb') as err:
-        # Reuse workflow cancellation primitive so timed-out child trees are stopped locally.
-        from .execution import terminate
-        process = subprocess.Popen(argv, cwd=directory, env={**os.environ, 'PYTHONDONTWRITEBYTECODE': '1'}, stdin=subprocess.DEVNULL, stdout=out, stderr=err,
-                                   start_new_session=os.name != 'nt',
-                                   creationflags=subprocess.CREATE_NEW_PROCESS_GROUP if os.name == 'nt' else 0)
-        try:
-            rc = process.wait(timeout=timeout)
-        except BaseException:
-            terminate(process)
-            raise
-    if rc:
-        raise ResearchError(f'Command failed ({rc}); inspect {log}')
-    return {'seconds': time.monotonic() - start, 'argv': argv, 'exit_code': rc}
+    from .process_runner import run as managed_run
+    directory_log = log.with_suffix('.job')
+    receipt = managed_run(argv, directory, directory_log, start + timeout, env={**os.environ, 'PYTHONDONTWRITEBYTECODE': '1'})
+    if receipt['status'] != 'completed':
+        raise ResearchError(f'Command failed ({receipt.get("reason") or receipt.get("exit_code")}); inspect {directory_log}')
+    return {'seconds': time.monotonic() - start, 'argv': argv, 'exit_code': receipt['exit_code'],
+            'supervisor': receipt, 'logs': str(directory_log)}
 
 
 def evaluate(store, name, candidate_dir, candidate_command, *, split='audit', promote=False):
+    from .locking import resource_lock
+    with resource_lock(store, 'rsi', name):
+        return _evaluate(store, name, candidate_dir, candidate_command, split=split, promote=promote)
+
+
+def _evaluate(store, name, candidate_dir, candidate_command, *, split='audit', promote=False):
     check_command(candidate_command)
     if split not in {'development', 'selection', 'audit', 'final'}:
         raise ResearchError('Unsupported split')
@@ -153,6 +151,7 @@ def evaluate(store, name, candidate_dir, candidate_command, *, split='audit', pr
         record['trials'].append(trial)
         record['running'] = trial['id']
         record['worker_pid'] = os.getpid()
+        record['worker_lock_version'] = 1
         if split == 'final': record['final_used'] = True
         store.set_value(key, record)
         store.event('rsi-' + name, 'trial_started', trial)
@@ -225,6 +224,13 @@ def evaluate(store, name, candidate_dir, candidate_command, *, split='audit', pr
                      uncertainty='bootstrap gate is approximate; fresh groups reduce reuse overfit but do not eliminate selection or pretraining contamination')
     except Exception as exc:
         trial.update(status='failed', reasons=[str(exc)], passed=False, promoted=False, observations=observations)
+    trial['cleanup_pending'] = False
+    for request in root.rglob('*.job/request.json'):
+        receipt_path = request.parent / 'result.json'
+        if not receipt_path.is_file() or not read_json(receipt_path).get('cleanup_verified'):
+            trial['cleanup_pending'] = True
+    if trial['cleanup_pending']:
+        trial.update(passed=False, promoted=False, reasons=trial['reasons'] + ['local supervisor cleanup unconfirmed'])
     with store.tx():
         latest = store.get_value(key)
         verify_epoch(store, latest)
@@ -246,7 +252,7 @@ def evaluate(store, name, candidate_dir, candidate_command, *, split='audit', pr
             latest['active'] = candidate
             latest['history'].append(candidate)
         latest['trials'][-1] = trial
-        latest['running'] = None
+        latest['running'] = trial['id'] if trial['cleanup_pending'] else None
         latest['worker_pid'] = None
         store.set_value(key, latest)
         store.event('rsi-' + name, 'trial_finished', trial)
@@ -254,20 +260,36 @@ def evaluate(store, name, candidate_dir, candidate_command, *, split='audit', pr
     return trial
 
 
-def recover_epoch(store, name, reason):
+def recover_epoch(store, name, reason, reconciliation=None):
+    from .locking import resource_lock
+    with resource_lock(store, 'rsi', name):
+        return _recover_epoch(store, name, reason, reconciliation)
+
+
+def _recover_epoch(store, name, reason, reconciliation=None):
     from .execution import process_exists
+    from .locking import file_lock
     if not reason: raise ResearchError('Record recovery reason and external-state inspection')
+    if reconciliation is not None and (not isinstance(reconciliation, dict) or not all(reconciliation.get(k) for k in ('actor', 'reason', 'effects_checked'))):
+        raise ResearchError('Reconciliation requires actor, reason and effects_checked')
     with store.tx():
         record = store.get_value('rsi:' + name)
         if not record or not record.get('running'):
             raise ResearchError('No interrupted trial to recover')
-        if record.get('worker_pid') and process_exists(record['worker_pid']):
+        if not record.get('worker_lock_version') and record.get('worker_pid') and process_exists(record['worker_pid']):
             raise ResearchError('Trial worker still exists; do not start a concurrent evaluation')
         trial = next(t for t in record['trials'] if t['id'] == record['running'])
-        trial.update(status='failed', passed=False, promoted=False, reasons=['interrupted trial; ' + reason])
+        root = store.root / 'rsi' / name / trial['id']
+        for request in root.rglob('*.job/request.json'):
+            (request.parent / 'cancel').touch()
+            with file_lock(request.parent / 'supervisor.lock'):
+                receipt = read_json(request.parent / 'result.json') if (request.parent / 'result.json').exists() else None
+                if (not receipt or not receipt.get('cleanup_verified')) and not reconciliation:
+                    raise ResearchError('RSI job cleanup unconfirmed; inspect the supervisor before recovery')
+        trial.update(status='failed', passed=False, promoted=False, cleanup_pending=False, reasons=['interrupted trial; ' + reason])
         record.update(running=None, worker_pid=None)
         store.set_value('rsi:' + name, record)
-        store.event('rsi-' + name, 'trial_recovered', {'trial': trial['id'], 'reason': reason, 'audit_use_retained': True})
+        store.event('rsi-' + name, 'trial_recovered', {'trial': trial['id'], 'reason': reason, 'audit_use_retained': True, 'reconciliation': reconciliation})
     return trial
 
 

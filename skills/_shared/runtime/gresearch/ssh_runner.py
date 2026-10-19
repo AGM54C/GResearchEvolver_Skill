@@ -74,7 +74,15 @@ def execute_stage(store,run,spec):
             with sftp.open(directory+'/'+name,'w') as f:f.write(str(time.time()))
         touch('heartbeat')
         channel=client.get_transport().open_session(timeout=15)
-        channel.exec_command('exec '+shlex.join([remote.get('python','python3'),directory+'/worker.py',directory]));submitted=True
+        # Persist intent before dispatch: losing the acknowledgement leaves an
+        # uncertain remote effect, never an apparently unstarted safe retry.
+        with store.tx():
+            _,current=store.get(run)
+            current['stages'][spec['id']].update(cleanup_pending=True,remote_attempt={'job_id':job,'directory':directory})
+            store.save(run,current)
+            store.event(run,'remote_dispatch_intent',{'stage':spec['id'],'job_id':job,'directory':directory})
+        submitted=True
+        channel.exec_command('exec '+shlex.join([remote.get('python','python3'),directory+'/worker.py',directory]))
         last_beat=time.monotonic();cancel_sent=False
         while not channel.exit_status_ready():
             status=store.get(run)[1]['status']
@@ -108,5 +116,6 @@ def execute_stage(store,run,spec):
         if sftp:sftp.close()
         if client:client.close()
         result['seconds']=time.monotonic()-start
+        result['cleanup_pending']=submitted and not result.get('remote_cleanup_verified',False)
         write_json(local/'transport.json',result)
     return result

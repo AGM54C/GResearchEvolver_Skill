@@ -6,3 +6,4 @@
 # Frozen input data and receipts retain original bytes, including whitespace.
 benchmarks/hci-materials/** -text -whitespace
 docs/validation-v2.1/** -text -whitespace
+docs/validation-harness/** -text -whitespace
