@@ -1,0 +1,21 @@
+{
+  "archive": "archive-003",
+  "extracted_at": "2026-10-19T16:18:00+08:00",
+  "operations": {
+    "adds": [
+      {
+        "path": "memory/experiences/latex-fulltext-style-stats.md",
+        "after": "（结构摘要）skill: style-mimic（及 arXiv HTML→txt 全文统计场景）；failure_mode: 证据扭曲（清洗规则误杀，非编造但同样污染数值）；为什么：kghalubench 首跑整行剔除 \\mathrm 段，误删 20% 正文致 suggest/indicate=0 假象且无报错（P1 静默违规风险）；如何应用：段内替换后再判段去留 + 统计后人工抽读交叉验证 + 行号锚点口径声明保 E6 幂等。"
+      }
+    ],
+    "updates": [
+      {
+        "path": "memory/evolution-log.md",
+        "after": "追加 style-mimic-1 轮条目：第 12 skill 落地（含 manifest/paper-writer 挂钩）+ kghalubench 画像首证（4401 词，prove×0，However 81% 句首，白名单 5/零注入 23）+ 清洗踩坑 + Phase 2 未执行诚实边界"
+      }
+    ],
+    "deletes": []
+  },
+  "skipped": [],
+  "summary": {"adds": 1, "updates": 1, "deletes": 0, "skipped": 0}
+}

@@ -1,0 +1,37 @@
+{
+  "manifest_version": 1,
+  "run_id": "rsi-1-and-intervention-round-1",
+  "reconstructed": true,
+  "reconstructed_at": "2026-10-19T15:30:00+08:00",
+  "note": "合并补归档：rsi-1（lit-retrieval v2 改进轮）+ 干预轮 1（L1-L6 诊断 + I1-I3 验证）。两轮执行时本协议尚未生效，依据现存产物追溯重建（HARNESS §5.5 / session-archive.md §4.4），非实时记录。",
+  "evidence": [
+    "memory/evolution-log.md",
+    "workspace/literature/inbox/raw/",
+    "workspace/literature/graph.json",
+    "workspace/literature/index.md",
+    "workspace/diagnoses/lit-retrieval-v2-deps.json",
+    "workspace/diagnoses/lit-retrieval-v2-diagnosis.md",
+    "workspace/diagnoses/interventions/lit-retrieval-v2-intervention-1.md",
+    "workspace/diagnoses/interventions/replay/",
+    "hw_repo git log（7 commits 至 42f9f29）"
+  ],
+  "skills": [
+    {"slug": "literature-miner", "anchor": "0ef82db（rsi-1 evolve 后）"},
+    {"slug": "literature-scholar", "anchor": "0ef82db"},
+    {"slug": "diagnosis-clinician", "anchor": "42f9f29"},
+    {"slug": "rsi-evolver", "anchor": "42f9f29"}
+  ],
+  "pipeline": ["literature-miner", "literature-scholar", "rsi-evolver", "diagnosis-clinician", "rsi-evolver"],
+  "parameters": {
+    "retrieval_sources": ["arXiv", "OpenAlex", "Crossref", "S2(限速降级缺席)"],
+    "graph_version": "v2（30 节点/16 边/6 篇）"
+  },
+  "gates": {
+    "pm_metric": "defect-unit（缺陷单元尺度，协议 §4 补丁后）",
+    "validated": "3/3",
+    "refuted": "0",
+    "evolve_gate": "独立执行证据（raw/ 可复核），无自评分数依赖"
+  },
+  "retrieval": {"scope": ["workspace/literature", "memory/experiences"], "tie_breaker": "path-lexicographic"},
+  "archived_at": "2026-10-19T15:30:00+08:00"
+}

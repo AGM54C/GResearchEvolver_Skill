@@ -1,0 +1,25 @@
+{
+  "manifest_version": 1,
+  "run_id": "graph-ab-1-gpath-validation",
+  "reconstructed": false,
+  "skills": [
+    {"slug": "survey-architect", "anchor": "a8df01f"},
+    {"slug": "research-autopilot", "anchor": "a8df01f"},
+    {"slug": "rsi-evolver", "anchor": "a8df01f"}
+  ],
+  "dirty": false,
+  "pipeline": ["survey-architect", "rsi-evolver"],
+  "parameters": {
+    "topic": "LLM 幻觉的定义、分类与基准化的现有挑战",
+    "g_path": {"seed_pattern": "(定义|分类|分类法|基准|框架|挑战|不一致|缺乏|extrinsic|intrinsic|基准化|评测)", "hop": 1, "subgraph": "17 nodes / 11 edges"},
+    "baseline_input": "6 entries + 6 notes（不接触 graph.json）",
+    "judgment": "三档 valid/degraded/broken，严格+宽松双口径"
+  },
+  "gates": {
+    "traceback_rate_graph": "18/18 = 100%（严格）",
+    "traceback_rate_baseline": "11/17 = 64.7%（严格）/ 76.5%（宽松）",
+    "protocol": "HARNESS v2 §4.6（commit a8df01f，本轮先行落地后实证）"
+  },
+  "retrieval": {"scope": ["workspace/literature", "memory/experiences"], "tie_breaker": "path-lexicographic"},
+  "archived_at": "2026-10-19T16:20:00+08:00"
+}

@@ -1,0 +1,57 @@
+{
+  "target": "lit-retrieval-v2",
+  "generated": "2026-10-19",
+  "pipeline_prior": "manifest.pipelines.retrieval = [literature-miner, literature-scholar]",
+  "layers": {
+    "L1_plan": "多源检索轮 v2：arXiv+OA+Crossref+S2 四源 ×3 主题 → 去重合并 → papers.json → scholar 摄取建图",
+    "L1_step_note": "结构来自 manifest 先验 + progress/产物落盘记录；raw/ 供 L1_log 层原始证据"
+  },
+  "nodes": [
+    {"id": "s1", "step": "arXiv API 检索 ×3 主题（benchmark/method/survey）", "agent": "literature-miner", "status": "completed", "log": "raw/arxiv-*.xml", "note": "返回 ID 带版本号后缀（如 2506.14634v3）"},
+    {"id": "s2", "step": "OpenAlex 检索 ×3 主题", "agent": "literature-miner", "status": "completed", "log": "raw/oa-*.json", "note": "返回键为 openalex id + DOI（10.48550/arxiv.xxx），无裸 arxiv_id"},
+    {"id": "s3", "step": "Crossref 检索 ×3 主题", "agent": "literature-miner", "status": "completed", "log": "raw/cr-*.json"},
+    {"id": "s4", "step": "Semantic Scholar 检索 ×3 主题 + survey 原样重试 ×1", "agent": "literature-miner", "status": "failed_then_degraded", "log": "raw/s2-*.json（4×429 错误体，含 retry）", "note": "全部 429；survey 重试 1 次仍 429 → 降级缺席 EVIDENCE_MISSING"},
+    {"id": "s5", "step": "多源去重合并 → papers.json", "agent": "literature-miner", "status": "completed_with_defect", "log": "papers.json（v2 版 57 条 0 重复；v1 版已被覆盖）", "note": "v1 执行时去重键未归一：arXiv 带版本号 vs OA DOI 前缀 → 同文献双身份入库（实测 3 条重复，依据经验库 2026-10-19 记录）"},
+    {"id": "s6", "step": "并行后台执行检索（shell & 派发）", "agent": "research-autopilot(编排)→literature-miner", "status": "completed_with_defect", "log": "经验库 parallel-task-cwd-pitfall.md", "note": "后台任务不继承运行时 cd，相对路径 -o 落盘到错误目录（实测 5 文件散落项目根目录，人工 find 归位）"},
+    {"id": "s7", "step": "literature-scholar 摄取（top3 全文 + 建图）", "agent": "literature-scholar", "status": "completed", "log": "workspace/literature/graph.json（30 节点/16 边）"},
+    {"id": "s8", "step": "v2 报告（四短板对照）", "agent": "literature-scholar", "status": "completed", "log": "workspace/literature/report.md"}
+  ],
+  "edges": [
+    {"from": "s6", "to": "s1", "type": "protocol", "note": "并行机制承载检索执行（& 派发）"},
+    {"from": "s6", "to": "s2", "type": "protocol"},
+    {"from": "s6", "to": "s3", "type": "protocol"},
+    {"from": "s6", "to": "s4", "type": "protocol"},
+    {"from": "s1", "to": "s5", "type": "protocol", "note": "检索产物 → 合并"},
+    {"from": "s2", "to": "s5", "type": "protocol"},
+    {"from": "s3", "to": "s5", "type": "protocol"},
+    {"from": "s4", "to": "s5", "type": "protocol", "note": "降级缺席传递（S2 数据不进合并）"},
+    {"from": "s1", "to": "s5", "type": "semantic", "note": "上游 ID 形态（带版本号）被 s5 去重键逻辑直接消费——格式耦合是 DE-1 的传播通道"},
+    {"from": "s2", "to": "s5", "type": "semantic", "note": "OA 无裸 arxiv_id，只有 DOI 前缀——与 s1 键形态不一致"},
+    {"from": "s5", "to": "s7", "type": "protocol", "note": "papers.json → 摄取输入"},
+    {"from": "s5", "to": "s7", "type": "claim", "note": "papers 条目 → graph.json 节点（claim 耦合）：重复条目会在图上形成潜在重复节点"},
+    {"from": "s7", "to": "s8", "type": "protocol"}
+  ],
+  "candidates_L3": [
+    {"id": "cand-1", "step": "s4", "reason": "症状最显性：S2 全 429 且原样重试无效，S2 数据缺席", "failure_condition": "无依据确认（S2 独有文献缺数据源）"},
+    {"id": "cand-2", "step": "s5", "reason": "键形态不一致（s1 带版本号 vs s2 DOI 前缀）且合并指令未规定归一化 → 同文献双身份", "failure_condition": "条件错误合并（对象=文献身份，条件=ID 形态）"},
+    {"id": "cand-3", "step": "s6", "reason": "后台任务不继承 cd，相对路径落盘错误目录", "failure_condition": "信息缺失（落盘目标位置未显式进入指令）"},
+    {"id": "cand-4", "step": "指令层（literature-miner v1 SKILL.md / HARNESS v1）", "reason": "上游候选：检索与并行规范均未规定 ID 归一化、绝对路径、限速策略——三个症状可能共享此上游", "failure_condition": "信息缺失（规范层）"}
+  ],
+  "propagation_L4": {
+    "s4_downstream": "S2 缺席 → papers.json 无 S2 独有文献（传播）→ OA+CR 补位达成 57 篇（被补偿）",
+    "s5_downstream": "3 条重复 → graph.json 潜在重复节点 → survey/idea 检索可能重复引用（传播链）；上游来源 = cand-4（规范未规定归一化），非 s5 本身逻辑错误",
+    "s6_downstream": "5 文件散落 → 人工 find 归位（被补偿）；机制未修复，下一轮并行任务必复发；上游来源 = cand-4（HARNESS v1 无绝对路径纪律）",
+    "common_upstream": "cand-4 是 cand-2/cand-3 的共同前件候选（共同依赖：同一份不完整规范）"
+  },
+  "verdict_L5": [
+    {"id": "DE-1", "type": "决定性错误", "step": "s5（根因在 cand-4 指令层）", "evidence": "经验库 multisource-retrieval-pitfalls.md 实测 3 条重复；raw/arxiv-survey.xml ID 带 v3 后缀 vs raw/oa-survey.json 仅 DOI 键", "note": "若在合并前归一化 ID，重复即消除且不影响其他步骤——v2 修复后 57 条 0 重复已反证"},
+    {"id": "DE-2", "type": "决定性错误", "step": "s6（根因在 cand-4 规范层 HARNESS v1）", "evidence": "经验库 parallel-task-cwd-pitfall.md 实测 5 文件散落", "note": "指令显式绝对路径即消除，不影响其他步骤"},
+    {"id": "N-1", "type": "被补偿失败", "step": "s4", "evidence": "raw/s2-*.json 4×429；papers.json 57 条含 OA+CR 补位", "note": "OA+CR 补位达成检索目标，缺席本身非决定性；但『原样重试 429』属 E1 误分类（429=限速非瞬时错误，应换策略）——记为改进项 INT-3"},
+    {"id": "N-2", "type": "计划性冗余", "step": "未发现", "evidence": "—", "note": "四源均有独立贡献，无冗余步骤"}
+  ],
+  "verification_L6": {
+    "s4_降级核验": "raw/ 4 个 429 错误体真实存在，降级声明与原始证据一致 ✅",
+    "s5_重复核验": "v1 重复条目原始产物已被 v2 覆盖，不可直接复核 → 未决项：以经验库实测记录为依据，INT-1 将真实重放补强",
+    "s6_散落核验": "散落文件已被人工归位，原散落状态不可直接复核 → 未决项：INT-2 将真实重放补强"
+  }
+}

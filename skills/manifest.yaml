@@ -1,0 +1,211 @@
+# skills 声明式路由注册表（manifest-driven routing）
+#
+# research-autopilot 是薄路由器：分诊/编排一律读本文件，禁止凭 SKILL.md 记忆内联路由。
+# 新增 skill = 此处一条注册（+ 按需一行 pipeline），无需改编排器正文。
+# DAG 由 provides/consumes 契约推导，不单独维护边表。
+
+version: 1
+
+defaults:
+  research_root: .codeartsdoer/.research
+  workspace: .codeartsdoer/.research/workspace
+
+# ---------------------------------------------------------------
+# skill 注册表（正交轴：layer × phase × intents × 数据契约）
+# ---------------------------------------------------------------
+skills:
+
+  literature-miner:
+    layer: L2
+    phase: retrieval
+    intents: ["找文献", "检索论文", "搜集相关研究", "补充文献", "查最新工作", "文献检索"]
+    provides: [literature_list]
+    consumes: []
+    outputs: ["literature/inbox/index.md", "literature/inbox/raw/"]
+    entry: skills/literature-miner/SKILL.md
+    rubric: skills/literature-miner/references/retrieval-qa-rubric.md
+
+  literature-scholar:
+    layer: L2
+    phase: intake
+    intents: ["读文献", "整理文献", "建立知识图谱", "做文献笔记", "构建论断图", "文献摄取"]
+    provides: [graph, notes]
+    consumes: [literature_list]        # 可选：miner 的清单可直接作输入
+    outputs: ["literature/graph.json", "literature/notes/", "literature/entries/", "literature/index.md"]
+    entry: skills/literature-scholar/SKILL.md
+    rubric: skills/literature-scholar/references/graph-qa-rubric.md
+
+  survey-architect:
+    layer: L2
+    phase: synthesis
+    intents: ["写综述", "组织综述", "综述大纲", "梳理领域"]
+    provides: [survey]
+    consumes: [graph, notes]
+    outputs: ["survey/"]
+    entry: skills/survey-architect/SKILL.md
+    rubric: skills/survey-architect/references/survey-qa-rubric.md
+
+  idea-forge:
+    layer: L2
+    phase: ideation
+    intents: ["发散IDEA", "候选idea", "研究点子", "选题", "收敛最优方案"]
+    provides: [ideas]
+    consumes: [graph, notes]
+    outputs: ["ideas/"]
+    entry: skills/idea-forge/SKILL.md
+    rubric: skills/idea-forge/references/fitness-rubric.md
+
+  experiment-designer:
+    layer: L2
+    phase: design
+    intents: ["设计实验", "怎么验证", "实验方案", "要做实验"]
+    provides: [plan]
+    consumes: [ideas]                  # 可选：可直接接收用户 hypothesis
+    outputs: ["experiments/design-*/"]
+    entry: skills/experiment-designer/SKILL.md
+    rubric: skills/experiment-designer/references/design-qa-rubric.md
+
+  experiment-replicator:
+    layer: L2
+    phase: execution
+    intents: ["复现", "跑基准", "执行方案", "跑数据集"]
+    provides: [runs, repl_report]
+    consumes: [plan]                   # 可选：可直接复现指定论文
+    outputs: ["experiments/*/runs/", "experiments/*/report.md"]
+    entry: skills/experiment-replicator/SKILL.md
+    rubric: skills/experiment-replicator/references/repl-qa-rubric.md
+
+  diagnosis-clinician:
+    layer: L2
+    phase: diagnosis
+    intents: ["诊断", "定位错误", "分析失败原因", "核验证据"]
+    provides: [diagnosis, interventions]
+    consumes: [graph, notes, ideas, plan, runs, repl_report, survey, trajectory, review_report]   # 全部可选，唯一汇聚点（含评审发现的问题流）
+    outputs: ["diagnoses/"]
+    entry: skills/diagnosis-clinician/SKILL.md
+    rubric: skills/diagnosis-clinician/references/diagnosis-qa-rubric.md
+
+  paper-writer:
+    layer: L2
+    phase: writing
+    intents: ["组装成论文", "写论文", "成稿"]
+    provides: [paper]
+    consumes: [survey, ideas, repl_report, diagnosis, style_profile]   # style_profile 可选：画像存在时语言层按画像执行
+    outputs: ["paper/paper.md"]
+    entry: skills/paper-writer/SKILL.md
+    rubric: skills/paper-writer/references/writing-qa-rubric.md
+
+  style-mimic:
+    layer: L2
+    phase: style
+    intents: ["模仿风格", "风格画像", "学习写作风格", "按这个风格写"]
+    provides: [style_profile]
+    consumes: []                    # 独立入口：直接吃用户样本；写作管线中作 paper-writer 可选前置
+    outputs: ["paper/style-profiles/"]
+    entry: skills/style-mimic/SKILL.md
+    rubric: skills/style-mimic/references/style-qa-rubric.md
+
+  latex-adaptor:
+    layer: L2
+    phase: production
+    intents: ["转LaTeX", "编译PDF", "排版", "投稿格式", "camera-ready", "生成参考文献库", "BibTeX"]
+    provides: [tex_pdf]
+    consumes: [paper]               # style_profile 可选经 paper-writer 间接生效
+    outputs: ["paper/tex/", "paper/build/"]
+    entry: skills/latex-adaptor/SKILL.md
+    rubric: skills/latex-adaptor/references/latex-qa-rubric.md
+
+  reviewer-panel:
+    layer: L2
+    phase: review
+    intents: ["模拟评审", "审稿意见", "压力测试", "投稿前检查"]
+    provides: [review_report]
+    consumes: [paper, survey]       # survey 可选：相关工作覆盖面审查输入
+    outputs: ["reviews/"]
+    entry: skills/reviewer-panel/SKILL.md
+    rubric: skills/reviewer-panel/references/review-qa-rubric.md
+
+  rebuttal-drafter:
+    layer: L2
+    phase: rebuttal
+    intents: ["写rebuttal", "回应审稿人", "回复评审意见", "反驳意见", "投稿信", "cover letter"]
+    provides: [rebuttal]
+    consumes: [review_report, runs, repl_report, diagnosis]   # 评审可为模拟产出或用户真实意见
+    outputs: ["rebuttals/"]
+    entry: skills/rebuttal-drafter/SKILL.md
+    rubric: skills/rebuttal-drafter/references/rebuttal-qa-rubric.md
+
+  figure-mimic:
+    layer: L2
+    phase: figures
+    intents: ["模仿图风格", "按论文风格画图", "生成论文图表", "图表风格画像"]
+    provides: [figure_profile, figures]
+    consumes: [paper, runs]        # 数据图数据点只从 runs/数字账本取（F2 红线）
+    outputs: ["paper/figures/"]
+    entry: skills/figure-mimic/SKILL.md
+    rubric: skills/figure-mimic/references/figure-qa-rubric.md
+
+  slides-builder:
+    layer: L2
+    phase: presentation
+    intents: ["做PPT", "答辩幻灯片", "组会汇报", "汇报演示", "slides"]
+    provides: [slides]
+    consumes: [paper, figures, repl_report]   # 数字从 paper-state.json 账本取（S2 红线）
+    outputs: ["slides/"]
+    entry: skills/slides-builder/SKILL.md
+    rubric: skills/slides-builder/references/slides-qa-rubric.md
+
+  doc-composer:
+    layer: L2
+    phase: outreach
+    intents: ["发小红书", "写分享笔记", "转博客", "调研报告", "周报", "传播稿"]
+    provides: [outreach_docs]
+    consumes: [paper, survey, repl_report, diagnosis]   # 断言登记表为单一事实源（C2 红线）
+    outputs: ["composer/"]
+    entry: skills/doc-composer/SKILL.md
+    rubric: skills/doc-composer/references/composer-qa-rubric.md
+
+  rsi-evolver:
+    layer: L3
+    phase: evolution
+    intents: ["复盘", "进化", "沉淀经验", "优化skill", "RSI"]
+    provides: [experiences, strategies]
+    consumes: [any]                    # 任意 L2 产出
+    outputs: ["../memory/experiences/", "../memory/strategies/"]
+    entry: skills/rsi-evolver/SKILL.md
+    rubric: skills/rsi-evolver/references/evolution-qa-rubric.md
+
+# ---------------------------------------------------------------
+# 分诊决策表（mode → skill 序列）。序列内顺序 = 执行顺序；
+# 相邻无数据依赖的 skill 可并行（由 provides/consumes 判定）。
+# ---------------------------------------------------------------
+pipelines:
+  retrieval:   [literature-miner, literature-scholar]
+  intake:      [literature-scholar]
+  survey:      [literature-scholar, survey-architect]
+  idea:        [literature-scholar, idea-forge]
+  design:      [idea-forge, experiment-designer, experiment-replicator, diagnosis-clinician]
+  replication: [experiment-replicator, diagnosis-clinician]
+  diagnosis:   [diagnosis-clinician]
+  style:       [style-mimic]
+  writing:     [style-mimic, paper-writer]   # style-mimic 仅当用户给了风格样本或画像已存在时执行
+  production:  [latex-adaptor]               # 成稿格式化末端（markdown → tex → PDF）
+  review:      [reviewer-panel]
+  rebuttal:    [reviewer-panel, rebuttal-drafter]   # 模拟评审 → 回应；真实评审意见可直接进 rebuttal-drafter
+  figures:     [figure-mimic]                       # 视觉层（与 style-mimic 语言层对称）
+  presentation: [slides-builder]                    # 论点骨架投影（非正文粘贴）
+  outreach:     [doc-composer]                      # 传播形态（评审五维·内容传播力直接对应）
+  evolution:   [rsi-evolver]
+
+# ---------------------------------------------------------------
+# 路由规则（分诊优先级从上到下）
+# ---------------------------------------------------------------
+routing_rules:
+  - id: match_intents
+    rule: 用户诉求关键词命中 skills[].intents → 取该 skill 所属 pipeline
+  - id: match_artifacts
+    rule: 丢入 PDF/文献目录/链接 → intake；丢入推理/结论/轨迹文本 → diagnosis；丢入 plan.json → replication；丢入 .tex/.bib → production；丢入审稿意见文本 → rebuttal；丢入图/图集 → figures；丢入讲稿需求/汇报记录 → presentation；丢入分享/发布需求 → outreach
+  - id: match_context
+    rule: 无显式意图时读 workspace 现状——graph.json 缺失则前置 literature-scholar；已有产物的 phase 不重复执行
+  - id: ambiguity
+    rule: 多个互斥 mode 同时命中且无法由上下文消解 → H3 暂停给选项，禁止擅自选择

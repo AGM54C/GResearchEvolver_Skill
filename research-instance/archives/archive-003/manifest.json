@@ -1,0 +1,37 @@
+{
+  "manifest_version": 1,
+  "run_id": "style-mimic-1-profile-extraction",
+  "reconstructed": false,
+  "skills": [
+    {
+      "slug": "style-mimic",
+      "anchor": "f898cf6"
+    }
+  ],
+  "dirty": false,
+  "pipeline": [
+    "style-mimic"
+  ],
+  "parameters": {
+    "style_sources": [
+      "workspace/literature/inbox/fulltext/kghalubench.txt"
+    ],
+    "target_lang": "en（样本主语言）",
+    "strength": "balanced",
+    "corpus": "正文行区间 [233,505)，LaTeXML 段内清洗，4401 词/215 句/80 段"
+  },
+  "gates": {
+    "profile_layers": "4/4 + AI-tel 核对区（结构/句法/词汇/修辞）",
+    "mechanical_stats_reproducible": "true（style_stats.py + kghalubench-stats.json 落盘，E6 幂等：同区间重跑数值一致）",
+    "verbatim_evidence": "每特征 ≥1 例句标 span（P1）",
+    "phase2_consistency_check": "not_executed——需 paper-writer 成稿触发（画像尾部已声明）",
+    "protocol": "HARNESS v2 §5（skill 落地 commit f898cf6 后首执行）"
+  },
+  "retrieval": {
+    "scope": [
+      "workspace/literature/inbox/fulltext"
+    ],
+    "tie_breaker": "样本为用户决策指定"
+  },
+  "archived_at": "2026-10-19T16:18:00+08:00"
+}

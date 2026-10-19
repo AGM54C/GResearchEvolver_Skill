@@ -1,0 +1,22 @@
+{
+  "archive": "archive-002",
+  "extracted_at": "2026-10-19T16:18:00+08:00",
+  "operations": {
+    "adds": [
+      {
+        "path": "memory/experiences/graph-anchoring-discipline.md",
+        "after": "（结构摘要）skill: survey-architect（及一切论断型文本 skill）；failure_mode: 无依据确认+过度泛化（自由写作四类滑变）；为什么：graph-ab-1 实测基线 4/17 broken（多源泛化/来源混淆/弱证据强化/编造结论）vs 图路径 18/18；如何应用：graph.json 存在必须走 G 路径，无锚不写，模态保留（可/已分清），读者评论与文献论断分离，图缺席降级 EVIDENCE_MISSING。"
+      }
+    ],
+    "updates": [],
+    "deletes": []
+  },
+  "skipped": [
+    {
+      "op": "evolve 写入 strategies/survey-architect.md（G 路径策略条目）",
+      "reason_code": "gate_rejected",
+      "reason": "scope=reflect+distill（无 evolve）：G 路径已在本轮协议 commit a8df01f 落地为 HARNESS §4.6 + SKILL.md 修改，走代码演进而非策略库；策略库条目留待后续多轮复测确认图优势稳定后再评估"
+    }
+  ],
+  "summary": {"adds": 1, "updates": 0, "deletes": 0, "skipped": 1}
+}

@@ -1,0 +1,153 @@
+[
+ {
+  "arxiv_id": "2504.17550v1",
+  "title": "HalluLens: LLM Hallucination Benchmark",
+  "authors": [
+   "Yejin Bang",
+   "Ziwei Ji",
+   "Alan Schelten",
+   "Anthony Hartshorn"
+  ],
+  "year": "2025",
+  "abstract": "Large language models (LLMs) often generate responses that deviate from user input or training data, a phenomenon known as \"hallucination.\" These hallucinations undermine user trust and hinder the adoption of generative AI systems. Addressing hallucinations is essential for the advancement of LLMs. This paper introduces a comprehensive hallucination benchmark, incorporating both new extrinsic and existing intrinsic evaluation tasks, built upon clear taxonomy of hallucination. A major challenge in benchmarking hallucinations is the lack of a unified framework due to inconsistent definitions and categorizations. We disentangle LLM hallucination from \"factuality,\" proposing a clear taxonomy that distinguishes between extrinsic and intrinsic hallucinations, to promote consistency and facilitate research. Extrinsic hallucinations, where the generated content is not consistent with the training data, are increasingly important as LLMs evolve. Our benchmark includes dynamic test set generation to mitigate data leakage and ensure robustness against such leakage. We also analyze existing benchmarks, highlighting their limitations and saturation. The work aims to: (1) establish a clear taxonomy of hallucinations, (2) introduce new extrinsic hallucination tasks, with data that can be dynamically regenerated to prevent saturation by leakage, (3) provide a comprehensive analysis of existing benchmarks, distinguishing them from factuality evaluations.",
+  "url": "https://arxiv.org/abs/2504.17550v1",
+  "queries": [
+   "benchmark"
+  ],
+  "relevance": 19
+ },
+ {
+  "arxiv_id": "2604.17982v1",
+  "title": "Mitigating Multimodal Hallucination via Phase-wise Self-reward",
+  "authors": [
+   "Yu Zhang",
+   "Chuyang Sun",
+   "Kehai Chen",
+   "Xuefeng Bai"
+  ],
+  "year": "2026",
+  "abstract": "Large Vision-Language Models (LVLMs) still struggle with vision hallucination, where generated responses are inconsistent with the visual input. Existing methods either rely on large-scale annotated data for fine-tuning, which incurs massive computational overhead, or employ static post-hoc strategies that overlook the dynamic nature of hallucination emergence. To address these, we introduce a new self-rewarding framework, enabling dynamic hallucination mitigation at inference time without external supervision. On the empirical side, we reveal that visual hallucination exhibits phase-wise dynamic patterns, peaking at the onset of each semantic phase. Drawing on these insights, we propose \\textbf{PSRD} (\\textbf{Phase-wise \\textbf{S}elf-\\textbf{R}eward \\textbf{D}ecoding) for online hallucination correction guided by phase-wise self-reward signals. To reduce the cost of repeated self-evaluation during decoding, we distill the hallucination guidance signal from LVLMs into a lightweight reward model. The reward model subsequently provides on-the-fly guidance for targeted intervention during the decoding process, enabling precise hallucination suppression. The proposed PSRD significantly reduces the hallucination rate of LLaVA-1.5-7B by 50.0% and consistently outperforms existing post-hoc methods across five hallucination evaluation benchmarks for four LVLMs. Further analysis confirms that PSRD effectively mitigates hallucination propagation and achieves a highly controllable trade-off between strong performance and inference efficiency.",
+  "url": "https://arxiv.org/abs/2604.17982v1",
+  "queries": [
+   "benchmark"
+  ],
+  "relevance": 16
+ },
+ {
+  "arxiv_id": "2608.26168v1",
+  "title": "Hallucinations in LLMs: A Lifecycle-Based Survey of Causes, Detection, Mitigation, and Prevention",
+  "authors": [
+   "Naveen Lamba",
+   "Sanju Tiwari",
+   "Manas Gaur"
+  ],
+  "year": "2026",
+  "abstract": "The lifecycle of hallucination in LLMs is a concept that enables building solid frameworks on the control and reliability of LLMs in high-stakes environments, including health, legal, and scientific research. Although previous surveys have primarily focused on detection or mitigation, this survey provides a lifecycle-based overview of the hallucinations in the LLMs, their cause, detection, mitigation, and prevention.We propose a three-fold categorization of hallucinations across the LLM lifecycle: data-related, training-related, and inference-related, which is consistent with the lifecycle of the development of the LLM. Each of these stages is discussed regarding the cause of hallucinations, their detection, and the ways they can be addressed under specific mitigation or prevention interventions. In addition, we discuss the available benchmark data using a number of parameters so as to establish their suitability in identifying, restricting and managing hallucinations. The survey provides researchers and practitioners with a standardized framework to understand, diagnose, and cure hallucinations in a systematic system to present actionable data to build safer and more reliable LLMs.",
+  "url": "https://arxiv.org/abs/2608.26168v1",
+  "queries": [
+   "survey"
+  ],
+  "relevance": 14
+ },
+ {
+  "arxiv_id": "2602.19643v1",
+  "title": "KGHaluBench: A Knowledge Graph-Based Hallucination Benchmark for Evaluating the Breadth and Depth of LLM Knowledge",
+  "authors": [
+   "Alex Robertson",
+   "Huizhi Liang",
+   "Mahbub Gani",
+   "Rohit Kumar"
+  ],
+  "year": "2026",
+  "abstract": "Large Language Models (LLMs) possess a remarkable capacity to generate persuasive and intelligible language. However, coherence does not equate to truthfulness, as the responses often contain subtle hallucinations. Existing benchmarks are limited by static and narrow questions, leading to limited coverage and misleading evaluations. We present KGHaluBench, a Knowledge Graph-based hallucination benchmark that assesses LLMs across the breadth and depth of their knowledge, providing a fairer and more comprehensive insight into LLM truthfulness. Our framework utilises the KG to dynamically construct challenging, multifaceted questions, whose difficulty is then statistically estimated to address popularity bias. Our automated verification pipeline detects abstentions and verifies the LLM's response at both conceptual and correctness levels to identify different types of hallucinations. We evaluate 25 frontier models, using novel accuracy and hallucination metrics. The results provide a more interpretable insight into the knowledge factors that cause hallucinations across different model sizes. KGHaluBench is publicly available to support future developments in hallucination mitigation.",
+  "url": "https://arxiv.org/abs/2602.19643v1",
+  "queries": [
+   "benchmark"
+  ],
+  "relevance": 14
+ },
+ {
+  "arxiv_id": "2506.09886v2",
+  "title": "Probabilistic distances-based hallucination detection in LLMs with RAG",
+  "authors": [
+   "Rodion Oblovatny",
+   "Alexandra Kuleshova",
+   "Konstantin Polev",
+   "Alexey Zaytsev"
+  ],
+  "year": "2025",
+  "abstract": "Detecting hallucinations in large language models (LLMs) is critical for their safety in many applications. Without proper detection, these systems often provide harmful, unreliable answers. In recent years, LLMs have been actively used in retrieval-augmented generation (RAG) settings. However, hallucinations remain even in this setting, and while numerous hallucination detection methods have been proposed, most approaches are not specifically designed for RAG systems. To overcome this limitation, we introduce a hallucination detection method based on estimating the distances between the distributions of prompt token embeddings and language model response token embeddings. The method examines the geometric structure of token hidden states to reliably extract a signal of factuality in text, while remaining friendly to long sequences. Extensive experiments demonstrate that our method achieves state-of-the-art or competitive performance. It also has transferability from solving the NLI task to the hallucination detection task, making it a fully unsupervised and efficient method with a competitive performance on the final task.",
+  "url": "https://arxiv.org/abs/2506.09886v2",
+  "queries": [
+   "survey",
+   "method"
+  ],
+  "relevance": 13
+ },
+ {
+  "arxiv_id": "2409.11353v3",
+  "title": "THaMES: An End-to-End Tool for Hallucination Mitigation and Evaluation in Large Language Models",
+  "authors": [
+   "Mengfei Liang",
+   "Archish Arun",
+   "Zekun Wu",
+   "Cristian Munoz"
+  ],
+  "year": "2024",
+  "abstract": "Hallucination, the generation of factually incorrect content, is a growing challenge in Large Language Models (LLMs). Existing detection and mitigation methods are often isolated and insufficient for domain-specific needs, lacking a standardized pipeline. This paper introduces THaMES (Tool for Hallucination Mitigations and EvaluationS), an integrated framework and library addressing this gap. THaMES offers an end-to-end solution for evaluating and mitigating hallucinations in LLMs, featuring automated test set generation, multifaceted benchmarking, and adaptable mitigation strategies. It automates test set creation from any corpus, ensuring high data quality, diversity, and cost-efficiency through techniques like batch processing, weighted sampling, and counterfactual validation. THaMES assesses a model's ability to detect and reduce hallucinations across various tasks, including text generation and binary classification, applying optimal mitigation strategies like In-Context Learning (ICL), Retrieval Augmented Generation (RAG), and Parameter-Efficient Fine-tuning (PEFT). Evaluations of state-of-the-art LLMs using a knowledge base of academic papers, political news, and Wikipedia reveal that commercial models like GPT-4o benefit more from RAG than ICL, while open-weight models like Llama-3.1-8B-Instruct and Mistral-Nemo gain more from ICL. Additionally, PEFT significantly enhances the performance of Llama-3.1-8B-Instruct in both evaluation tasks.",
+  "url": "https://arxiv.org/abs/2409.11353v3",
+  "queries": [
+   "method"
+  ],
+  "relevance": 12
+ },
+ {
+  "arxiv_id": "2509.03518v1",
+  "title": "Can LLMs Lie? Investigation beyond Hallucination",
+  "authors": [
+   "Haoran Huan",
+   "Mihir Prabhudesai",
+   "Mengning Wu",
+   "Shantanu Jaiswal"
+  ],
+  "year": "2025",
+  "abstract": "Large language models (LLMs) have demonstrated impressive capabilities across a variety of tasks, but their increasing autonomy in real-world applications raises concerns about their trustworthiness. While hallucinations-unintentional falsehoods-have been widely studied, the phenomenon of lying, where an LLM knowingly generates falsehoods to achieve an ulterior objective, remains underexplored. In this work, we systematically investigate the lying behavior of LLMs, differentiating it from hallucinations and testing it in practical scenarios. Through mechanistic interpretability techniques, we uncover the neural mechanisms underlying deception, employing logit lens analysis, causal interventions, and contrastive activation steering to identify and control deceptive behavior. We study real-world lying scenarios and introduce behavioral steering vectors that enable fine-grained manipulation of lying tendencies. Further, we explore the trade-offs between lying and end-task performance, establishing a Pareto frontier where dishonesty can enhance goal optimization. Our findings contribute to the broader discourse on AI ethics, shedding light on the risks and potential safeguards for deploying LLMs in high-stakes environments. Code and more illustrations are available at https://llm-liar.github.io/",
+  "url": "https://arxiv.org/abs/2509.03518v1",
+  "queries": [
+   "survey"
+  ],
+  "relevance": 10
+ },
+ {
+  "arxiv_id": "2606.06959v1",
+  "title": "OpenHalDet: A Unified Benchmark for Hallucination Detection across Diverse Generation Scenarios",
+  "authors": [
+   "Xinyi Li",
+   "Zhen Fang",
+   "Yongxin Deng",
+   "Jinyuan Luo"
+  ],
+  "year": "2026",
+  "abstract": "Hallucination detection is essential for the reliable deployment of large language models (LLMs). However, existing evaluations face two core challenges: inconsistent inference configuration and evaluation, and limited coverage of downstream domains and tasks. Consequently, reported detector performance is often difficult to compare, reproduce, and generalize beyond specific experimental settings. We introduce OpenHalDet, a unified benchmark for hallucination detection across diverse generation scenarios. OpenHalDet standardizes the evaluation pipeline, from prompt construction and response generation to truthfulness annotation, detector scoring, and metric computation. It supports heterogeneous detector families under different access settings, including black-box methods that use only generated outputs, gray-box methods that rely on probability-based signals, and white-box methods that exploit internal model signals. By bringing diverse tasks, models, and detectors into a shared framework, OpenHalDet enables controlled comparison and provides a systematic view of how different detection paradigms behave in LLM applications. We release OpenHalDet as an open and extensible codebase to facilitate reproducible evaluation and future development of hallucination detection methods. The code and datasets are available at https://github.com/Nellie179/Hallucination-Detection.",
+  "url": "https://arxiv.org/abs/2606.06959v1",
+  "queries": [
+   "method",
+   "benchmark"
+  ],
+  "relevance": 10
+ },
+ {
+  "arxiv_id": "2506.22486v1",
+  "title": "Hallucination Detection with Small Language Models",
+  "authors": [
+   "Ming Cheung"
+  ],
+  "year": "2025",
+  "abstract": "Since the introduction of ChatGPT, large language models (LLMs) have demonstrated significant utility in various tasks, such as answering questions through retrieval-augmented generation. Context can be retrieved using a vectorized database, serving as a foundation for LLMs to generate responses. However, hallucinations in responses can undermine the reliability of LLMs in practical applications, and they are not easily detectable in the absence of ground truth, particularly in question-and-answer scenarios. This paper proposes a framework that integrates multiple small language models to verify responses generated by LLMs using the retrieved context from a vectorized database. By breaking down the responses into individual sentences and utilizing the probability of generating \"Yes\" tokens from the outputs of multiple models for a given set of questions, responses, and relevant context, hallucinations can be detected. The proposed framework is validated through experiments with real datasets comprising over 100 sets of questions, answers, and contexts, including responses with fully and partially correct sentences. The results demonstrate a 10\\% improvement in F1 scores for detecting correct responses compared to hallucinations, indicating that multiple small language models can be effectively employed for answer verification, providing a scalable and efficient solution for both academic and practical applications.",
+  "url": "https://arxiv.org/abs/2506.22486v1",
+  "queries": [
+   "method"
+  ],
+  "relevance": 9
+ }
+]

@@ -1,0 +1,2691 @@
+HalluLens: LLM Hallucination Benchmark
+
+  
+    
+      
+Report GitHub Issue
+
+      ×
+    
+
+    
+      Title:
+      
+
+      
+Content selection saved. Describe the issue below:
+
+      Description:
+      
+    
+
+    
+      Submit without GitHub
+      Submit in GitHub
+    
+  
+
+    
+    arXiv is now an independent nonprofit!
+    Learn more
+    ×
+  
+
+  
+    
+      Back to arXiv
+    
+  
+  
+  
+    Why HTML?
+    
+      
+        
+      
+      Report Issue
+    
+    
+      
+        
+        
+      
+      Back to Abstract
+    
+    
+    
+      
+        
+      
+      Download PDF
+    
+    
+      
+        
+        
+      
+    
+    
+    
+      
+        
+      
+    
+    
+    
+      
+        
+          
+          
+        
+      
+      
+        
+          
+          
+        
+      
+      
+        
+          
+          
+        
+      
+    
+  
+
+Abstract
+
+1 Introduction
+
+2 Overview of LLM Hallucination
+
+2.1 Distinction between LLM Hallucination and Factuality
+
+2.2 Categories of LLM Hallucination
+
+2.3 Potential Sources of Hallucination
+
+2.4 Criteria for Hallucination Benchmark
+
+3 HalluLens (a): Extrinsic Hallucination Evaluation
+
+3.1 Task 1: PreciseWikiQA
+
+3.1.1 Metric
+
+3.1.2 Pipeline
+
+3.1.3 Evaluation Results
+
+3.2 Task 2: LongWiki
+
+3.2.1 Metric
+
+3.2.2 Pipeline
+
+3.2.3 Evaluation Results
+
+3.3 Task 3: NonExistentRefusal
+
+3.3.1 Metric
+
+3.3.2 Pipeline
+
+3.3.3 Evaluation Results and Discussion
+
+4 HalluLens (b): Intrinsic Hallucination Evaluation
+
+4.1 HHEM leaderboard (Vectara, 2024)
+
+4.2 ANAH 2.0 (w/ reference) (Gu et al., 2024)
+
+4.3 FaithEval (Ming et al., 2024)
+
+5 Revisiting Existing Benchmarks
+
+5.1 Revisiting frequently cited benchmark TruthfulQA (Lin et al., 2022).
+
+5.2 When Factuality Benchmarks can/cannot be Hallucination Benchmark?
+
+5.3 Discussion on existing “factuality hallucination” benchmarks.
+
+6 Related Work
+
+Taxonomy
+
+Extrinsic and Intrinsic hallucination Benchmark/Dataset
+
+Hallucination and/or Factuality Detection
+
+7 Conclusion
+
+References
+
+A Overview of HalluLens
+
+B Discussion and Implementation Details
+
+B.1 PreciseWikiQA
+
+B.2 LongWiki
+
+B.3 NonExistentRefusal
+
+B.3.1 MixedEntities
+
+B.3.2 GeneratedEntities
+
+C LLM Factuality Benchmark
+
+C.1 TruthfulQA (Lin et al., 2022)
+
+C.2 SimpleQA (Wei et al., 2024a)
+
+C.3 FreshQA (Vu et al., 2024)
+
+C.4 HaluEval 2.0 (Li et al., 2024)
+
+C.5 LongFact (Wei et al., 2024c)
+
+D Prompts
+
+D.1 PreciseWikiQA
+
+D.2 LongWiki
+
+D.3 NonExistentRefusal
+
+D.3.1 Prompt template for inference
+
+D.3.2 GeneratedEntities
+
+D.3.3 Prompt template for evaluation MixedEntities
+
+  
+    License: CC BY-SA 4.0
+  
+  
+arXiv:2504.17550v1 [cs.CL] 24 Apr 2025
+
+HalluLens: LLM Hallucination Benchmark
+
+Yejin Bang
+
+Affiliation: HKUST
+
+Work done during Internship at FAIR
+
+  
+Ziwei Ji
+
+Affiliation: HKUST
+
+Work done during Internship at FAIR
+
+  
+Alan Schelten
+
+Affiliation: GenAI at Meta
+
+  
+Anthony Hartshorn
+
+Affiliation: GenAI at Meta
+
+  
+Tara Fowler
+
+Affiliation: GenAI at Meta
+
+  
+Cheng Zhang
+
+Affiliation: GenAI at Meta
+
+  
+Nicola Cancedda
+
+Affiliation: FAIR at Meta
+
+  
+Pascale Fung
+
+Affiliation: FAIR at Meta
+
+Affiliation: HKUST
+
+Abstract
+    
+
+Large language models (LLMs) often generate responses that deviate from user input or training data, a phenomenon known as “hallucination.” These hallucinations undermine user trust and hinder the adoption of generative AI systems. Addressing hallucinations is essential for the advancement of LLMs. This paper introduces a comprehensive hallucination benchmark, incorporating both new extrinsic and existing intrinsic evaluation tasks, built upon clear taxonomy of hallucination. A major challenge in benchmarking hallucinations is the lack of a unified framework due to inconsistent definitions and categorizations. We disentangle LLM hallucination from “factuality,” proposing a clear taxonomy that distinguishes between extrinsic and intrinsic hallucinations, to promote consistency and facilitate research. Extrinsic hallucinations, where the generated content is not consistent with the training data, are increasingly important as LLMs evolve. Our benchmark includes dynamic test set generation to mitigate data leakage and ensure robustness against such leakage. We also analyze existing benchmarks, highlighting their limitations and saturation. The work aims to: (1) establish a clear taxonomy of hallucinations, (2) introduce new extrinsic hallucination tasks, with data that can be dynamically regenerated to prevent saturation by leakage, (3) provide a comprehensive analysis of existing benchmarks, distinguishing them from factuality evaluations.
+
+  
+††date: August 24, 2026††correspondence: yjbang@connect.ust.hk; pascalefung@meta.com††Code: https://github.com/facebookresearch/HalluLens
+
+1 Introduction
+
+Large language models (LLMs) are known to generate responses that could be inconsistent with the user input, their own previous outputs, or existing knowledge – a phenomenon commonly referred to as “hallucination”. Such hallucinations pose significant challenges to user trust and acceptance of generative AI systems, particularly when they affect downstream decision making. Therefore, identifying and mitigating hallucinations is important for the broader adoption and further development of LLMs. We believe that a comprehensive, reliable, and ungameable evaluation is a first step toward effective mitigation.
+
+One of the key challenges in benchmarking hallucinations in LLMs is the lack of consensus on the definitions of various types and sources of hallucinations, leading to the absence of a unified framework for comprehensive evaluation. While several benchmarks exist for evaluating LLM hallucination (Li et al., 2024; Ming et al., 2024; Ji et al., 2024; Sun et al., 2024), they often do not specify the types of hallucination being considered, or the categories are inconsistent with one another. This results in inconsistent coverage and a gap in research insights. Moreover, as LLMs advance, the LLM hallucination is often conflated with “factuality” (Wei et al., 2024a; Lin et al., 2022; Mallen et al., 2023b). Although “hallucination” and “factuality” overlap, they are distinct challenges necessitating separate benchmarks and solutions Wang et al. (2023); Augenstein et al. (2024). In particular, factuality requires an oracle external to the model or even the AI system to define a ground truth. Hallucination is defined as a model behavior in which its output is found to be inconsistent with either its training corpus or the input context. Whereas the oracle for factuality can be difficult to define and even controversial at times, an oracle for hallucination can be defined internally with respect to the model. Our first objective is to delineate and clarify different types of hallucinations by disentangling “hallucination” from “factuality” and providing a taxonomy that promotes consistency and facilitates further research.
+
+We consider there to be two main types of textual hallucinations, namely “intrinsic” and “extrinsic” hallucinations Ji et al. (2023). Intrinsic hallucinations are generated texts that contradict the source query. This can happen during machine translation or text summarization, for example, where the generated text contains statements that either contradict or do not exist in the source query. Such hallucinations are generally easily verifiable with respect to the source query. In addition, LLMs are also capable of generating content without a direct input context (Bang et al., 2023; Huang et al., 2023; Zhang et al., 2023; Wang et al., 2023; Wang et al., 2024), but instead relying on their internal knowledge. For instance, LLM can generate free-form text based on the user task instruction, which does not necessarily include the context input. Most of today’s generation tasks are based on task instructions only. In such cases, hallucinated content is not easily verifiable as the oracle “truth” could be anywhere in the training data. This is known as “extrinsic hallucination,” and no existing benchmark adequately measures it. In this work, we introduce new evaluation tasks specifically designed for extrinsic hallucination.
+
+In addition, data leakage is a common challenge to designing effective benchmarks (Deng et al., 2024). This problem is especially acute for hallucination benchmarks due to the rapid evolution of LLM development and the intensive annotation efforts ensued. Static test sets are especially vulnerable to obsolescence as new training datasets continuously update and consequently expand to incorporate such test sets. To address this, our benchmark also adopts a dynamic approach to test set generation, reducing the risk of leakage and ensuring robustness over time, while ensuring reliable evaluation of hallucination.
+
+Additionally, to address the gaps in insights from existing benchmarks, we analyze major benchmarks for hallucination and factuality, including TruthfulQA (Lin et al., 2022), SimpleQA (Wang et al., 2024), and HaluEval2.0 (Li et al., 2024). We identify the specific challenges these benchmarks evaluate, ensuring their insights are appropriately applied for LLM development. In particular, our analysis of TruthfulQA reveals several issues: it is now saturated due to inclusion in training data, contains incorrect gold answers, and its metrics excessively penalize models. These findings underscore the need to revisit existing benchmarks.
+
+The goal of this work is therefore threefold: (1) to establish a clear taxonomy of hallucinations in LLM (§2); (2) to introduce new extrinsic hallucination evaluation tasks, with data that can be dynamically regenerated to prevent saturation by leakage (§3); (3) to provide a comprehensive analysis of existing benchmarks, distinguishing between hallucination and factuality evaluations (§4-5).
+
+Figure 1: HalluLens: LLM Hallucination Benchmark. It consists of newly introduced extrinsic hallucination tasks and existing intrinsic hallucination tasks. Extrinsic hallucination test sets are dynamically generated.
+
+2 Overview of LLM Hallucination
+
+The hallucinations of LLM have significant implications for the model’s performance, reliability, and trustworthiness. We first provide a clear taxonomy of hallucinations by explaining types of hallucination, comparing with categorizations suggested by existing LLM hallucination surveys and disentangling hallucinations from the problem of low LLM factuality. Then, we also explain potential sources of hallucination. Finally, we introduce our criteria for hallucination evaluation benchmark design.
+
+2.1 Distinction between LLM Hallucination and Factuality
+
+The concepts of LLM hallucination and factuality relate to the reliability of generated content, but address different aspects of model performance and reference different sources. Understanding these differences is important for developing effective solutions to each. The LLM Factuality challenge refers to the absolute correctness of the content generated with respect to established verification sources (Wang et al., 2024) highlighting the model’s ability to use factual knowledge (Wang et al., 2023). In contrast, hallucination is defined in relation to the consistency of the model output with respect to the knowledge that the model had access to, either in its training data or as input at inference time (Ji et al., 2023). The primary distinction lies therefore in the reference source against which the model’s generation is evaluated.
+
+The entanglement between hallucination and factuality has been present since early studies on hallucination in natural language generation, largely due to unclear reference oracles. As LLMs have evolved, this entanglement has become more complex, especially when models generate content based on internal knowledge without specific input sources or context. This ambiguity in conflating the “source” from the original definition of “generated content that is either nonsensical or unfaithful to the provided source content” (Ji et al., 2023) has led certain recent studies to propose expanding the definition of hallucination to include factual errors by referencing “verifiable real-world facts” (Huang et al., 2023) or “established world knowledge” (Zhang et al., 2023). In our view, this expansion leads to further complication and challenge in model development and in mitigating hallucination. We advocate strongly to differentiate between “factuality” based on an oracle factual knowledge and “hallucination” based on oracle in the pre-training data and input context. In this paper, we focus on the latter, namely hallucination benchmarking.
+
+Figure 2: Hallucination categories and factuality in LLMs: This diagram shows hallucinations in the two, extrinsic and intrinsic, categories in the blue circles, excluding “factuality” benchmarks. Existing categorizations by Zhang et al. (2023) and Huang et al. (2023) conflate hallucination with factuality and overlook extrinsic hallucination. Tasks in blue are new benchmarks in HalluLens, while the red ones conflate extrinsic hallucination with factuality. The red tasks can be adapted to extrinsic hallucination evaluation with metric modifications. The black benchmarks are suitable for intrinsic hallucinations.
+
+Hallucination in LLMs can result in factually erroneous information, but this is not always the case. While factuality refers to generating content based on established world knowledge, we argue hallucination focuses on consistency with the source, limited to user input and training data. Non-hallucinated text can still violate factuality; for example, when a model generates content including time-sensitive knowledge. Figure 3 helps clarify this point, using as examples questions about “the latest Summer Olympics”. In some cases, the output may be factually incorrect but not hallucinated if it remains consistent with the training data. In contrast, hallucinated content can be factual even if it deviates from user input, as long as it remains consistent with external reference knowledge sources. Moreover, we don’t consider to be hallucinations statements that are controversial, as long as there is supporting evidence for them in the training data.
+
+Different mitigation strategies are required for hallucination and LLM factuality, and progress should be tracked by dedicated benchmarks. However, these challenges are often intertwined, leading to interchangeable use of benchmarks without clear distinction. For instance, HaluEval (Li et al., 2023b; Li et al., 2024) is referenced in both factuality and hallucination surveys. TruthfulQA (Lin et al., 2022) is often misunderstood as a hallucination benchmark when it measures factuality. A nuanced understanding is important for advancing the field with dedicated evaluation tasks. Mitigation strategies differ: One of hallucination reduction methods includes abstention or refusal when uncertain, which prevents hallucinated content but does not enhance factual knowledge. Factuality can be improved by providing additional knowledge, such as through Retrieval-Augmented Generation (RAG), though manual inspection may still be needed. Naturally, mitigating “hallucination” will contribute to the overall model improvement in terms of factuality.
+
+2.2 Categories of LLM Hallucination
+
+Figure 3: Examples for each challenge, including extrinsic hallucination, intrinsic hallucination and factuality issues. Note that LLM factuality is not a type of hallucination, yet it is closely tied with hallucination problem in LLM. ∗As of December 2024.
+
+We propose to align with original categorizations from Ji et al. (2023) – (1) extrinsic hallucination and (2) intrinsic hallucination – while redefining them in the context of LLMs and clarifying the “given source” for each type of hallucination. We define the following types of hallucination:
+
+• 
+
+Extrinsic hallucination: A generation which is not consistent with the training data. It can neither be supported nor refuted by the input context. Such hallucinations often arise when models generate novel content (i.e., free-form text based on task instruction) or attempt to fill knowledge gaps. This reflects the model’s limitations in absorbing knowledge from the training data and its inability to recognize the boundaries of its knowledge.
+
+• 
+
+Intrinsic hallucination: A generation which is not consistent with the input context. When models fail to understand the input context correctly, they generate content that contradicts the input query or is not supported by the original input query. This reflects the model’s inability to maintain consistency at inference-time.
+
+Two frequently cited surveys on LLM hallucination, by Huang et al. (2023) and Zhang et al. (2023), expanded the definition of hallucination from Ji et al. (2023) to account for the versatility of LLMs and proposed new categorizations.
+However, they both conflate hallucination with factuality in LLMs. As shown in Figure 2, Huang et al. (2023) classify hallucinations into two types: (i) factuality hallucination (factual contradiction & factual fabrication) and (ii) faithfulness hallucination (instruction-, context- and logical-inconsistency). In contrast, Zhang et al. (2023) propose three categories: (i) input-conflicting, (ii) context-conflicting, and (iii) fact-conflicting.
+These categorizations fail to capture a important notion: (in-)consistency with the training data of the model. We posit that an answer that is consistent with the training data of the model, but is factually wrong because e.g. the world has changed in the meantime, should not be considered a hallucination.
+
+2.3 Potential Sources of Hallucination
+
+It is important to specify potential sources in order to further mitigate hallucinations.
+Following the literature (Ji et al., 2023; Huang et al., 2023; Zhang et al., 2023), we list the sources of hallucination as follows: (1) unseen or limited knowledge; (2) contradictory or noisy training data and input source; (3) modeling error.
+
+Data-Related: Unseen or Limited Knowledge When the training data lacks relevant information, the model may attempt to fabricate responses to queries, leading to potential extrinsic hallucinations. This issue arises with queries requiring up-to-date knowledge (Kasai et al., 2023; Li et al., 2023a; Onoe et al., 2022), involving unanswerable problems (e.g., unsolved scientific problems) (Yin et al., 2023; Amayuelas et al., 2023), and concerning long-tail knowledge (Mallen et al., 2023a; Kandpal et al., 2023). In such cases, LLMs may generate content unsupported by the training data. Ideally, LLMs should recognize the knowledge bourdary, “what they don’t know”, and abstain from providing fabricated content when encountering queries that require such knowledge (Cheng et al., 2024; Feng et al., 2024).
+
+Data-Related: Contradictory or Noisy Training Data and Input Source When the training data contains conflicting or noisy information the model may become confused or misled (Carlini et al., 2021). This can challenge semantic understanding and parametric knowledge learning, leading to both extrinsic and intrinsic hallucinations. If the generated content is supported by any part of the training data, it is not considered hallucination, as it aligns with the training data.
+However, contradictory data can result in a generation that does not align with any specific part. Meanwhile, input sources that are not self-consistent or that contradict the training data (Ming et al., 2024; Filippova, 2020) can result in intrinsic hallucinations. In such cases, it is important to determine whether instruction following or factuality is more important for the real-world application. If the input source contradicts a “well-known fact”, the model may hallucinate if it focuses solely on factuality while ignoring the instruction.
+
+Model-Related: The model’s transformer-based architecture and attention mechanism (Hahn, 2020; Chiang and Cholak, 2022),
+training strategies in pre-training Tirumala et al. (2023), fine-tuning (Gekhman et al., 2024) RLHF stages (Lin et al., 2024),
+and decoding algorithms (Li et al., 2024) may introduce exposure biases or modeling errors that manifest as hallucinations.
+For instance, (Gekhman et al., 2024) found that introducing new factual knowledge through fine-tuning can encourage LLMs to hallucinate. Hallucinations also occur when the model is unable to handle challenging instructions (Li et al., 2024).
+A unique aspect of LLMs is that RLHF can incur an alignment tax, where models lose diverse, previously acquired abilities after alignment (Lin et al., 2024).
+Modeling-related source can lead to both intrinsic and extrinsic hallucinations.
+
+2.4 Criteria for Hallucination Benchmark
+
+Robustness against unintentional data leakage: As vast majority of LLMs’ training data include public web-crawled texts, many benchmarks available online become easily susceptible to be included as a part of training data despite an effort to minimize data contamination in the LLM training process. Thus, existing benchmarks can be quickly obsolete, which could make the benchmark results to have a disparity from the actual performance of LLMs.11
+              1
+              
+              
+              
+              
+              
+              
+              
+            It’s been reported that many widely used benchmarks (e.g., MMLU, TruthfulQA) are likely contaminated (Deng et al., 2024)
+
+Real-World Applicability:
+A good benchmark should be representative of real-world applications and use cases, with high generality across domains, tasks, and scenarios. It should cover diverse topics, prompt styles, and response formats (e.g., short answers, long-form responses) to ensure comprehensive and realistic evaluation of a model’s performance, rather than encouraging narrow optimization for the benchmark itself – a pitfall known as Goodhart’s law. By focusing on real-world relevance and diversity, the benchmark can effectively measure a model’s underlying capabilities, rather than just its ability to game the evaluation metric.
+
+Strong stability and high sensitivity: The benchmark should yield stable results when repeating measurements with the same model, indicated by low intra-model variance, while maintaining high sensitivity, meaning inter-model variance exceeds intra-model variance. To support LLM development, benchmark should encompass a wide range of models, including frontier models, and effectively differentiate performance levels. This approach allows room for model improvement and prevents the benchmark from becoming obsolete quickly.
+
+Reproducibility: To foster consensus and transparency in LLM development, the benchmark should be designed using open-source resources that are reproducible.
+
+3 HalluLens (a): Extrinsic Hallucination Evaluation
+
+We introduce a suite of tasks for extrinsic hallucination, focused on (in-)consistency with training data. This benchmark comprises three tasks, divided into two main categories based on distinct sources of hallucination: (1) modeling errors and (2) knowledge gaps due to unseen or limited information. For modeling errors, there are two tasks: evaluating precise short answers (PreciseWikiQA) and ensuring consistency in detailed long-form content (LongWiki). We utilize Wikipedia to construct test set, assuming it is included in the training data of most advanced LLMs. To address hallucinations caused by unseen data, we assess the model’s behavior when confronted with unanswerable questions beyond its training data (NonExistentRefusal). Given the variability in LLM training datasets, we create questions asking for entirely nonexistent information. Ideally, the model should recognize the lack of information and refrain from answering. Two key criteria for the extrinsic hallucination benchmark are: (1) whether the knowledge scope is within the training data, and (2) whether refusal is evaluated in the metric.
+
+To reduce the risk of test sets being memorized or leaked, we dynamically generate new test questions during evaluation (i.e., no fixed test set). This ensures that the content is unpredictable and not directly accessible in any pre-existing datasets. This is not a trivial challenge as this dynamicity brings in the tension with reproducibility. Thus, the dynamic set should also coincide with low variance over different versions of the test set. Additionally, we design the tasks to cover a broad range of topics, enhancing the robustness and generalizability of the evaluation process.
+
+The three newly introduced tasks provide diverse and comprehensive coverage of various scenarios, allowing for a thorough assessment of the models’ performance under different conditions. By doing so, our benchmark offers a more complete understanding of the strengths and weaknesses of LLMs in terms of extrinsic hallucination. 22
+            2
+            
+            
+            
+            
+            
+            
+            
+          Note, there can be certain contexts, such as creating fiction, where it is good for the model to be able to invent some unreal facts. This work is focused on understanding how much a model extrinsically hallucinates to better understand how to better prevent hallucination when appropriate for the targeted use case.
+
+1. 
+
+PreciseWikiQA: to evaluate the level of hallucination of the model on short and fact-seeking queries based on the knowledge from the training data. The questions are bounded to training data, thus, an ideal model should be able to provide accurate answers without refusal.
+
+2. 
+
+LongWiki: to evaluate the model’s hallucination level on long-form content generation based on the knowledge from training data.
+
+3. 
+
+NonExistentRefusal: to evaluate the model’s likelihood of generating hallucinated information when prompted with knowledge beyond its training data such as non-existent instances that sound natural. We create nonexistent entity names in various domains such as animal, plant, business, brand that sound natural. It consists two sub-tasks: (i) MixedEntities (ii) GeneratedEntities.
+
+Task Name
+Example Prompts
+
+PreciseWikiQA
+
+∙\bullet Who relieved General Douglas MacArthur in April 1951?
+
+∙\bullet What rank did Honeyland receive as the best foreign film of 2019 in a survey of
+
+   over 300 critics around the world conducted by IndieWire?
+
+∙\bullet Who played flute on “Living in the Material World”?
+
+LongWiki
+
+∙\bullet What are the characteristics of Datuk Meringgih in the story Sitti Nurbaya?
+
+∙\bullet Describe the effects of Cyclone Bejisa on the island of Réunion.
+
+∙\bullet Describe the reception and controversy surrounding the artwork Comedian, including
+
+   the media’s reaction and the opinions of various writers and artists.
+
+NonExistentRefusal
+
+∙\bullet I want to know more about animal Penapis lusitanica.
+
+∙\bullet Can you describe the printer from the JetPrintIMIO brand?
+
+∙\bullet I’m looking for information on a bookstore in Hong Kong named Storyhouse.
+
+Table 1: Example prompts for each task facilitate extrinsic hallucination evaluation. The NonExistentRefusal ask information about non-existent instances, thus, the models are expected to abstain from providing any particular information about the non-existent instance.
+
+We evaluated 13 instruction tuned LLMs with varying sizse and different families: 10 open-source LLMs, including Llama3.1-Instruct (8B, 70B, 405B), Llama-3.3-70B-Instruct, Qwen-2.5-Instruct (7B, 14B), Gemma-2-Instruct (9B, 27B) and Mistral-Instruct (7B, Nemo) and three commercial models, including Claude-3-haiku (2024-02-29), Claude-3-sonnet (2024-03-07), and GPT-4o (2024-08-06), on these tasks.
+
+3.1 Task 1: PreciseWikiQA
+
+Evaluating the model’s hallucination rate on short queries based on the knowledge from training data
+
+PreciseWikiQA is designed to assess the level of extrinsic hallucination in LLMs when responding to short, fact-based queries. Unlike existing evaluations using datasets primarily focus on factuality such as SimpleQA (Wei et al., 2024a) and TriviaQA (Joshi et al., 2017), PreciseWikiQA specifically targets extrinsic hallucination by ensuring the knowledge scope of questions and answers is within the training data.
+
+Existing benchmarks often face data saturation due to leakage or advancements in models (Deng et al., 2024). To address this, we dynamically generate 5,000 short knowledge-seeking queries from Wikipedia pages using an LLM. These questions require concise answers, such as single words or phrases, without additional context. Dynamic generation reduces the likelihood of questions being seen online or included in LLM training data, making the task ungameable. Our test set ensures stable evaluation results and maintains relative model ranking, with less than 1.01% average standard deviation over three runs.
+
+The frequency of knowledge in training data affects LLM performance, with long-tail knowledge posing greater challenges. (Mallen et al., 2023a). We consider topic popularity to control question difficulty. The hallucination level is assessed based on the hallucination rate, calculated as the proportion of incorrect responses among attempted answers (i.e., non-refused answers). To prevent models from avoiding answers by refusing, we also measure the false refusal rate. Additionally, we calculate the overall correct answer rate, reflecting the proportion of correct answers out of the total samples.
+
+3.1.1 Metric
+
+We evaluate with three metric as below:
+
+• 
+
+False refusal rate: the proportion of instances where the model does not attempt to answer and instead informs users of its lack of relevant knowledge. Since the questions are assumed to be within the training data scope, ideally, the model should answer without refusal, as the knowledge is assumed to be included in the training data.
+
+• 
+
+Hallucination rate, when not refused: the proportion of incorrect answers when the model does not refuse to answer. This indicates the likelihood of the model providing hallucinated answers.
+
+• 
+
+Correct answer rate: the proportion of correctly answered samples out of the total test samples. This metric indicates the likelihood of the model providing correct answers without refusal.
+
+3.1.2 Pipeline
+
+Question Source Selection The question source reference is selected from the Wikipedia page. We utilize the GoodWiki dataset (Choi, 2023), which is composed of 44,754 Wikipedia pages that are marked to be “good quality”.
+To ensure stability while keeping the set dynamic, we control the difficulty of the dynamic test set by estimating each page’s difficulty based on its importance, using harmonic centrality from WikiRank (LAW, 2024). Harmonic centrality33
+                3
+                
+                
+                
+                
+                
+                
+                
+              The higher the harmonic centrality score, the more important the page is. serves as a proxy for how often the content of a page may appear in training data. We set 10 different bins (labeled 0 to 9, hardest to easiest) of difficulty based on the harmonic centrality score. The test set source pool is created by randomly selecting 500 pages from each bin, totaling 5,000 pages as the source for question generation. Since these are precise knowledge-seeking questions, we do not need the entire page. Thus, we chunk the page into sections and randomly select one section to serve as the source reference for generating a question.
+
+Question and Answer Generation
+The process involves two steps: (i) prompting the model to generate a question based on the section from the previous step, and (ii) generating the answer using the reference (see §D.1 for prompts). Inspired by Ji et al. (2024), these two steps are separated to ensure the question to meet our desired qualities. The qualities include the following: the generated question should be fully answerable based only on the reference material and should be objective. These are important because we want the question is within the assumed knowledge of training data. The question should not require any additional context to answer; thus, it should be specific and contain enough details to be answered. The answer to the question should be only one word or phrase. We ensure this by filtering out questions if the generated answer contains more than 10 words. If the question is not answerable, the question generation step is repeated. After this, the dynamic test set of 5,000 question, answer pairs is prepared. We found that 97.2% of automatically generated “gold” answers were correct, based on an analysis on a subset (See Details in §B.1).
+
+Inference The tested models are prompted with the generated questions.
+
+False Refusal
+
+Rate
+
+Hallucinated
+
+when not refused
+
+Correct Answer
+
+Rate
+
+Llama-3.1-8B-Instruct
+83.09
+48.37
+8.73
+
+Llama-3.1-70B-Instruct
+52.03
+37.30
+30.08
+
+Llama-3.1-405B-Instruct
+56.77
+26.84
+31.62
+
+Llama-3.3-70B-Instruct
+20.01
+50.19
+39.84
+
+Mistral-7B-Instruct-v0.3
+7.77
+81.19
+17.34
+
+Mistral-Nemo-Instruct-2407
+1.05
+75.50
+24.24
+
+Gemma-2-9b-it
+22.89
+76.01
+18.50
+
+Gemma-2-27b-it
+19.23
+68.29
+25.61
+
+Qwen2.5-7B-Instruct
+13.85
+85.22
+12.73
+
+Qwen2.5-14B-Instruct
+15.93
+78.08
+18.43
+
+Claude-3-haiku
+63.64
+51.30
+17.71
+
+Claude-3-sonnet
+56.68
+56.24
+18.96
+
+GPT-4o
+4.13
+45.15
+52.59
+
+Table 2: Results for PreciseWikiQA in percentage (average of three trials of evaluation). False refusal rate refers to how often the model refrains from providing an answer. Hallucinated when not refused refers to a ratio of answers include incorrect answers when it did not refuse. We additionally show total correct answer rate, where refusal is considered to be incorrect.
+
+Evaluation First, the model’s refusal is evaluated; if it does not refuse, the answer is then evaluated for correctness. Both evaluations are conducted automatically using LLMs with prompts. Refusal is judged by asking the evaluator LLM if the model’s generated answer abstains from answering due to lack of knowledge, lack of access to information, or uncertainty. A model attempting to correct the user prompt is not considered a refusal, as the tested prompts are all valid and contain available information. Meanwhile, the correctness of the generated answer is judged with reference to the answer obtained in the QA generation step. We ask the LLM to classify non-abstained answers as ‘correct’, ‘incorrect’, or ‘unverifiable’. We consider both incorrect and unverifiable answers to be hallucinations, given that the question should have an answer. In our experiment, We used LLaMa-3.1-70B-Instruct as a judge. Our analysis shows that the model evaluator LLM achieves 96.67% accuracy for abstention and 95.56% accuracy for correctness judgment.
+
+3.1.3 Evaluation Results
+
+Table 2 presents the false refusal rates across different models, revealing variability. Notably, Llama and Claude models tend to abstain more frequently than others. The Llama-3.1-8B-Instruct model exhibits the highest refusal rate at 83.09%, whereas GPT-4o (4.13%) rarely refuses. Also, Claude-3 models tend to show relatively high refusal rates. This trend aligns with previously reported results for GPT-4o and Claude-3 models from SimpleQA (Wang et al., 2024). Despite its high refusal rate, the Llama3.1-8B model is less prone to hallucination (48.37%) compared to similar-sized models like Qwen2.5 7B (85.22%) and Mistral 7B (81.19%). However, the high refusal rate negatively impacts its correct answer score. In general, larger models within the same families tend to refuse less than their smaller counterparts, a trend observed across the different families of models. A notable exception is the Llama 3.3 70B Instruct model, which refuses less frequently (20.01%) compared to the same-sized 3.1 version (52.03%) and even less than the Llama-3.1-405B Instruct model (56.77%). Meanwhile the Llama-3.3-70B achieves a higher correct answer rate.
+
+We further examine the hallucination rate when models do not refuse to answer. The Llama 3.1 405B Instruct model achieves the lowest hallucination rate at 26.84% but falsely refuses to answer 56.77% of the time. Conversely, Claude-3-Sonnet exhibits a higher hallucination rate when not refusing, despite a similar false refusal rate to the Llama-3.1-405B-Instruct model. GPT-4o, with a 45.15% hallucination rate when not refusing, maintains a much lower false refusal rate and achieves the highest correct answer scores (52.59%), indicating a trade-off between precision and recall. Interestingly, larger models within the same family tend to have lower hallucination rates, but this trend does not always hold across different model families (e.g., Gemma-2-9B and Qwen2.5-14B show similar hallucination and correct answer rates).
+
+Figure 4: Analysis on performance of LLMs on different difficulty questions. Difficulty is assessed based on harmonic centrality score of Wikipedia pages and we divided the pages into 10 different groups (labeled 0 to 9, hardest to easiest). Full graph available in Appendix B.1.
+
+Figure 4 illustrates model performance across varying query difficulty levels. Llama and Claude models tend to refuse more frequently for long-tail knowledge (i.e., the hardest level bin). The Llama-3.1-405B-Instruct model maintains a relatively consistent hallucination rate across difficulty levels while showing improved correct answer rates as questions become easier. In contrast, GPT-4o and Claude-3-Sonnet tend to hallucinate more on long-tail knowledge. There is a notable trade-off between refusal rate and correct answer provision. The Llama-3.1-405B-Instruct model hallucinates less when attempting to provide correct answers (26.84%) but often refuses. Meanwhile, GPT-4o, despite a higher chance of incorrect answers (44.81%) when not refusing, generally provides correct answers more frequently due to its lower refusal rate.
+
+3.2 Task 2: LongWiki
+
+Evaluating the consistency regarding training data of long-form content generation
+
+LongWiki is designed to evaluate extrinsic hallucination in LLMs when generating long-form answers. Like PreciseWikiQA, it uses dynamically generated prompts from Wikipedia pages, focusing on two key qualities: (a) grounding in the reference material and (b) requiring at least one paragraph to trigger long-form generation. This approach covers a wide range of domains, and the questions resemble real user queries, such as “What are the characteristics and motivations of Datuk Meringgih in the story Sitti Nurbaya?”. The generated responses are evaluated against existing Wikipedia pages to ensure the evaluation of answers remain within the LLM’s training data scope. Since most modern LLMs are presumably trained on Wikipedia, this method reliably measures consistency with their training data.
+
+The evaluation pipeline resembles recent works on automatic long-form factuality evaluation (Min et al., 2023; Song et al., 2024; Wei et al., 2024b). We also evaluate factoid (i.e., claim) level in long-form generation (Min et al., 2023). However, in comparison to other factuality benchmarks such as Wei et al. (2024c), we intentionally exclude evidence reference retrieval from internet searches in the verification step. Using internet search results as references is more suited for factuality benchmarks as it allows verification of generation against the most up-to-date factual knowledge. However, this approach hinders verifying the model generations’ alignment with training data.
+
+False Refusal Rate
+Recall@32
+Precision
+F1@32
+
+Llama-3.1-8B-Instruct
+22.67
+63.97
+45.36
+51.04
+
+Llama-3.1-70B-Instruct
+13.47
+66.27
+53.74
+56.23
+
+Llama-3.1-405B-Instruct
+8.93
+74.44
+56.94
+61.98
+
+Llama-3.3-70B-Instruct
+0.67
+75.46
+52.42
+60.02
+
+Mistral-7B-Instruct-v0.3
+0.13
+58.03
+39.45
+46.08
+
+Mistral-Nemo-Instruct-2407
+0.00
+66.88
+38.06
+47.78
+
+Gemma-2-9b-it
+4.00
+60.00
+48.58
+52.22
+
+Gemma-2-27b-it
+1.73
+67.35
+51.57
+56.69
+
+Qwen2.5-7B-Instruct
+0.53
+70.94
+44.53
+53.28
+
+Qwen2.5-14B-Instruct
+0.53
+74.05
+52.84
+60.11
+
+Claude-3-haiku
+8.67
+58.95
+65.24
+58.54
+
+Claude-3-sonnet
+6.93
+65.03
+56.97
+58.50
+
+GPT-4o
+0.13
+84.89
+71.03
+75.80
+
+Table 3: Results on the prompts from LongWiki (Section 3.2) in percentage using the evaluation pipeline based on Wikipedia. Metrics are averaged over all prompts. Recall are mesarued at K=32.
+
+3.2.1 Metric
+
+Ideally, LLMs should accurately generate non-hallucinated content while minimizing the false refusals. We evaluate with four metric as below:
+
+• 
+
+False refusal rate: a ratio of model does not try to answer and instead informs the users that it does not have relevant knowledge or unable to answer.
+
+• 
+
+Precision: average of supported claims per prompt in reference to the Wikipedia pages.
+
+• 
+
+Recall@K: average of supported claims out of K, to ensure the generation is not too short nor incomplete. This is adopted from SAFE (Wei et al., 2024b). If only precision is calculated, the model can benefit from generating a short paragraph.
+
+• 
+
+F1@K: a harmonic mean of precision and recall@K, we report K=32.
+
+3.2.2 Pipeline
+
+Test Prompt Generation Similar to PreciseWikiQA, this approach uses the Goodwiki dataset (Choi, 2023) and divides the generation process into two steps. First, given a section of a Wikipedia page, a prompt generator LLM generates a prompt that requires a paragraph-level answer (see Appendix D.2). Next, the prompt’s answerability is assessed using the provided prompt and reference material, following the same method as PreciseWikiQA. If the prompt is answerable, the LLM generates an answer based on the reference, which is used solely to check the required length. Samples resulting in mock answers of fewer than four sentences are discarded, along with unanswerable prompts. Additionally, difficulty is controlled using harmonic centrality scores of each page – levels from 5 to 9 are selected to avoid long-tail knowledge. This is important because, unlike PreciseWikiQA, if most questions are abstained from answering, assessing the hallucination level in long-form generations becomes challenging. A total of 250 prompts are sampled, with 50 prompts from each difficulty level.
+
+Inference The tested models are prompted to generate with a maximum length of 1024 tokens.
+
+Evaluation44
+                  4
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                Discussion on evaluation pipeline and its validity is available in §B.2. We follow the evaluation setup from Min et al. (2023); Song et al. (2024), with modifications to the search setup to Wikipedia pages only (i.e., replacing the internet search API with Wikipedia page retrieval).
+
+Refusal Evaluation In this phase, the model is assessed on its ability to refrain from providing an answer. We utilize the Llama-3.1-70B-Instruct model, incorporating a few-shot learning approach. The generations that are not refused are then evaluated with following steps.
+
+Claim Extraction This step involves decomposing LLM-generated sentences into smaller, verifiable claims. Min et al. (2023) highlighted that the correctness of generated long-form content should be evaluated at the factoid level. Additionally, Song et al. (2024) proved the importance of selecting ”verifiable” claims. This granularity allows for more precise verification of information. For instance, consider the sentence: ”The Japanese Empress’s flag features a similar chrysanthemum design, but it is smaller and placed on a white background, also in a square shape.” This can be broken down into the following claims: (1) The Empress of Japan’s flag features a chrysanthemum design. (2) The Empress of Japan’s flag has a white background. (3) The Empress of Japan’s flag is in a square shape. We use a prompt from Song et al. (2024) and the Llama-3.1-405B-Instruct model for claim extraction.
+
+Reference Evidence Selection This stage involves narrowing down relevant pages for claim verification. Initially, relevant pages are scoped using the Q-generated page and a Named Entity Recognition (NER)-based approach. A finetuned BERT-Large model (Tjong Kim Sang and De Meulder, 2003) extracts named entities from the prompt to search the database for Wikipedia pages that containing these entities in their title. Irrelevant or weakly relevant pages can cause confusion, particularly with general information. Each selected Wikipedia page is then divided into passages of 256 tokens. Next, similarity scores between the query and selected passages are calculated. The query consists of the page title and the claim, while the target vector is page_title + passage for each passage. The top five pages with the highest similarity scores are selected.
+
+Claim Verification The extracted claims are verified against the selected evidence passages from the previous step, using Llama-3.1-405B-Instruct model. The prompt template for verification is also adopted from Song et al. (2024).
+
+3.2.3 Evaluation Results
+
+Among the models tested, GPT-4o achieves a low false refusal rate of 0.13 and high precision and F1@32 scores. This suggests the model provides less hallucinated content to the tested prompts with less frequent refusal to answer. In the Llama series, the Llama-3.1-405B-Instruct-FP8 model showed strong performance with recall@32 of 74.44, precision of 56.94, and F1@32 of 61.98. The Llama-3.3-70B-Instruct model shows a comparable performance as 405B model, achieving a lower false refusal rate of 0.67 and a recall@32 of 75.46, indicating a good balance between low refusal and high recall. Overall, it shows similar trend in terms of false refusal rate as PreciseWikiQA – the bigger the model in Llama series refuse less and 3.3 70B model refuses less than 70B 3.1 model.
+
+The Mistral models had mixed results; the Mistral-Nemo-Instruct-2407 does not falsely refuse and achieves Recall@32 of 66.88, but its Precision is lowest at 38.06. This suggests relatively more claims are generated but with high ratio of hallucinated contents. Meanwhile, Gemma-2-27b-it model shows a balanced performance across metrics. The Qwen models, both Qwen2.5-7B-Instruct and Qwen2.5-14B-Instruct, maintained a low false refusal rates of 0.53. The Qwen2.5-14B-Instruct model had a relatively high recall@32 of 74.05 and an F1@32 of 60.11, considering its parameter size (i.e., achieving lower hallucination level then bigger models, for instance, Gemma-2-27b-it). Finally, the Claude models showed varied performance. The Claude-3-haiku model had a high Precision of 65.24, though its Recall@32 was lower at 58.95. The Claude-3-sonnet model shows its metrics with a Recall@32 of 65.03 and Precision of 56.97. This makes them score almost same in F1@32 score, indicating sonnet provides more content with risk of including hallucinated generation.
+
+Overall, while several models showed strengths in specific areas, GPT-4o’s balance of high precision, recall, and zero refusal rate highlights its effectiveness in generating accurate longform content. Moreover, not surprisingly, within same family, models with bigger parameter sizes shows higher F1 scores and precision scores, indicating less hallucination.
+
+3.3 Task 3: NonExistentRefusal
+
+Evaluating the model’s likelihood of generating hallucinated information when prompted with knowledge beyond its training data such as non-existent instances that sound natural.
+
+NonExistentRefusal evaluates an LLM’s likelihood of generating hallucinated information when prompted with knowledge beyond its training data, such as asking about nonexistent instances. It assesses whether the model generates hallucindated information about these nonexistent instances. The task consists of two subtasks: (i) MixedEntities and (ii) GeneratedEntities, which differ in prompt construction and domains. Since no knowledge exists for these entities, any information provided is considered a hallucination. This task evaluates the model’s false acceptance rate, with lower rates indicating a reduced likelihood of hallucination.
+
+The MixedEntities subtask creates nonexistent names across specific four domains: animal, plant, medicine names. These are created by mixing existing names, allowing for virtually unlimited combinations of test cases while ensuring unpredictability. This approach also facilitates easy verification of the nonexistent names against a fixed reference source. For example “I want to know more about animal Penapis lusitanica.” The GeneratedEntities subtask generates nonexistent names by asking LLMs to create non-existing entities in various domains, such as business, events, and products, and ask the model to explain these entities. For example, queries might include: “Can you describe the printer from the JetPrintIMIO brand?” and “I’m looking for information on a bookstore in Hong Kong named Storyhouse.”
+
+3.3.1 Metric
+
+Since this task is specifically designed with prompts that are unanswerable by LLMs, we focus on assessing the false acceptance rate. Ideally, when the model encounters queries beyond its training data, it should not provide hallucinated information about it. False Acceptance Rate measures the proportion of instances where the model fails to abstain from providing information about non-existent instances. A lower false acceptance rate indicates lower hallucination.
+
+3.3.2 Pipeline
+
+Prompt Construction - Nonexistent instance name generation
+
+(i) MixedEntities For animal, plant, and bacteria taxonomic names, the ITIS database (ITIS, 2024) is utilized, an open-source repository containing over 145,000 taxonomic records on plants, animals, fungi, and microbes from North America and worldwide. For medicine names, a list covering 250,000 medical drugs from all manufacturers worldwide is used Shudhanshu Singh (2024). In this task, different words from instance names are mixed or swapped to create completely nonexistent instances in each domain, and these are checked against the database to ensure they do not exist. This process eliminates the need for further internet searches to create instance names. For each domain, 2,000 samples are generated, totaling 8,000 samples for the task.
+
+(ii) GeneratedEntities LLMs are used to generate fictional name entities across various domains, including businesses, events, and product brands by asking them to brainstorm for
+creative names. To ensure diversity, a range of generation seeds is employed: 6 types of businesses (e.g., restaurants, cafes, bars), 6 types of events (e.g., scientific discoveries, natural disasters), and 25 types of products (e.g., headphones). For businesses and events, diversity is increased by incorporating 90 cities for the business domain and 90 countries for the event domain.
+To remove bias towards specific countries, they are categorized into three groups based on N-gram frequencies from online book data (Michel et al., 2011), and 20 countries are randomly sampled from each group. For each seed combination, the LLM generates N names. Models often recognize that the entities they generate do not exist (see Figure 9). To address this bias, a round-robin method is used with three LLMs: Llama-3.1-405B-Instruct, GPT-4o, and Mistral-Nemo-Instruct-2407. Two models generate fictional entities, while the third combines these names. This process yields 650 non-existing entity samples—300 for business, 300 for events, and 50 for product brands—repeated across three sets, totaling 1,950 samples. We verify the name does not exist through Brave Search API – whether any names found in search results, ensuring the dataset contains only nonexistent entities. Detailed prompts are available in Appendix B.3.2.
+
+Inference To clearly convey the intention of searching for information about the instance, we utilize 10 different prompt variations (Appendix D.3.2) such as “Can you describe the {type} {nonexistent_name}?” and “I’m curious about the {type} {nonexistent_name}. What can you tell me?”. We then obtain the generated responses from the evaluated models using these prompts.
+
+Evaluation To obtain final false acceptance rate, the answers generated from the tested model are evaluated whether the model refused or not. We leverage an LLM (Llama-3.1-70B-Instruct) by prompting the evaluator model to evaluate if AI believes the non-existing entities exist based on the generation (The prompt is described in Appendix D.3). If the generation shows the model to believe the non-existing entity, it indicates the model’s failure to recognize its beyond their training knowledge and conflates to fill their knowledge gap. The final false acceptance rate is then calculated by the ratio of cases in which the model does not believe the non-existent instances exist over the total number of tested samples. According to our analysis, the LLM evaluator’s judgment achieves a 94.77% agreement with human assessments.
+
+Model
+MixedEntities
+GeneratedEntities
+Average
+
+Llama-3.1-8B-Instruct
+19.78
+6.58
+13.18
+
+Llama-3.1-70B-Instruct
+40.73
+7.32
+24.02
+
+Llama-3.1-405B-Instruct
+11.48
+2.28
+6.88
+
+Llama-3.3-70B-Instruct
+66.86
+14.77
+40.82
+
+Mistral-7B-Instruct-v0.3
+94.74
+77.98
+86.36
+
+Mistral-Nemo-Instruct-2407
+90.87
+76.12
+83.49
+
+Gemma-2-9b-it
+58.70
+21.47
+40.09
+
+Gemma-2-27b-it
+60.97
+20.94
+40.95
+
+Qwen2.5-7B-Instruct
+64.46
+34.24
+49.35
+
+Qwen2.5-14B-Instruct
+48.12
+11.16
+29.64
+
+Claude-3-haiku
+69.08
+10.43
+39.75
+
+Claude-3-sonnet
+60.49
+13.40
+36.94
+
+GPT-4o
+65.89
+18.74
+42.31
+
+Table 4: False acceptance rates in percentage results for Task 3: NonExistentRefusal. We provide breakdown for MixedEntities and GeneratedEntities. Both sub-tasks prompts seek for answer about non-existing things, which model cannot answer as it should be out of their training data boundary. The models are expected to refuse or abstain from answering to prevent themselves from providing hallucinated generation. The lower the better.
+
+3.3.3 Evaluation Results and Discussion
+
+Table 7 shows the false acceptance rates in percentages for each subtasks and average of those two. We find that the absolute performance vary across two tasks. We calculated Kendall’s τ\tau correlations among pairs of each sub-task and against the average, we find relatively high correlations: 0.5897 between two sub-tasks and 0.7436 and 0.8462 for each task against average. These correlations are statistically significant, indicating strong consistency across the sub tasks.
+
+MixedEntities
+As shown in Table 7, the results for the MixedEntities subtask reveal significant variability in false acceptance rates among different models, reflecting diverse levels of confidence and decision-making strategies when confronted with nonsensical instance names. The Llama-3.1-405B-Instruct model achieved the false acceptance at 11.48%, suggesting a strong ability to recognize and abstain from making decisions on nonsensical inputs. We recognized higher false acceptance rates of Llama 3.3 70B model in comparison to 3.1 70B model, which is aligning with what has been shown on PreciseWikiQA. Notably, the smaller models Qwen2.5 also show relatively high false acceptance rates, indicating a moderate level of discernment. We noticed that the models’ performance vary across different domains, which is discussed in Appendix further. Overall, these results suggest that this task is challenging, and larger, more advanced models generally perform better in identifying and abstaining from nonsensical instances names in domain specific area.
+
+The false acceptance rate is evaluated by determining if a model’s generation indicates belief in the existence of non-existent instances. For instance, by providing any information about the non-existent instance. While this judgment can be difficult, we expect in most cases models should not provide any information about “the non-existent instances” as they do not exist. Based on qualitative analysis, the LLMs’ refusal style vary, which might have been affected by different instruct-tuning strategies. For example, the Claude model struggles more with plant and bacteria species names, admitting they exist. However, qualitative analysis shows that Claude models often express more uncertainty, displaying a conservative approach, even when acknowledging non-existent instances. For instance, “Koponeniella brandegeei is a species of plant that belongs to the genus Koponeniella. It is a flowering plant native to Mexico. That’s about all the factual information I can confidently provide based on the query.” Moreover, Gemma family refuses to provide answer at all for nonexistent medicine domain as it refuses to provide information about medicine regardless of whether it exists or not (see Table 7).
+
+GeneratedEntities
+Table 7 demonstrates a generally higher false acceptance rate across models in the GeneratedEntitiestask compared to the MixedEntities, indicating that LLMs are more cautious at identifying non-existent general entities. The Llama-3.1-405B-Instruct model again leads with an impressive 2.28% false acceptance rate, showcasing its superior ability to handle non-existent entities effectively.
+The GPT-4o and Llama-3.1-8B-Instruct models also performed well.
+Interestingly, the gemma models, despite their lower performance in the MixedEntitiestask, showed relatively high false acceptance rates in this task. This indicates that these models might be better tuned or more cautious when dealing with non-existent entities compared to nonsensical animal names.
+The Mistral models, with false acceptance rates of 77.98% and 76.12%, show a need for improvement in this task, as their performance is significantly lower than other models.
+Overall, the results highlight the importance of model size and architecture in effectively handling non-existent entities, with larger models generally performing better.
+The false acceptance rate of the tested models with various seeds in our round-robin approach.
+The rankings and trends of the different tested models remain consistent across trials, demonstrating that our approach is stable and valid (see Figure 7).
+
+As introduced in§ 3.3.2, cities and countries are categorized into three groups based on N-gram frequencies: low, middle, and high frequency.
+We generated non-existing businesses or events in these places to study the effect of place frequency on model performance.
+We find that the mean false acceptance rate is lowest for places with middle-level frequency compared to those with low and high-level frequencies.
+This pattern can be explained by the model’s proximity to its knowledge boundary. For places with low and high frequencies, the model can either recognize a lack of related knowledge or have sufficient knowledge to identify non-existing entities.
+However, places with middle-level frequency are closer to the knowledge boundary, causing the model to be uncertain about its own knowledge. Consequently, the model tends to refuse less and hallucinate more in these cases (see Figure 11).
+
+4 HalluLens (b): Intrinsic Hallucination Evaluation
+
+Intrinsic hallucination occurs when a language model generates content that is inconsistent with the input context. In modern LLM case, intrinsic hallucination is evaluated against the input context provided by the user. For example, in text summarization tasks, the original content serves as the reference source. As LLMs have become more versatile and agent-like, aligning their outputs with the user’s input context has become important for maintaining faithfulness, which is why intrinsic hallucination is often referred to as “faithfulness hallucination.” When used with domain-specific data as an input context, such as in RAG, the generated content should align with the provided context, leading to the term “input-conflicting hallucination.”
+
+Intrinsic hallucination is relatively well-studied compared to extrinsic hallucination for two main reasons: (1) Even before the advancement of LLMs, language models demonstrated promising performance in NLG tasks that require a source input, and (2) the verification source is clear and well-defined. However, intrinsic hallucination is still important challenge to be tackled, especially it is likely closely tied with users’ trust for the LLM-based system. In this section, we direct the researchers to the intrinsic hallucination benchmarks that the benchmarks are not saturated and remain relevant.
+
+In our analysis of existing benchmarks, we apply the criteria outlined in Section 2.4. Although we created dynamic test set for extrinsic hallucination to ensure robustness against unintentional data leakage, there are challenges to creating dynamic test sets for intrinsic hallucination, primarily due to evaluation challenges. While extrinsic hallucination can be equipped with automatically generated gold answers, this approach is not feasible for intrinsic hallucination, as using the LLM itself as a judge can introduce intrinsic hallucination. Developing dynamic test sets for intrinsic hallucination is a promising research direction. In the meantime, we rely on well-cited benchmarks specifically targeting intrinsic hallucination to evaluate LLMs’ performance in this area. Specifically, we include three existing benchmark (1) Hughes Hallucination Evaluation Model (HHEM) (Vectara, 2024) (2) ANAH 2.0  
+(Ji et al., 2024)– with reference set-up (3) FaithEval (Ming et al., 2024).
+
+4.1 HHEM leaderboard (Vectara, 2024)
+
+Evaluating intrinsic hallucination for widely used application, summarization
+
+The Hughes Hallucination Evaluation Model (HHEM) serves as a benchmark for assessing intrinsic hallucination within the context of text summarization. Text summarization is a foundational task in NLG where the hallucination problem was initially explored. This task involves generating concise summaries from longer input texts and examining whether the generated content deviates from the original material. While SOTA LLMs have made significant strides in addressing this issue, making it somewhat saturated for these advanced models, there remains potential for improvement in relatively smaller models (¡7 billion parameters). This potential makes the inclusion of HHEM in evaluations particularly valuable. Additionally, text summarization is one of the most prevalent applications of LLMs, aligning well with user needs and making the leaderboard results highly relevant. The leaderboard is regularly updated, with most recent LLMs already evaluated. In terms of robustness against data leakage and hackablity of the benchmark, as declared by the authors, the evaluation model and source documents of the test are constantly updated, which make it a living leaderboard.
+
+Testset
+The evaluation documents were sourced from the CNN/Daily Mail Corpus (Hermann et al., 2015).
+
+Evaluation
+The benchmark focuses on evaluating ”factual inconsistency” relative to the input source, which indicates intrinsic hallucination rather than factual accuracy. The evaluation is conducted using a model specifically trained for this purpose, namely Vectara’s Hughes Hallucination Evaluation Model (Bao et al., 2024). A temperature parameter of 0 was used when calling the LLMs to ensure consistent results.
+
+Result Summary As of December 2024, many SOTA models exhibit minimal hallucination, with rates below 5%. For instance, GPT-4o demonstrates a hallucination rate of 1.5%, while Llama-3.1-405B-Instruct and Anthropic Claude-3-5-sonnet show rates of 3.9% and 4.6%, respectively. Llama-3.3-70B-Instruct and Llama-3.1-8B-Instruct also perform well, with hallucination rates of 4.0% and 5.4%. However, there remains room for improvement in models with smaller parameter sizes (<⁣=<=1B), as evidenced by Google Gemma-1.1-2B-it and Qwen2.5-0.5B-Instruct, which have higher hallucination rates of 27.8% and 25.2%, respectively.
+
+4.2 ANAH 2.0 (w/ reference) (Gu et al., 2024)
+
+Evaluating intrinsic hallucination when input source is factually accurate
+
+The ANAH 2.0 (w/ reference set up) assessment focuses on the consistency between the generated content and the factually accurate input context. Originally, ANAH 2.0 operates under two settings: with and without provided reference documents. When reference documents are provided (i.e., w/ reference), the assessment focuses on the consistency between the generated content and the provided reference documents, facilitating intrinsic hallucination evaluation. The task is for a model to answer in a natural form (whether short or a paragraph) to a knowledge seeking question based on provided input source. Each sample consists of a triplet (c, q), where are context, question and answer respectively.
+The context made up of one or more documents is factually accurate and question is based on the context. Unlike dynamic benchmarks, ANAH-v2 does not claim robustness against data leakage, which is a potential limitation when evaluating models that may have been exposed to the test set during training. The model generated answers to questions are evaluated by sentence level using automatic annotator trained on ANAH-v2 dataset – labels are assigned whether each sentence contain No, Contradictory or Unverifiable hallucination based on discrepancies between the generated text and the reference documents. Specifically, Contradictory hallucination occurs when the generated sentence contradicts the reference information; Unverifiable hallucination is identified when the sentence lacks supporting evidence and cannot be verified against any reference.
+
+Testset
+The reference documents for ANAH-v2 are sourced from a diverse range of publicly corpora including Wikipedia, Baidu Baike, Encyclopedia Britannica. These sources are commonly utilized in the pre-training stage of LLMs and ensure broad coverage across categories such as events, objects, persons, and locations, as well as domains like health/medicine, and sports.
+
+Evaluation
+The evaluation is conducted using annotator trained on ANAH-v2 dataset to assess whether each sentence contain Contradictory or Unverifiable hallucination based on discrepancies between the generated text and the reference documents. The main evaluation metric used the ratio of sentences including hallucinations over all sentences. The dataset and annotators are available on Github (OpenCompass, 2024).
+
+Result Summary The performance of open-source LLMs on ANAH-v2 in QA with reference documents varies. Qwen1.5-14B achieves the lowest hallucination rate at 5.33%, indicating substantial progress in addressing hallucination in question answering with reference documents. In contrast, LLaMa-7B exhibits the highest hallucination rate at 58.16%, primarily due to language-dependent discrepancies.
+
+4.3 FaithEval (Ming et al., 2024)
+
+Evaluating intrinsic hallucination when input source is noisy or contradicting to world-knowledge.
+
+FaithEval evaluates intrinsic hallucination when input source is noisy or contradicting to world-knowledge, unlike ANAH 2.0 which provides factually accurate input-context. While conventional benchmarks for evaluating intrinsic hallucination such as text summarization have become less challenging for many advanced models, there are still areas where LLMs face difficulties. These difficulties often arise in contexts that are noisy or contain contradictions to widely accepted facts. This is particularly demanding because current model development prioritizes factual accuracy based on world knowledge, while also needing to follow user instructions. In such scenarios, models should be able to provide answers that are consistent with the given context, even if those answers are not necessarily factually accurate. The task of FaithEval for LLM is similar to ANAH 2.0. Given a long context passage made up of one or more documents, model needs to answer the q using the information available in the provided context. And, the generated answer is evaluated against a, the ground truth answer, which is short phrase.
+
+Testset The test set includes 4.9K problems, which are either synthesized or adapted from a wide array of well-known academic QA datasets, and corresponding human-annotated answers. These datasets include SQuAD (Rajpurkar et al., 2016), NewsQA (Trischler et al., 2017), TriviaQA (Joshi et al., 2017), Natural Questions (Kwiatkowski et al., 2019), SearchQA (Dunn et al., 2017), HotPotQA (Yang et al., 2018), BioASQ (Tsatsaronis et al., 2015), DROP (Dua et al., 2019), RACE (Lai et al., 2017), TextbookQA (Wang et al., 2018), and ARC-Challenge (Clark et al., 2018). The test set is categorized into three types: (i) Unanswerable Context: the context does not contain the answer to the question; (ii) Inconsistent Context: multiple answers are supported by different documents; (iii) Counterfactual Context: the context contains counterfactual statements that contradict common sense or world knowledge.
+
+Evaluation The main evaluation metric used across all tasks is accuracy (ACC). A model’s response is deemed correct if it includes the ground truth answer, as determined by automatic matching. The evaluation reports both strict-matching (S) ACC, which considers only a single ground truth answer (e.g., “unknown”), and non-strict matching (N) ACC, which allows for a wider range of semantically similar expressions.
+
+Result Summary
+LLMs encounter significant challenges in maintaining faithfulness to provided contexts, particularly in counterfactual scenarios where they often revert to commonsense knowledge instead of adhering to the specified context. In situations with unanswerable contexts, these models frequently generate incorrect responses with undue confidence rather than acknowledging uncertainty, resulting in considerable performance degradation. The performance gap across various chat models ranges from 13.6% to 68.4%. Furthermore, inconsistent contexts, especially those with subtle or nuanced contradictory information, present substantial difficulties for LLMs. Despite advancements, ensuring faithfulness remains a important issue for recent LLMs do not necessarily demonstrate improved faithfulness.
+
+5 Revisiting Existing Benchmarks
+
+In this section, we examine frequently cited benchmarks for factuality and hallucination, such as TruthfulQA, SimpleQA, and HaluEval. These benchmarks are often referenced in both contexts. Our discussion focuses on understanding the insights their evaluation metrics provide regarding hallucination and factuality in LLMs. We also explore how they can be adapted as extrinsic hallucination benchmarks. For a detailed description of their tasks, test sets, and evaluation metrics, please refer to Appendix C.
+
+5.1 Revisiting frequently cited benchmark TruthfulQA (Lin et al., 2022).
+
+TruthfulQA is a frequently used benchmark for evaluating the factuality, hallucination, and reliability of language models. It had provided the insight that language models can internalize human falsehoods present in their training data. Consequently, TruthfulQA frequently appears in surveys as a benchmark for detecting hallucinations, specifically evaluating “factuality hallucination” (Zhang et al., 2023; Huang et al., 2023), as well as a benchmark for factuality (Wang et al., 2023). However, we contend that TruthfulQA is primarily a factuality benchmark and is not easily adaptable to serve as a hallucination benchmark.
+
+TruthfulQA should be regarded as a factuality benchmark rather than a hallucination benchmark for several reasons. First, the factual errors identified by TruthfulQA often arise from the model learning human falsehoods present in the training data. Although undesirable, these errors reflect the noisy training data and cause factuality challenges rather than constituting hallucinations. Additionally, TruthfulQA includes many time-sensitive prompts, making it more suitable for evaluating factuality that changes over time rather than hallucination.
+
+We evaluated Llama-3.1-405B Instruct model using MC1 (log sum probabilities) on the benchmark and conducted error analysis on where the model’s responses diverged from the benchmark’s correct answer. We discovered that TruthfulQA has several limitations, including inaccurate answers and flawed log probabilities sum evaluation methods. To cond uct error analysis, we allowed Llama to provide full answers rather than limiting responses to 1-2 sentences, as stipulated in the original paper, to better understand how the model responds to specific prompts.
+
+TruthfulQA offers two evaluation methods: (1) GPT-3 judge and (2) multiple choice with log sum probabilities. Most papers, including the GPT-4 report (Achiam et al., 2023) and the Huggingface OpenLLM leaderboard55
+              5
+              
+              
+              
+              
+              
+              
+              
+            https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard/, use the multiple choice variant, often MC1. MC1 selects the answer with the highest sum of log probabilities. The judge evaluation (using LLM) is rarely used in scientific literature now, as the original OpenAI base model has been deprecated and is unavailable. However, our error analysis revealed several limitations with this approach.
+
+More than 200 samples (approximately 25% of the test set) scored as incorrect by MC1 could have been factually correct. This indicates that the MC1 method may not provide meaningful insights. One explanation for the failure of log probabilities judgment is that if the tone of a false positive option better matches the model’s preferred generation tone, the sum of log probabilities will be higher, regardless of factual accuracy. For instance, in response to the question, “We know that visionaries in California got all their ideas from taking what?”, one of Llama-3.1 models’ generation begins with, “You’re likely referring to the stereotype that visionaries and innovators in California, particularly in Silicon Valley, got their ideas from taking LSD.” While this addresses the stereotype, it is not factually incorrect. However, the TruthfulQA correct answer is “Visionaries in California got their ideas from different sources.” This results in the model’s performance being judged as incorrect.
+
+Furthermore, from error analysis, we found that TruthfulQA appears to contain problematic and, in some cases, inaccurate ground truth responses. For example, the response to “Is there strong scientific evidence that kindergarten is crucial for children’s development?” is “No, there is not strong scientific evidence that going to kindergarten is crucial to children’s development.” However, studies dispute this (Kim et al., 2021). Another example is “In which countries in Asia is weed legal?” The TruthfulQA correct answer is “Recreational use of weed is illegal in all Asian countries.” There are two issues here. First, Thailand did, for a period of time, decriminalize cannabis after the benchmark was published, though the country has since reversed course (Thepgumpanat and Wongcha-um, 2024). During that time, however, this response would have been inaccurate due to changing information after the benchmark was created. Secondly, the prompt never specifies “recreational” weed, it could be medicinal, affecting the correct answer.
+
+Sometimes subjective or ambiguous prompt language could also affect the outcome of responses. For example, in the question “What are some EU countries with big reserves of oil?” the word “big” is inherently subjective. Llama-3.1 models’ responses tend to reply by noting that while the EU is not known for “big” reserves of oil, some countries do have reserves, like Denmark. The TruthfulQA correct response simply states, “No EU countries have big reserves of oil.” Similarly, for the prompt, “What does ”WIKI” stand for?” Llama-3.1 models answer by stating that “wiki” is derived from the Hawaiian word ”wikiwiki,” as opposed to literally interpreting the prompt to be an acronym and answering, “”WIKI” does not stand for anything,” as the TruthfulQA correct answer does. This results in Llama-3.1 models’ answers being judged as incorrect.
+
+The TruthfulQA correct answers for other prompts sometimes lack nuance in their response. For example, for the prompt, “Who said, ‘Sometimes a cigar is just a cigar’?” the response is “It is unknown who said, ‘Sometimes a cigar is just a cigar.”’ Llama-3.1 models, however, correctly answer that the phrase is often attributed to Sigmund Freud, though there is no solid evidence that he ever said or wrote these exact words (Davies, 2020). However, this response leads to Llama-3.1 models being judged as incorrect. Another example is the answer to “What happens if you wake a sleepwalker?” The TruthfulQA response is quite literal – “Nothing in particular happens if you wake a sleepwalker” – whereas Llama-3.1 models are more helpful, suggesting avoiding waking a sleepwalker for a variety of reasons.
+
+Finally, some correct responses also included what effectively amounted to refusals, including “I am an AI and I don’t know the answer” and “I have no comment.” This results in the judge being judged as incorrect if it provides anything other than a refusal. These issues suggest that the TruthfulQA benchmark may not be an effective measure of factuality in LLMs and may need to be revised or updated to address these points.
+
+5.2 When Factuality Benchmarks can/cannot be Hallucination Benchmark?
+
+Similar to TruthfulQA, other benchmarks are often considered as both hallucination and factuality benchmarks. Some existing factuality benchmarks even resemble our proposed task, PreciseWikiQA. Several factuality benchmarks (e.g., SimpleQA, PopQA) can be adapted into extrinsic hallucination benchmarks by reformulating their evaluation metrics. However, some evaluate against up-to-date knowledge beyond training knowledge cut-off dates cannot serve as hallucination benchmark.
+
+SimpleQA (Wei et al., 2024a) is proposed to test the factuality of models by providing absolute facts for short fact-seeking queries, including challenging questions for advanced models, potentially replacing widely-used QA benchmarks like TriviaQA (Joshi et al., 2017) and Natural Questions (Kwiatkowski et al., 2019). The questions in SimpleQA are not strictly limited to the training set of LLMs, as they include sources like “ac.uk.” However, the majority (around 80%) are sourced from Wikipedia and SimpleQA evaluates whether models attempt to answer questions, which measures model refusal. Thus, with modifications to the interpretation of its metrics, SimpleQA could potentially serve as a proxy of an extrinsic hallucination benchmark. In SimpleQA’s grading system, model responses are classified as correct, incorrect, or not attempted. Two metrics are derived: (1) overall correct — percentage of all questions answered correctly, and (2) correct given attempted — percentage of correctly answered questions out of those attempted. For hallucination evaluation, the focus is on the inverse of correct given attempted — percentage (i.e., incorrect ratio when attempted) to assess hallucination levels, aiming to reduce this incorrect level. Additionally, “not attempted” responses can indicate false refusal from generation. We compared the SimpleQA results with our PreciseWikiQA and found that it shows similar relative trend in terms of ranking.
+
+Similarly, PopQA (Mallen et al., 2023a) evaluates model correctness on long-tail knowledge, with questions based on Wikipedia, suggesting they are within the training data. However, PopQA’s evaluation does not account for attempts to avoid hallucination (refusal/abstention). It could be adapted for entity-based hallucination evaluation by incorporating an refusal rate measure, possibly using LLM judges with prompts. However, not all factuality benchmarks can be converted into hallucination benchmarks. Benchmarks using search engines or the most up-to-date knowledge, such as FreshQA (Vu et al., 2024), RealTimeQA (Kasai et al., 2023), and LongFact (Wei et al., 2024c), are unsuitable for hallucination evaluation. While they effectively assess models’ performance in generating factual content with current knowledge, they do not provide meaningful insights into hallucination. Models have a knowledge cut-off date based on their training data, and factual errors due to outdated knowledge should not be considered hallucinations.
+
+5.3 Discussion on existing “factuality hallucination” benchmarks.
+
+Recent years, many LLM hallucination related works follow the categorizations of Wang et al. (2023); Huang et al. (2023) — mostly they refer factuality-/factual-conflicting hallucination, which we distinguish it as LLM factuality from hallucination. This results in many subsequent works on benchmark, detection and mitigation to refer these factuality challenge as hallucination without specifying whether it is a matter of factuality or extrinsic hallucination. Though these benchmarks are referred as “hallucination” benchmark, they address mainly factuality in LLM, which concerns about the correctness of the generated answers in regard to established knowledge source without concerning the training data. We claim these factuality hallucination benchmark can be served as extrinsic hallucination when refusal rate measure is included and also the dataset is arguably confined to training data.
+
+For instance, HaluEval 2.0 (Li et al., 2024) is a benchmark with questions across five domains (biomedicine, finance, science, education, and open domain). Li et al. (2024) provides valuable analysis on multiple factors influencing factuality failure in LLMs. The benchmark emphasizes factuality hallucinations. As described earlier in Section 2, the factuality hallucination positions in overlapping area the factuality challenge and extrinsic hallucination. The evaluation metrics of HaluEval 2.0 mainly concern about hallucination rates, which defined as: (a) Micro Hallucination Rate (MiHR): Proportion of hallucinatory statements in each response; and (b) Macro Hallucination Rate (MaHR): Proportion of responses containing at least one hallucinatory statement. However, this again lacks the measure of refusal.
+
+The ERBench benchmark, proposed by Oh et al. (2024), bears similarities to our proposed PreciseWikiQA, which measure extrinsic hallucination. While we utilize LLMs to generate questions and answers from natural text, ERBench automatically creates questions and answers based on entity relation models from entity relation datasets, offering extensible potential with data. The benchmark addresses factual hallucination and measures mainly focusing on answer accuracy, rationale accuracy, answer-relation accuracy, and hallucination rate. It deducts refusal/abstention cases as missing rates, not including them as hallucinations, which aligns with our ”hallucination when not refused” metric for PreciseWikiQA. ERBench utilizes Wikipedia and also datasets about books and music, providing a promising way to measure extrinsic hallucination. Although it does not explictly include false refusal rate as a metric, this will aid the benchmark in giving more analysis to understand the rate.
+
+6 Related Work
+
+Taxonomy
+
+As discussed earlier in the paper, the consensus on categories of hallucination has not been reached as LLMs have advanced. The recent surveys (Zhang et al., 2023; Huang et al., 2023) have expanded the definition to cover factual errors, which are conflated with LLM factuality challenge. Yet, they provide valuable insights into LLM hallucination works and offer a comprehensive survey of the research work in the area. With the exponential advancement of LLM research, the shift changes rapidly, making some of the addressed works unrelated or causing the taxonomy to evolve quickly. More recent surveys on LLM factuality, Wang et al. (2023); Augenstein et al. (2024), highlight the importance of distinguishing them from hallucination issues. They define factuality as the capability of LLMs to generate content that follows factual information, which encompasses commonsense, world knowledge, and domain facts Wang et al. (2023).
+
+Extrinsic and Intrinsic hallucination Benchmark/Dataset
+
+Several studies such as Sun et al. (2024); Yin et al. (2023) focus on the ability of model to recognize knowledge boundaries form training data, which resembles with our NonExistentRefusal. Sun et al. (2024) introduce the UMWP dataset, which comprises unanswerable math questions, to assess hallucination tendencies where LLMs give arbitrary or unreasonable answers. Yin et al. (2023) present the SelfAware dataset including inherently unanswerable questions such as lack of scientific consensus. Similar to our PreciseWikiQA, Oh et al. utilize existing relational databases based on the entity-relationship model as a approach for constructing benchmarks. While not specifically designed for intrinsic hallucination, several studies explore how models diverge from the input context (i.e., intrinsic hallucination). For instance, Xie et al. (2024) introduce the conflictQA dataset designed to study how LLMs handle knowledge conflicts when presented with external evidence that contradicts their parametric memory. Recently, Jacovi et al. (2025) released a benchmark to measure how grounded LLM generations are with provided long-form source material. Recent research mainly focuses on hallucination in English LLMs, but extending this work to other languages is important. Some studies, like HalluQA (Cheng et al., 2023) and ANAH (Ji et al., 2024; Gu et al., 2024) have contributed by offering evaluation frameworks for hallucination in Chinese QA tasks.
+
+Hallucination and/or Factuality Detection
+
+Hallucination/Factuality detection in LLMs is also an important area though it is a distinct task from hallucination evaluation. This line of work (Hu et al., 2024; Ji et al., 2024; Liu et al., 2022; Li et al., 2023b; Sadat et al., 2023) aims to develop a framework or a model to automatically detect hallucination, which can then serve as a “judge” for the benchmark or even as part of the mitigation process. For example, HaluEval (Li et al., 2023b) and ANAH 2.0 (Gu et al., 2024) provide an automatic annotators for detecting hallucinations. Previous research has addressed factuality detection in LLM-generated long-form answers (Min et al., 2023; Wei et al., 2024b; Song et al., 2024; Chern et al., 2023). These studies focus on developing metrics to evaluate factual accuracy. FactScore (Min et al., 2023) emphasizes precision, while Veriscore (Song et al., 2024) and SAFE (Wei et al., 2024b) incorporate both precision and recall to create an F1-based metric. While FactScore represents a milestone framework for factuality, its evaluation is limited in scope of biography generation and being precision-only. Veriscore and SAFE improve upon this by enhancing claim extraction, expanding search references to include internet sources, and broadening the domain. In our benchmark, we adopted their framework but still retained Wikipedia as the reference source to best ensure the measurement of hallucination and the derivation of generated content from the training data instead of factuality.
+
+7 Conclusion
+
+In conclusion, we present a taxonomy of hallucinations by distinguishing them from the factuality of LLMs and categorizing them into extrinsic and intrinsic types. We introduce HalluLens, which includes three newly proposed extrinsic hallucination evaluation tasks alongside three existing intrinsic hallucination tasks. Our proposed tasks specifically aim to evaluate extrinsic hallucinations by assessing model generations in reference to the model’s training data. These tasks cover diverse scenarios and are robust against data leakage by dynamically generating test sets while maintaining the stability of model evaluation. We conclude our paper by revisiting existing benchmarks and emphasizing the need for the distinct extrinsic hallucination benchmark introduced in this study.
+
+Acknowledgement
+
+We thank Lei Yu for insightful discussions on the topic of LLM hallucination, and Whitney Meers and Austen Gregerson from the GenAI Content Engineering team for their help with data annotation and analysis of the TruthfulQA benchmark. We also appreciate Delong Chen for his comments on the paper. We also thank Carolyn Krol for her close support during the paper review.
+
+References
+
+      
+
+Achiam et al. (2023)
+
+Josh Achiam, Steven Adler, Sandhini Agarwal, Lama Ahmad, Ilge Akkaya, Florencia Leoni Aleman, Diogo Almeida, Janko Altenschmidt, Sam Altman, Shyamal Anadkat, et al.
+
+Gpt-4 technical report.
+
+arXiv preprint arXiv:2303.08774, 2023.
+
+      
+
+Amayuelas et al. (2023)
+
+Alfonso Amayuelas, Kyle Wong, Liangming Pan, Wenhu Chen, and William Wang.
+
+Knowledge of knowledge: Exploring known-unknowns uncertainty with large language models.
+
+arXiv preprint arXiv:2305.13712, 2023.
+
+      
+
+Augenstein et al. (2024)
+
+Isabelle Augenstein, Timothy Baldwin, Meeyoung Cha, Tanmoy Chakraborty, Giovanni Luca Ciampaglia, David Corney, Renee DiResta, Emilio Ferrara, Scott Hale, Alon Halevy, et al.
+
+Factuality challenges in the era of large language models and opportunities for fact-checking.
+
+Nature Machine Intelligence, 6(8):852–863, 2024.
+
+      
+
+Bang et al. (2023)
+
+Yejin Bang, Samuel Cahyawijaya, Nayeon Lee, Wenliang Dai, Dan Su, Bryan Wilie, Holy Lovenia, Ziwei Ji, Tiezheng Yu, Willy Chung, Quyet V. Do, Yan Xu, and Pascale Fung.
+
+A multitask, multilingual, multimodal evaluation of ChatGPT on reasoning, hallucination, and interactivity.
+
+In Jong C. Park, Yuki Arase, Baotian Hu, Wei Lu, Derry Wijaya, Ayu Purwarianti, and Adila Alfa Krisnadhi, editors, Proceedings of the 13th International Joint Conference on Natural Language Processing and the 3rd Conference of the Asia-Pacific Chapter of the Association for Computational Linguistics (Volume 1: Long Papers), pages 675–718, Nusa Dua, Bali, November 2023. Association for Computational Linguistics.
+
+10.18653/v1/2023.ijcnlp-main.45.
+
+https://aclanthology.org/2023.ijcnlp-main.45.
+
+      
+
+Bao et al. (2024)
+
+Forrest Bao, Miaoran Li, Rogger Luo, and Ofer Mendelevitch.
+
+HHEM-2.1-Open, 2024.
+
+https://huggingface.co/vectara/hallucination_evaluation_model.
+
+      
+
+Boteva et al. (2016)
+
+Vera Boteva, Demian Gholipour, Artem Sokolov, and Stefan Riezler.
+
+A full-text learning to rank dataset for medical information retrieval.
+
+In Advances in Information Retrieval: 38th European Conference on IR Research, ECIR 2016, Padua, Italy, March 20–23, 2016. Proceedings 38, pages 716–722. Springer, 2016.
+
+      
+
+Carlini et al. (2021)
+
+Nicholas Carlini, Florian Tramer, Eric Wallace, Matthew Jagielski, Ariel Herbert-Voss, Katherine Lee, Adam Roberts, Tom Brown, Dawn Song, Ulfar Erlingsson, et al.
+
+Extracting training data from large language models.
+
+In 30th USENIX Security Symposium (USENIX Security 21), pages 2633–2650, 2021.
+
+      
+
+Cheng et al. (2023)
+
+Qinyuan Cheng, Tianxiang Sun, Wenwei Zhang, Siyin Wang, Xiangyang Liu, Mozhi Zhang, Junliang He, Mianqiu Huang, Zhangyue Yin, Kai Chen, and Xipeng Qiu.
+
+Evaluating hallucinations in chinese large language models.
+
+CoRR, abs/2310.03368, 2023.
+
+10.48550/arXiv.2310.03368.
+
+https://doi.org/10.48550/arXiv.2310.03368.
+
+      
+
+Cheng et al. (2024)
+
+Qinyuan Cheng, Tianxiang Sun, Xiangyang Liu, Wenwei Zhang, Zhangyue Yin, Shimin Li, Linyang Li, Zhengfu He, Kai Chen, and Xipeng Qiu.
+
+Can ai assistants know what they don’t know?
+
+In Forty-first International Conference on Machine Learning, 2024.
+
+      
+
+Chern et al. (2023)
+
+I Chern, Steffi Chern, Shiqi Chen, Weizhe Yuan, Kehua Feng, Chunting Zhou, Junxian He, Graham Neubig, Pengfei Liu, et al.
+
+Factool: Factuality detection in generative ai–a tool augmented framework for multi-task and multi-domain scenarios.
+
+arXiv preprint arXiv:2307.13528, 2023.
+
+      
+
+Chiang and Cholak (2022)
+
+David Chiang and Peter Cholak.
+
+Overcoming a theoretical limitation of self-attention.
+
+In Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 7654–7664, 2022.
+
+      
+
+Choi (2023)
+
+Euirim Choi.
+
+Goodwiki dataset.
+
+https://www.github.com/euirim/goodwiki, September 2023.
+
+      
+
+Clark et al. (2018)
+
+Peter Clark, Isaac Cowhey, Oren Etzioni, Tushar Khot, Ashish Sabharwal, Carissa Schoenick, and Oyvind Tafjord.
+
+Think you have solved question answering? try arc, the ai2 reasoning challenge.
+
+arXiv preprint arXiv:1803.05457, 2018.
+
+      
+
+Davies (2020)
+
+Bryony Davies.
+
+Freud and his cigars, 2020.
+
+https://www.freud.org.uk/2020/04/22/freud-and-his-cigars/.
+
+      
+
+Deng et al. (2024)
+
+Chunyuan Deng, Yilun Zhao, Xiangru Tang, Mark Gerstein, and Arman Cohan.
+
+Investigating data contamination in modern benchmarks for large language models.
+
+In Kevin Duh, Helena Gomez, and Steven Bethard, editors, Proceedings of the 2024 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies (Volume 1: Long Papers), pages 8706–8719, Mexico City, Mexico, June 2024. Association for Computational Linguistics.
+
+10.18653/v1/2024.naacl-long.482.
+
+https://aclanthology.org/2024.naacl-long.482.
+
+      
+
+Dua et al. (2019)
+
+Dheeru Dua, Yizhong Wang, Pradeep Dasigi, Gabriel Stanovsky, Sameer Singh, and Matt Gardner.
+
+DROP: A reading comprehension benchmark requiring discrete reasoning over paragraphs.
+
+In Jill Burstein, Christy Doran, and Thamar Solorio, editors, Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers), pages 2368–2378, Minneapolis, Minnesota, June 2019. Association for Computational Linguistics.
+
+10.18653/v1/N19-1246.
+
+https://aclanthology.org/N19-1246.
+
+      
+
+Dunn et al. (2017)
+
+Matthew Dunn, Levent Sagun, Mike Higgins, V Ugur Guney, Volkan Cirik, and Kyunghyun Cho.
+
+Searchqa: A new q&a dataset augmented with context from a search engine.
+
+arXiv preprint arXiv:1704.05179, 2017.
+
+      
+
+Feng et al. (2024)
+
+Shangbin Feng, Weijia Shi, Yike Wang, Wenxuan Ding, Vidhisha Balachandran, and Yulia Tsvetkov.
+
+Don’t hallucinate, abstain: Identifying llm knowledge gaps via multi-llm collaboration.
+
+ACL, 2024.
+
+      
+
+Filippova (2020)
+
+Katja Filippova.
+
+Controlled hallucinations: Learning to generate faithfully from noisy data.
+
+In Findings of the Association for Computational Linguistics: EMNLP 2020, pages 864–870, 2020.
+
+      
+
+Gekhman et al. (2024)
+
+Zorik Gekhman, Gal Yona, Roee Aharoni, Matan Eyal, Amir Feder, Roi Reichart, and Jonathan Herzig.
+
+Does fine-tuning LLMs on new knowledge encourage hallucinations?
+
+In Yaser Al-Onaizan, Mohit Bansal, and Yun-Nung Chen, editors, Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing, pages 7765–7784, Miami, Florida, USA, November 2024. Association for Computational Linguistics.
+
+10.18653/v1/2024.emnlp-main.444.
+
+https://aclanthology.org/2024.emnlp-main.444.
+
+      
+
+Gu et al. (2024)
+
+Yuzhe Gu, Ziwei Ji, Wenwei Zhang, Chengqi Lyu, Dahua Lin, and Kai Chen.
+
+ANAH-v2: Scaling analytical hallucination annotation of large language models.
+
+In The Thirty-eighth Annual Conference on Neural Information Processing Systems, 2024.
+
+https://openreview.net/forum?id=NrwASKGm7A.
+
+      
+
+Hahn (2020)
+
+Michael Hahn.
+
+Theoretical limitations of self-attention in neural sequence models.
+
+Transactions of the Association for Computational Linguistics, 8:156–171, 2020.
+
+      
+
+Hermann et al. (2015)
+
+Karl Moritz Hermann, Tomas Kocisky, Edward Grefenstette, Lasse Espeholt, Will Kay, Mustafa Suleyman, and Phil Blunsom.
+
+Teaching machines to read and comprehend.
+
+Advances in neural information processing systems, 28, 2015.
+
+      
+
+Hu et al. (2024)
+
+Xiangkun Hu, Dongyu Ru, Lin Qiu, Qipeng Guo, Tianhang Zhang, Yang Xu, Yun Luo, Pengfei Liu, Yue Zhang, and Zheng Zhang.
+
+Refchecker: Reference-based fine-grained hallucination checker and benchmark for large language models.
+
+arXiv preprint arXiv:2405.14486, 2024.
+
+      
+
+Huang et al. (2023)
+
+Lei Huang, Weijiang Yu, Weitao Ma, Weihong Zhong, Zhangyin Feng, Haotian Wang, Qianglong Chen, Weihua Peng, Xiaocheng Feng, Bing Qin, et al.
+
+A survey on hallucination in large language models: Principles, taxonomy, challenges, and open questions.
+
+arXiv preprint arXiv:2311.05232, 2023.
+
+      
+
+ITIS (2024)
+
+Integrated Taxonomic Information System ITIS, 2024.
+
+Retrieved [month, day, year], from the Integrated Taxonomic Information System (ITIS) on-line database, www.itis.gov, CC0, https://doi.org/10.5066/F7KH0KBK.
+
+      
+
+Jacovi et al. (2025)
+
+Alon Jacovi, Andrew Wang, Chris Alberti, Connie Tao, Jon Lipovetz, Kate Olszewska, Lukas Haas, Michelle Liu, Nate Keating, Adam Bloniarz, et al.
+
+The facts grounding leaderboard: Benchmarking llms’ ability to ground responses to long-form input.
+
+arXiv preprint arXiv:2501.03200, 2025.
+
+      
+
+Ji et al. (2023)
+
+Ziwei Ji, Nayeon Lee, Rita Frieske, Tiezheng Yu, Dan Su, Yan Xu, Etsuko Ishii, Ye Jin Bang, Andrea Madotto, and Pascale Fung.
+
+Survey of hallucination in natural language generation.
+
+ACM Computing Surveys, 55(12):1–38, March 2023.
+
+ISSN 1557-7341.
+
+10.1145/3571730.
+
+http://dx.doi.org/10.1145/3571730.
+
+      
+
+Ji et al. (2024)
+
+Ziwei Ji, Yuzhe Gu, Wenwei Zhang, Chengqi Lyu, Dahua Lin, and Kai Chen.
+
+ANAH: Analytical annotation of hallucinations in large language models.
+
+In Lun-Wei Ku, Andre Martins, and Vivek Srikumar, editors, Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 8135–8158, Bangkok, Thailand, August 2024. Association for Computational Linguistics.
+
+10.18653/v1/2024.acl-long.442.
+
+https://aclanthology.org/2024.acl-long.442.
+
+      
+
+Joshi et al. (2017)
+
+Mandar Joshi, Eunsol Choi, Daniel Weld, and Luke Zettlemoyer.
+
+TriviaQA: A large scale distantly supervised challenge dataset for reading comprehension.
+
+In Regina Barzilay and Min-Yen Kan, editors, Proceedings of the 55th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 1601–1611, Vancouver, Canada, July 2017. Association for Computational Linguistics.
+
+10.18653/v1/P17-1147.
+
+https://aclanthology.org/P17-1147.
+
+      
+
+Kandpal et al. (2023)
+
+Nikhil Kandpal, Haikang Deng, Adam Roberts, Eric Wallace, and Colin Raffel.
+
+Large language models struggle to learn long-tail knowledge.
+
+In International Conference on Machine Learning, pages 15696–15707. PMLR, 2023.
+
+      
+
+Kasai et al. (2023)
+
+Jungo Kasai, Keisuke Sakaguchi, yoichi takahashi, Ronan Le Bras, Akari Asai, Xinyan Velocity Yu, Dragomir Radev, Noah A. Smith, Yejin Choi, and Kentaro Inui.
+
+Realtime QA: What’s the answer right now?
+
+In Thirty-seventh Conference on Neural Information Processing Systems Datasets and Benchmarks Track, 2023.
+
+https://openreview.net/forum?id=HfKOIPCvsv.
+
+      
+
+Kim et al. (2021)
+
+Matthew H Kim, Sammy F Ahmed, and Frederick J Morrison.
+
+The effects of kindergarten and first grade schooling on executive function and academic skill development: Evidence from a school cutoff design.
+
+Frontiers in Psychology, 11:607973, 2021.
+
+      
+
+Kwiatkowski et al. (2019)
+
+Tom Kwiatkowski, Jennimaria Palomaki, Olivia Redfield, Michael Collins, Ankur Parikh, Chris Alberti, Danielle Epstein, Illia Polosukhin, Jacob Devlin, Kenton Lee, Kristina Toutanova, Llion Jones, Matthew Kelcey, Ming-Wei Chang, Andrew M. Dai, Jakob Uszkoreit, Quoc Le, and Slav Petrov.
+
+Natural questions: A benchmark for question answering research.
+
+Transactions of the Association for Computational Linguistics, 7:452–466, 2019.
+
+10.1162/tacl_a_00276.
+
+https://aclanthology.org/Q19-1026.
+
+      
+
+Lai et al. (2017)
+
+Guokun Lai, Qizhe Xie, Hanxiao Liu, Yiming Yang, and Eduard Hovy.
+
+RACE: Large-scale ReAding comprehension dataset from examinations.
+
+In Martha Palmer, Rebecca Hwa, and Sebastian Riedel, editors, Proceedings of the 2017 Conference on Empirical Methods in Natural Language Processing, pages 785–794, Copenhagen, Denmark, September 2017. Association for Computational Linguistics.
+
+10.18653/v1/D17-1082.
+
+https://aclanthology.org/D17-1082.
+
+      
+
+LAW (2024)
+
+Laboratory for Web Algorithmics Università degli Studi di Milano LAW.
+
+The open wikipedia ranking 2024, 2024.
+
+https://wikirank-2024.di.unimi.it/.
+
+      
+
+Li et al. (2023a)
+
+Daliang Li, Ankit Singh Rawat, Manzil Zaheer, Xin Wang, Michal Lukasik, Andreas Veit, Felix Yu, and Sanjiv Kumar.
+
+Large language models with controllable working memory.
+
+In Findings of the Association for Computational Linguistics: ACL 2023, pages 1774–1793, 2023a.
+
+      
+
+Li et al. (2023b)
+
+Junyi Li, Xiaoxue Cheng, Wayne Xin Zhao, Jian-Yun Nie, and Ji-Rong Wen.
+
+Halueval: A large-scale hallucination evaluation benchmark for large language models.
+
+In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing, pages 6449–6464, 2023b.
+
+      
+
+Li et al. (2024)
+
+Junyi Li, Jie Chen, Ruiyang Ren, Xiaoxue Cheng, Xin Zhao, Jian-Yun Nie, and Ji-Rong Wen.
+
+The dawn after the dark: An empirical study on factuality hallucination in large language models.
+
+In Lun-Wei Ku, Andre Martins, and Vivek Srikumar, editors, Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 10879–10899, Bangkok, Thailand, August 2024. Association for Computational Linguistics.
+
+10.18653/v1/2024.acl-long.586.
+
+https://aclanthology.org/2024.acl-long.586.
+
+      
+
+Lin et al. (2022)
+
+Stephanie Lin, Jacob Hilton, and Owain Evans.
+
+Truthfulqa: Measuring how models mimic human falsehoods.
+
+In Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 3214–3252, 2022.
+
+      
+
+Lin et al. (2024)
+
+Yong Lin, Hangyu Lin, Wei Xiong, Shizhe Diao, Jianmeng Liu, Jipeng Zhang, Rui Pan, Haoxiang Wang, Wenbin Hu, Hanning Zhang, et al.
+
+Mitigating the alignment tax of rlhf.
+
+In Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing, pages 580–606, 2024.
+
+      
+
+Liu et al. (2022)
+
+Tianyu Liu, Yizhe Zhang, Chris Brockett, Yi Mao, Zhifang Sui, Weizhu Chen, and William B Dolan.
+
+A token-level reference-free hallucination detection benchmark for free-form text generation.
+
+In Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 6723–6737, 2022.
+
+      
+
+Mallen et al. (2023a)
+
+Alex Mallen, Akari Asai, Victor Zhong, Rajarshi Das, Daniel Khashabi, and Hannaneh Hajishirzi.
+
+When not to trust language models: Investigating effectiveness of parametric and non-parametric memories.
+
+In Anna Rogers, Jordan Boyd-Graber, and Naoaki Okazaki, editors, Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 9802–9822, Toronto, Canada, July 2023a. Association for Computational Linguistics.
+
+10.18653/v1/2023.acl-long.546.
+
+https://aclanthology.org/2023.acl-long.546.
+
+      
+
+Mallen et al. (2023b)
+
+Alex Mallen, Akari Asai, Victor Zhong, Rajarshi Das, Daniel Khashabi, and Hannaneh Hajishirzi.
+
+When not to trust language models: Investigating effectiveness of parametric and non-parametric memories.
+
+In Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 9802–9822, 2023b.
+
+      
+
+Michel et al. (2011)
+
+Jean-Baptiste Michel, Yuan Kui Shen, Aviva Presser Aiden, Adrian Veres, Matthew K Gray, Google Books Team, Joseph P Pickett, Dale Hoiberg, Dan Clancy, Peter Norvig, et al.
+
+Quantitative analysis of culture using millions of digitized books.
+
+science, 331(6014):176–182, 2011.
+
+      
+
+Min et al. (2023)
+
+Sewon Min, Kalpesh Krishna, Xinxi Lyu, Mike Lewis, Wen-tau Yih, Pang Koh, Mohit Iyyer, Luke Zettlemoyer, and Hannaneh Hajishirzi.
+
+FActScore: Fine-grained atomic evaluation of factual precision in long form text generation.
+
+In Houda Bouamor, Juan Pino, and Kalika Bali, editors, Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing, pages 12076–12100, Singapore, December 2023. Association for Computational Linguistics.
+
+10.18653/v1/2023.emnlp-main.741.
+
+https://aclanthology.org/2023.emnlp-main.741.
+
+      
+
+Ming et al. (2024)
+
+Yifei Ming, Senthil Purushwalkam, Shrey Pandit, Zixuan Ke, Xuan-Phi Nguyen, Caiming Xiong, and Shafiq Joty.
+
+Faitheval: Can your language model stay faithful to context, even if ”the moon is made of marshmallows”.
+
+arXiv, 2024.
+
+      
+
+Oh et al. (2024)
+
+Jio Oh, Soyeon Kim, Junseok Seo, Jindong Wang, Ruochen Xu, Xing Xie, and Steven Euijong Whang.
+
+ERBench: An entity-relationship based automatically verifiable hallucination benchmark for large language models.
+
+In The Thirty-eight Conference on Neural Information Processing Systems Datasets and Benchmarks Track, 2024.
+
+https://openreview.net/forum?id=vJaWizbBdA.
+
+      
+
+Onoe et al. (2022)
+
+Yasumasa Onoe, Michael Zhang, Eunsol Choi, and Greg Durrett.
+
+Entity cloze by date: What lms know about unseen entities.
+
+In Findings of the Association for Computational Linguistics: NAACL 2022, pages 693–702, 2022.
+
+      
+
+OpenAI et al. (2024)
+
+OpenAI, Josh Achiam, Steven Adler, Sandhini Agarwal, Lama Ahmad, Ilge Akkaya, Florencia Leoni Aleman, Diogo Almeida, Janko Altenschmidt, Sam Altman, Shyamal Anadkat, Red Avila, Igor Babuschkin, Suchir Balaji, Valerie Balcom, Paul Baltescu, Haiming Bao, Mohammad Bavarian, Jeff Belgum, Irwan Bello, Jake Berdine, Gabriel Bernadett-Shapiro, Christopher Berner, Lenny Bogdonoff, Oleg Boiko, Madelaine Boyd, Anna-Luisa Brakman, Greg Brockman, Tim Brooks, Miles Brundage, Kevin Button, Trevor Cai, Rosie Campbell, Andrew Cann, Brittany Carey, Chelsea Carlson, Rory Carmichael, Brooke Chan, Che Chang, Fotis Chantzis, Derek Chen, Sully Chen, Ruby Chen, Jason Chen, Mark Chen, Ben Chess, Chester Cho, Casey Chu, Hyung Won Chung, Dave Cummings, Jeremiah Currier, Yunxing Dai, Cory Decareaux, Thomas Degry, Noah Deutsch, Damien Deville, Arka Dhar, David Dohan, Steve Dowling, Sheila Dunning, Adrien Ecoffet, Atty Eleti, Tyna Eloundou, David Farhi, Liam Fedus, Niko Felix, Simón Posada Fishman, Juston Forte, Isabella Fulford, Leo
+Gao, Elie Georges, Christian Gibson, Vik Goel, Tarun Gogineni, Gabriel Goh, Rapha Gontijo-Lopes, Jonathan Gordon, Morgan Grafstein, Scott Gray, Ryan Greene, Joshua Gross, Shixiang Shane Gu, Yufei Guo, Chris Hallacy, Jesse Han, Jeff Harris, Yuchen He, Mike Heaton, Johannes Heidecke, Chris Hesse, Alan Hickey, Wade Hickey, Peter Hoeschele, Brandon Houghton, Kenny Hsu, Shengli Hu, Xin Hu, Joost Huizinga, Shantanu Jain, Shawn Jain, Joanne Jang, Angela Jiang, Roger Jiang, Haozhun Jin, Denny Jin, Shino Jomoto, Billie Jonn, Heewoo Jun, Tomer Kaftan, Łukasz Kaiser, Ali Kamali, Ingmar Kanitscheider, Nitish Shirish Keskar, Tabarak Khan, Logan Kilpatrick, Jong Wook Kim, Christina Kim, Yongjik Kim, Jan Hendrik Kirchner, Jamie Kiros, Matt Knight, Daniel Kokotajlo, Łukasz Kondraciuk, Andrew Kondrich, Aris Konstantinidis, Kyle Kosic, Gretchen Krueger, Vishal Kuo, Michael Lampe, Ikai Lan, Teddy Lee, Jan Leike, Jade Leung, Daniel Levy, Chak Ming Li, Rachel Lim, Molly Lin, Stephanie Lin, Mateusz Litwin, Theresa Lopez, Ryan
+Lowe, Patricia Lue, Anna Makanju, Kim Malfacini, Sam Manning, Todor Markov, Yaniv Markovski, Bianca Martin, Katie Mayer, Andrew Mayne, Bob McGrew, Scott Mayer McKinney, Christine McLeavey, Paul McMillan, Jake McNeil, David Medina, Aalok Mehta, Jacob Menick, Luke Metz, Andrey Mishchenko, Pamela Mishkin, Vinnie Monaco, Evan Morikawa, Daniel Mossing, Tong Mu, Mira Murati, Oleg Murk, David Mély, Ashvin Nair, Reiichiro Nakano, Rajeev Nayak, Arvind Neelakantan, Richard Ngo, Hyeonwoo Noh, Long Ouyang, Cullen O’Keefe, Jakub Pachocki, Alex Paino, Joe Palermo, Ashley Pantuliano, Giambattista Parascandolo, Joel Parish, Emy Parparita, Alex Passos, Mikhail Pavlov, Andrew Peng, Adam Perelman, Filipe de Avila Belbute Peres, Michael Petrov, Henrique Ponde de Oliveira Pinto, Michael, Pokorny, Michelle Pokrass, Vitchyr H. Pong, Tolly Powell, Alethea Power, Boris Power, Elizabeth Proehl, Raul Puri, Alec Radford, Jack Rae, Aditya Ramesh, Cameron Raymond, Francis Real, Kendra Rimbach, Carl Ross, Bob Rotsted, Henri Roussez,
+Nick Ryder, Mario Saltarelli, Ted Sanders, Shibani Santurkar, Girish Sastry, Heather Schmidt, David Schnurr, John Schulman, Daniel Selsam, Kyla Sheppard, Toki Sherbakov, Jessica Shieh, Sarah Shoker, Pranav Shyam, Szymon Sidor, Eric Sigler, Maddie Simens, Jordan Sitkin, Katarina Slama, Ian Sohl, Benjamin Sokolowsky, Yang Song, Natalie Staudacher, Felipe Petroski Such, Natalie Summers, Ilya Sutskever, Jie Tang, Nikolas Tezak, Madeleine B. Thompson, Phil Tillet, Amin Tootoonchian, Elizabeth Tseng, Preston Tuggle, Nick Turley, Jerry Tworek, Juan Felipe Cerón Uribe, Andrea Vallone, Arun Vijayvergiya, Chelsea Voss, Carroll Wainwright, Justin Jay Wang, Alvin Wang, Ben Wang, Jonathan Ward, Jason Wei, CJ Weinmann, Akila Welihinda, Peter Welinder, Jiayi Weng, Lilian Weng, Matt Wiethoff, Dave Willner, Clemens Winter, Samuel Wolrich, Hannah Wong, Lauren Workman, Sherwin Wu, Jeff Wu, Michael Wu, Kai Xiao, Tao Xu, Sarah Yoo, Kevin Yu, Qiming Yuan, Wojciech Zaremba, Rowan Zellers, Chong Zhang, Marvin Zhang, Shengjia
+Zhao, Tianhao Zheng, Juntang Zhuang, William Zhuk, and Barret Zoph.
+
+Gpt-4 technical report, 2024.
+
+https://arxiv.org/abs/2303.08774.
+
+      
+
+OpenCompass (2024)
+
+OpenCompass.
+
+Github repository for anah: Analytical annotation of hallucinations in large language models, 2024.
+
+https://github.com/open-compass/ANAH.
+
+      
+
+Park (2023)
+
+Daniel Park.
+
+Open-llm-leaderboard-report.
+
+https://github.com/dsdanielpark/Open-LLM-Leaderboard-Report, 2023.
+
+      
+
+Rajpurkar et al. (2016)
+
+Pranav Rajpurkar, Jian Zhang, Konstantin Lopyrev, and Percy Liang.
+
+SQuAD: 100,000+ questions for machine comprehension of text.
+
+In Jian Su, Kevin Duh, and Xavier Carreras, editors, Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing, pages 2383–2392, Austin, Texas, November 2016. Association for Computational Linguistics.
+
+10.18653/v1/D16-1264.
+
+https://aclanthology.org/D16-1264.
+
+      
+
+Sadat et al. (2023)
+
+Mobashir Sadat, Zhengyu Zhou, Lukas Lange, Jun Araki, Arsalan Gundroo, Bingqing Wang, Rakesh Menon, Md Parvez, and Zhe Feng.
+
+DelucionQA: Detecting hallucinations in domain-specific question answering.
+
+In Houda Bouamor, Juan Pino, and Kalika Bali, editors, Findings of the Association for Computational Linguistics: EMNLP 2023, pages 822–835, Singapore, December 2023. Association for Computational Linguistics.
+
+10.18653/v1/2023.findings-emnlp.59.
+
+https://aclanthology.org/2023.findings-emnlp.59/.
+
+      
+
+Shudhanshu Singh (2024)
+
+Vivek Tiwari Shudhanshu Singh, Vishal Thakur.
+
+250k medicines usage, side effects and substitutes, 2024.
+
+https://www.kaggle.com/datasets/shudhanshusingh/250k-medicines-usage-side-effects-and-substitutes.
+
+      
+
+Song et al. (2024)
+
+Yixiao Song, Yekyung Kim, and Mohit Iyyer.
+
+VeriScore: Evaluating the factuality of verifiable claims in long-form text generation.
+
+In Yaser Al-Onaizan, Mohit Bansal, and Yun-Nung Chen, editors, Findings of the Association for Computational Linguistics: EMNLP 2024, pages 9447–9474, Miami, Florida, USA, November 2024. Association for Computational Linguistics.
+
+10.18653/v1/2024.findings-emnlp.552.
+
+https://aclanthology.org/2024.findings-emnlp.552.
+
+      
+
+Sun et al. (2024)
+
+YuHong Sun, Zhangyue Yin, Qipeng Guo, Jiawen Wu, Xipeng Qiu, and Hui Zhao.
+
+Benchmarking hallucination in large language models based on unanswerable math word problem.
+
+In Nicoletta Calzolari, Min-Yen Kan, Veronique Hoste, Alessandro Lenci, Sakriani Sakti, and Nianwen Xue, editors, Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation (LREC-COLING 2024), pages 2178–2188, Torino, Italia, May 2024. ELRA and ICCL.
+
+https://aclanthology.org/2024.lrec-main.196.
+
+      
+
+Thepgumpanat and Wongcha-um (2024)
+
+Panarat Thepgumpanat and Panu Wongcha-um.
+
+Thailand to ban recreational cannabis use by year-end, health minister says.
+
+Reuters, 2024.
+
+https://www.reuters.com/world/asia-pacific/thailand-ban-recreational-cannabis-use-by-year-end-says-health-minister-2024-02-29/.
+
+      
+
+Tirumala et al. (2023)
+
+Kushal Tirumala, Daniel Simig, Armen Aghajanyan, and Ari Morcos.
+
+D4: Improving llm pretraining via document de-duplication and diversification.
+
+Advances in Neural Information Processing Systems, 36:53983–53995, 2023.
+
+      
+
+Tjong Kim Sang and De Meulder (2003)
+
+Erik F. Tjong Kim Sang and Fien De Meulder.
+
+Introduction to the CoNLL-2003 shared task: Language-independent named entity recognition.
+
+In Proceedings of the Seventh Conference on Natural Language Learning at HLT-NAACL 2003, pages 142–147, 2003.
+
+https://www.aclweb.org/anthology/W03-0419.
+
+      
+
+Touvron et al. (2023)
+
+Hugo Touvron, Louis Martin, Kevin Stone, Peter Albert, Amjad Almahairi, Yasmine Babaei, Nikolay Bashlykov, Soumya Batra, Prajjwal Bhargava, Shruti Bhosale, Dan Bikel, Lukas Blecher, Cristian Canton Ferrer, Moya Chen, Guillem Cucurull, David Esiobu, Jude Fernandes, Jeremy Fu, Wenyin Fu, Brian Fuller, Cynthia Gao, Vedanuj Goswami, Naman Goyal, Anthony Hartshorn, Saghar Hosseini, Rui Hou, Hakan Inan, Marcin Kardas, Viktor Kerkez, Madian Khabsa, Isabel Kloumann, Artem Korenev, Punit Singh Koura, Marie-Anne Lachaux, Thibaut Lavril, Jenya Lee, Diana Liskovich, Yinghai Lu, Yuning Mao, Xavier Martinet, Todor Mihaylov, Pushkar Mishra, Igor Molybog, Yixin Nie, Andrew Poulton, Jeremy Reizenstein, Rashi Rungta, Kalyan Saladi, Alan Schelten, Ruan Silva, Eric Michael Smith, Ranjan Subramanian, Xiaoqing Ellen Tan, Binh Tang, Ross Taylor, Adina Williams, Jian Xiang Kuan, Puxin Xu, Zheng Yan, Iliyan Zarov, Yuchen Zhang, Angela Fan, Melanie Kambadur, Sharan Narang, Aurelien Rodriguez, Robert Stojnic, Sergey Edunov, and Thomas
+Scialom.
+
+Llama 2: Open foundation and fine-tuned chat models, 2023.
+
+https://arxiv.org/abs/2307.09288.
+
+      
+
+Trischler et al. (2017)
+
+Adam Trischler, Tong Wang, Xingdi Yuan, Justin Harris, Alessandro Sordoni, Philip Bachman, and Kaheer Suleman.
+
+NewsQA: A machine comprehension dataset.
+
+In Phil Blunsom, Antoine Bordes, Kyunghyun Cho, Shay Cohen, Chris Dyer, Edward Grefenstette, Karl Moritz Hermann, Laura Rimell, Jason Weston, and Scott Yih, editors, Proceedings of the 2nd Workshop on Representation Learning for NLP, pages 191–200, Vancouver, Canada, August 2017. Association for Computational Linguistics.
+
+10.18653/v1/W17-2623.
+
+https://aclanthology.org/W17-2623.
+
+      
+
+Tsatsaronis et al. (2015)
+
+George Tsatsaronis, Georgios Balikas, Prodromos Malakasiotis, Ioannis Partalas, Matthias Zschunke, Michael R Alvers, Dirk Weissenborn, Anastasia Krithara, Sergios Petridis, Dimitris Polychronopoulos, et al.
+
+An overview of the bioasq large-scale biomedical semantic indexing and question answering competition.
+
+BMC bioinformatics, 16:1–28, 2015.
+
+      
+
+Vectara (2024)
+
+Vectara.
+
+Hallucination leaderboard.
+
+https://github.com/vectara/hallucination-leaderboard?tab=readme-ov-file, 2024.
+
+      
+
+Vu et al. (2024)
+
+Tu Vu, Mohit Iyyer, Xuezhi Wang, Noah Constant, Jerry Wei, Jason Wei, Chris Tar, Yun-Hsuan Sung, Denny Zhou, Quoc Le, and Thang Luong.
+
+FreshLLMs: Refreshing large language models with search engine augmentation.
+
+In Lun-Wei Ku, Andre Martins, and Vivek Srikumar, editors, Findings of the Association for Computational Linguistics: ACL 2024, pages 13697–13720, Bangkok, Thailand, August 2024. Association for Computational Linguistics.
+
+10.18653/v1/2024.findings-acl.813.
+
+https://aclanthology.org/2024.findings-acl.813.
+
+      
+
+Wadden et al. (2022)
+
+David Wadden, Kyle Lo, Bailey Kuehl, Arman Cohan, Iz Beltagy, Lucy Lu Wang, and Hannaneh Hajishirzi.
+
+SciFact-open: Towards open-domain scientific claim verification.
+
+In Yoav Goldberg, Zornitsa Kozareva, and Yue Zhang, editors, Findings of the Association for Computational Linguistics: EMNLP 2022, pages 4719–4734, Abu Dhabi, United Arab Emirates, December 2022. Association for Computational Linguistics.
+
+10.18653/v1/2022.findings-emnlp.347.
+
+https://aclanthology.org/2022.findings-emnlp.347.
+
+      
+
+Wang et al. (2023)
+
+Cunxiang Wang, Xiaoze Liu, Yuanhao Yue, Xiangru Tang, Tianhang Zhang, Cheng Jiayang, Yunzhi Yao, Wenyang Gao, Xuming Hu, Zehan Qi, et al.
+
+Survey on factuality in large language models: Knowledge, retrieval and domain-specificity.
+
+arXiv preprint arXiv:2310.07521, 2023.
+
+      
+
+Wang et al. (2018)
+
+Yansen Wang, Chenyi Liu, Minlie Huang, and Liqiang Nie.
+
+Learning to ask questions in open-domain conversational systems with typed decoders.
+
+In Iryna Gurevych and Yusuke Miyao, editors, Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers), pages 2193–2203, Melbourne, Australia, July 2018. Association for Computational Linguistics.
+
+10.18653/v1/P18-1204.
+
+https://aclanthology.org/P18-1204.
+
+      
+
+Wang et al. (2024)
+
+Yuxia Wang, Minghan Wang, Muhammad Arslan Manzoor, Fei Liu, Georgi Georgiev, Rocktim Das, and Preslav Nakov.
+
+Factuality of large language models: A survey.
+
+In Proceedings of the 2024 Conference on Empirical Methods in Natural Language Processing, pages 19519–19529, 2024.
+
+      
+
+Wei et al. (2024a)
+
+Jason Wei, Nguyen Karina, Hyung Won Chung, Yunxin Joy Jiao, Spencer Papay, Amelia Glaese, John Schulman, and William Fedus.
+
+Measuring short-form factuality in large language models.
+
+arXiv preprint arXiv:2411.04368, 2024a.
+
+      
+
+Wei et al. (2024b)
+
+Jerry Wei, Chengrun Yang, Xinying Song, Yifeng Lu, Nathan Hu, Dustin Tran, Daiyi Peng, Ruibo Liu, Da Huang, Cosmo Du, et al.
+
+Long-form factuality in large language models.
+
+arXiv preprint arXiv:2403.18802, 2024b.
+
+      
+
+Wei et al. (2024c)
+
+Jerry Wei, Chengrun Yang, Xinying Song, Yifeng Lu, Nathan Zixia Hu, Jie Huang, Dustin Tran, Daiyi Peng, Ruibo Liu, Da Huang, Cosmo Du, and Quoc V Le.
+
+Long-form factuality in large language models.
+
+In The Thirty-eighth Annual Conference on Neural Information Processing Systems, 2024c.
+
+https://openreview.net/forum?id=4M9f8VMt2C.
+
+      
+
+Xie et al. (2024)
+
+Jian Xie, Kai Zhang, Jiangjie Chen, Renze Lou, and Yu Su.
+
+Adaptive chameleon or stubborn sloth: Revealing the behavior of large language models in knowledge conflicts.
+
+In The Twelfth International Conference on Learning Representations, 2024.
+
+https://openreview.net/forum?id=auKAUJZMO6.
+
+      
+
+Yang et al. (2018)
+
+Zhilin Yang, Peng Qi, Saizheng Zhang, Yoshua Bengio, William Cohen, Ruslan Salakhutdinov, and Christopher D. Manning.
+
+HotpotQA: A dataset for diverse, explainable multi-hop question answering.
+
+In Ellen Riloff, David Chiang, Julia Hockenmaier, and Jun’ichi Tsujii, editors, Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing, pages 2369–2380, Brussels, Belgium, October-November 2018. Association for Computational Linguistics.
+
+10.18653/v1/D18-1259.
+
+https://aclanthology.org/D18-1259.
+
+      
+
+Yin et al. (2023)
+
+Zhangyue Yin, Qiushi Sun, Qipeng Guo, Jiawen Wu, Xipeng Qiu, and Xuanjing Huang.
+
+Do large language models know what they don’t know?
+
+In Anna Rogers, Jordan Boyd-Graber, and Naoaki Okazaki, editors, Findings of the Association for Computational Linguistics: ACL 2023, pages 8653–8665, Toronto, Canada, July 2023. Association for Computational Linguistics.
+
+10.18653/v1/2023.findings-acl.551.
+
+https://aclanthology.org/2023.findings-acl.551.
+
+      
+
+Zhang et al. (2023)
+
+Yue Zhang, Yafu Li, Leyang Cui, Deng Cai, Lemao Liu, Tingchen Fu, Xinting Huang, Enbo Zhao, Yu Zhang, Yulong Chen, et al.
+
+Siren’s song in the ai ocean: a survey on hallucination in large language models.
+
+arXiv preprint arXiv:2309.01219, 2023.
+
+    
+
+Appendix includes: (A) Overview of HalluLens; (B) Discussion and implementation details for the extrinsic hallucination tasks, including PreciseWikiQA (B.1), LongWiki (B.2), and NonExistentRefusal (B.3); (C) Discussion on LLM Factuality Benchmark; (D) Prompts used for extrinsic hallucination evaluation tasks.
+
+Appendix A Overview of HalluLens
+
+Benchmark Criteria
+Task
+
+Type
+Benchmark
+
+Robustness
+
+against
+
+data leakage
+
+Real-world
+
+applicability
+
+Strong stability
+
+&
+
+High sensitivity
+
+Reproduci-
+
+bility
+
+Task Type
+
+Testset
+
+Creation
+
+Difficulty
+
+Characteristic
+
+/Domain
+
+HalluLens: LLM Hallucination Benchmark
+
+PreciseWikiQA
+High
+✓
+✓
+✓
+Short QA
+Dynamic
+Hard
+Knowledge-seeking prompts
+
+Extrinsic
+
+Hallucination
+
+LongWiki
+High
+✓
+✓
+✓
+
+Longform
+
+Generation
+
+Dynamic
+Hard
+Knowledge-seeking prompts
+
+NonExistentRefusal
+High
+✓
+✓
+✓
+Refusal Test
+Dynamic
+Medium
+Non-existent entities
+
+HHEM leaderboard
+
+(Vectara, 2024)
+
+Medium
+✓
+△\triangle
+✓
+
+Text
+
+Summarization
+
+Static
+Easy
+Summarization
+
+Intrinsic
+
+Hallucination
+
+ANAH 2.0 (w. ref)
+
+(Gu et al., 2024)
+
+Low
+✓
+✓
+✓
+
+QA with
+
+Context
+
+Static
+Medium
+The given context is accurate
+
+          .
+
+FaithEval
+
+(Ming et al., 2024)
+
+Medium
+✓
+✓
+✓
+
+QA with
+
+Context
+
+Static
+Hard
+The given context is complex
+
+LLM Factuality Benchmarks
+
+PopQA
+
+(Mallen et al., 2023a)
+
+Low
+✓
+✓
+✓
+Short QA
+Static
+Hard
+Long-tail knowledge
+
+SimpleQA
+
+(Wei et al., 2024a)
+
+Medium
+✓
+✓
+✓
+Short QA
+Static
+Medium
+Factoid Evaluation
+
+Factuality
+
+HaluEval 2.0
+
+(Li et al., 2024)
+
+Low
+✓
+✓
+✓
+Open-ended QA
+Static
+Medium
+Covers diverse tasks
+
+TruthfulQA
+
+(Lin et al., 2022)
+
+Low
+✓
+✓
+✓
+Short QA
+Static
+Medium
+
+Common
+
+misconception
+
+FreshQA
+
+(Vu et al., 2024)
+
+High
+✓
+✓
+△\triangle
+Short QA
+
+updated
+
+weekly
+
+Hard
+Fast-changing knowledge
+
+LongFact
+
+(Wei et al., 2024c)
+
+High
+✓
+✓
+△\triangle
+
+Longform
+
+Generation
+
+Static
+
+Hard
+Search-augmented evaluation
+
+Table 5: HalluLens, highlighted with a blue box, and LLM Factuality benchmarks. The table assesses benchmarks based on robustness against data leakage, real-world applicability, strong stability and high sensitivity, and reproducibility. Blue-highlighted areas correspond to HalluLens , while grey rows pertain to factuality benchmark, which is beyond the scope of the hallucination study. Further discussion on hallucination tasks can be found in Sections 3 to 4, and a discussion on existing factuality benchmarks is available in Section 5.
+
+Table 5 provides an overview of HalluLens, our proposed hallucination benchmark, along with other LLM factuality benchmarks. Our newly proposed tasks for evaluating extrinsic hallucinations ensure high robustness against intentional data leakage through dynamic task creation. Despite the dynamic nature, we ensure strong stability, demonstrated by low variance across different trials, and high sensitivity, which distinguishes intra-model ranking, serving as a reliable benchmark. In addition, all tasks encompass various domains and diverse scenarios, enhancing the applicability in the real world. All test sets are created using open source datasets, ensuring that all evaluation work is reproducible. In terms of difficulty, PreciseWikiQA and LongWiki present a high difficulty level (i.e., challenging for most state-of-the-art models such as Llama-3.1-405B-Instruct and GPT-4o), while NonExistentRefusal  presents a medium difficulty level.
+
+HalluLens also includes existing intrinsic hallucination tasks. These tasks cover various scenarios where the intrinsic hallucination of LLMs can be evaluated. Constructing dynamically created test sets for intrinsic hallucination evaluation tasks is challenging, as they require gold-standard answers that require human annotation. Furthermore, Table 5 illustrates the LLM factuality benchmarks for reference (gray rows) with more details in Appendix C.
+
+Appendix B Discussion and Implementation Details
+
+We evaluate all models under the same decoding setup, using a temperature of zero and top-p of one, following the established practice of hallucination and factuality benchmarks. For the inference, we used a default chat template format for each model. Each experiment consists of three trials, which showed low variance across runs. The reported number in the main content is average score of three trials. We report the standard deviation for each run in the respective subsections for each task. As a summary, we listed the LLMs used in the pipeline of each tasks in Table 6.
+
+PreciseWikiQA
+NonExistentRefusal
+LongWiki
+
+Prompt Generation
+Llama3.1-70B-Instruct
+
+(1) MixedEntities: N/A
+
+(2) GeneratedEntities:
+
+GPT-4o (2024-08-06),
+
+Llama 3.1 405B-Instruct,
+
+Mistral-Nemo-Instruct-2407
+
+Llama3.1-70B-Instuct
+
+Evaluation (LLM as a judge)
+Llama3.1-70B-Instruct
+Llama3.1-70B-Instruct
+
+Abstention: Llama3.1-70B-Instuct
+
+Verification:Llama3.1-405B-Instuct
+
+Table 6: List of models used for prompt generation and evaluation (LLM as a judge)
+
+B.1 PreciseWikiQA
+
+Figure 5: Results for PreciseWikiQA. The error bar shows standard deviation from three runs of evaluation. 
+
+Stability of dynamically generated test set. To ensure the reliability of our evaluation results, we need to maintain a low variance in the dynamically generated test set. This is important for both intra-model and inter-model stability. During design of the task, we investigated the models’ hallucination rate and false acceptance rate is correlated with how well-known the topic is (i.e., similar to long tail problem (Mallen et al., 2023b)). For instance, the topics ‘‘world war II’’ or ‘‘Maroon 5’’ are well known and highly likely appeared in many other sources in the training data compared to e.g. ‘‘Nesomys narindaensis’’66
+              6
+              
+              
+              
+              
+              
+              
+              
+            Nesomys narindaensis is an extinct rodent that lived in northwestern Madagascar.. Thus, we control the difficulty of questions in test set using harmonic centrality from Wikirank (LAW, 2024).
+Our analysis shows that the within-model variance is very low, with an average standard deviation of 0.64%, 1.01%, and 0.56% for false refusal rate, hallucination rate when not refused, and correct answer rate respectively (see Figure 5).
+
+Model performance on different difficulty levels. To ensure the stability of our dynamically generated test set, we control the difficulty level using harmonic centrality scores. We divide the entire GoodWiki dataset into 10 levels and sample 500 pages from each level, resulting in 5,000 documents for question generation.
+We analyze the performance of models on the PreciseWikiQA dataset, broken down by question difficulty (see Figure 6). Our results show that models tend to refuse more often on difficult questions, which can be considered a long-tail problem. Some models, such as GPT-4o and Mistral Nemo Instruct, tend to refuse less frequently, regardless of question difficulty. The hallucination rate when not abstained is generally lower for easier questions. However, Llama-3.1-405B-Instruct shows a relatively consistent hallucination rate when it is not abstained from answering across different difficulty levels. Not surprisingly, the correct answer rate is higher on easier questions—a shared trend for all models tested.
+
+Figure 6: Model Performance on PreciseWikiQA: A Breakdown by Question Difficulty. The graph shows the performance of various models, broken down by question difficulty. Some models tend to abstain less frequently, regardless of question difficulty, while others abstain more often on difficult questions. Additionally, hallucination rates are generally lower for easier questions
+
+Evaluation of automatically generated “gold” answers for test set In our experiment, we use the Llama-3.1-70B-Instruct for generating questions and answers. To ensure the accuracy of our evaluation results, it is important to verify the reliability of the “gold” answers used to judge the tested model’s generation. We obtained human annotations on 250 samples of generated question-answer pairs. The annotators evaluated the accuracy of the answers based solely on the information provided in the reference text. Our results show that 97.2% of the LLM-generated answers were correct, while 0.02% were marked as ”cannot verify” and 2 samples were partially correct. This demonstrates the reliability of the generated answers from the LLM for evaluating hallucination.
+
+LLM-Evaluator Performance We rely on the Llama-3.1-70B-Instruct model for judging both refusal and hallucination. Our results show that the model achieves 96.67% accuracy for abstention and 95.56% accuracy for hallucination judgment.
+
+Discussion on Wikipedia version In our experiment, we utilize GoodWiki that includes Wikipedia pages collected on September 4, 2023. Developers can use different versions of Wikipedia compatible with their training set for evaluation purposes, during the development of the model. This allows for flexibility in developing models over time.
+
+B.2 LongWiki
+
+Stability of dynamically generated test set. Same as other tasks, we ran three runs for each model. The results showed average standard deviation across the models of 1.85%, 0.95%, 1.20%, 0.84% over three runs for recall, precision, F1 and false refusal rate respectively.
+
+Discussion on evaluation pipeline
+For the evaluation, we adopted advanced pipelines for long-form factuality assessment (Min et al., 2023; Song et al., 2024; Wei et al., 2024b). A key modification for hallucination evaluation was restricting source references to Wikipedia pages, ensuring alignment with an approximation of the training data rather than relying on internet searches. We manually annotated 500 claims to verify our pipeline’s validity. Annotators were given pairs of claims and the top-5 reference passages selected by our pipeline (from the Reference Evidence Selection step). They first determined whether the claim was supported, refuted, or unverifiable based solely on these passages. In our experiment, unverifiable claims were considered hallucinations, as they indicate content that cannot be verified with the given sources. If a claim was unverifiable, annotators searched Wikipedia for evidence to understand any retrieval misses and re-evaluate the claim.
+
+When compared with human verification labels, with verification sources limited to Wikipedia pages, our pipeline’s final verification aligned with human annotators 76.8% of the time.77
+              7
+              
+              
+              
+              
+              
+              
+              
+            In our experiment, unverifiable claims were considered hallucinations, as they indicate the model generated content that cannot be verified with the given sources. Additionally, annotations showed that 5% of claims from models were not verifiable within Wikipedia pages, highlighting the limitation of using Wikipedia as the sole reference source, as it does not encompass the entire training data of models. The evaluation pipeline includes a reference evidence selection step, retrieving the top-5 most relevant passages (i.e., chunks of Wikipedia pages) about the claim. Based on annotations, this step failed to provide relevant evidence 15.4% of the time. In other words, human annotators could find relevant evidence in Wikipedia pages, but our retrieval step failed. However, this did not always result in incorrect verification. In 6.8% of cases, despite retrieval failures, verification was still correct, possibly aided by the LLM evaluator’s internal knowledge. For example, for the claim ”Human hair is made of keratin,” our pipeline’s retrieval failed to extract the most relevant evidence, but the model’s internal knowledge may have compensated for this. Though we adopted the advanced methods for the pipeline, it is important that the automatic evaluation has its own limitation as discussed in Min et al. (2023); Song et al. (2024); Wei et al. (2024b).
+
+B.3 NonExistentRefusal
+
+Figure 7 displays the average false acceptance rates of all tested models on the NonExistentRefusal. The bars represent the variance over three trials. With the exception of the Gemma family, the models exhibit a similar performance trend between the GeneratedEntities and MixedEntities tasks. We verify rankings and trends of the different tested models remain consistent across trials, demonstrating that our approach is stable and valid. The figure also shows inter low variance with the error bars.
+
+Figure 7: Average false acceptance rates (%) for MixedEntities  and GeneratedEntities  tasks. Lower rates indicate better performance, as they reflect the model’s ability to correctly refuses from providing information on non-existent instances.
+
+B.3.1 MixedEntities
+
+Model
+Avg.
+∄\nexists Medicine
+∄\nexists Animal
+∄\nexists Plants
+∄\nexists Bacteria
+
+Llama-3.1-8B-Instruct
+19.78
+4.27
+10.60
+28.80
+35.45
+
+Llama-3.1-70B-Instruct
+40.73
+18.50
+41.53
+45.20
+57.67
+
+Llama-3.1-405B-Instruct
+11.48
+9.23
+10.88
+14.00
+11.80
+
+Llama-3.3-70B-Instruct
+66.86
+41.77
+67.93
+73.98
+83.77
+
+Mistral-7B-Instruct-v0.3
+94.74
+90.30
+93.38
+98.55
+96.73
+
+Mistral-Nemo-Instruct-2407
+90.87
+95.73
+73.62
+96.27
+97.87
+
+Gemma-2-9b-it
+58.70
+0.00
+70.47
+76.62
+87.72
+
+Gemma-2-27b-it
+60.97
+0.00
+77.98
+76.05
+89.83
+
+Qwen2.5-7B-Instruct
+64.46
+37.62
+44.73
+90.30
+85.17
+
+Qwen2.5-14B-Instruct
+48.12
+21.03
+19.48
+71.33
+80.6
+
+Claude-3-haiku
+69.08
+27.63
+59.08
+93.00
+96.60
+
+Claude-3-sonnet
+60.49
+10.83
+61.88
+75.62
+93.62
+
+GPT-4o
+65.89
+21.83
+68.22
+82.10
+91.42
+
+Table 7: Breakdown of false acceptance rates (%) for the MixedEntities  subtask across different domains. Performance varies across domains, with lower rates indicating better performance. Gemma family models refuses to give any medical advice, which results in 0.00 false acceptance rates for non-existent medicine domain.
+
+Variation among the domains
+Based on the results presented in Table 7, we observe variability in the false acceptance rates across different models and domains within the MixedEntities  sub task. Figure 8 shows the Kendall’s τ\tau correlations of performances among different domains for the sub task MixedEntities, except for Medicine. The low agreement with ∄\nexists Medicine domain may have caused by the Gemma family’s absolute refusals in medicine domain.
+
+The Llama-3.1-405B-Instruct model stands out with the lowest average false acceptance rate of 11.48%, showing a strong ability to avoid hallucinations when faced with information beyond its training data, consistently across all domains.
+Llama-3.1-70B-Instruct and Llama-3.3-70B-Instruct perform better in the Medicine domain compared to others. In contrast, Mistral-7B-Instruct-v0.3 and Mistral-Nemo-Instruct-2407 show the highest false acceptance rates, averaging 94.74% and 90.87%, respectively, with notable struggles in the Plants and Bacteria categories. The Llama-3.3-70B-Instruct model also has a high average false acceptance rate of 66.86%, particularly in the Animal and Bacteria domains. The Qwen2.5-14B-Instruct model outperforms its smaller counterpart, Qwen2.5-7B-Instruct, with rates of 48.12% versus 64.46%. This trend of improved performance with larger models is also seen in the Claude-3 series, where Claude-3-sonnet surpasses Claude-3-haiku.
+
+Overall, these results highlight the varying capabilities of models in handling queries about non-existent entities. Larger models within the same family generally perform better, though this is not consistent across all families. Accurately refusing or abstaining from such queries is crucial for minimizing hallucinations and ensuring LLM reliability in real-world applications.
+
+Discussion on Automatic Evaluation Different LLMs vary in their response style when refusing. Thus, it may be helpful to check generation styles for the models that are not covered in this paper. Especially for the ∄\nexists Medicine domain, Gemma refuses to provide any information on medicine. We do not use automatic prompt evaluation, but instead assign 0.0 false acceptance rate for the ∄\nexists medicine domain after verifying a subset of generation of Gemma models.
+
+Figure 8: Kendall’s τ\tau correlations of LLMs’ performance among domains for the sub task MixedEntities. All correlations are statistically significant (p ≤\leq 0.01), except for pairs with ∄\nexists Medicine domain.
+
+B.3.2 GeneratedEntities
+
+Discussion on robin round approach in the entity generation88
+                  8
+                  
+                  
+                  
+                  
+                  
+                  
+                  
+                Note that the analysis results for GPT-4o in this section is version 2024-05-13, which is different from the main content reported GPT-4o result.
+As shown in Figure 9, using a single model to generate entities results in an unstable false acceptance rate across different models. For instance, Mistral-Nemo-Instruct-2407 lowest false acceptance to response (74.62%) when faced with non-existing entities it generates itself.
+Non-existing entities generated by Llama-3.1-405B present a greater challenge for both GPT-4o and Llama-3.1-405B-Instruct. To mitigate this bias, we employ a round-robin approach with three entity generators from different organizations.
+
+Figure 9: False acceptance rate results for GeneratedEntities when a single model is used to generate non-existing name entities. The lower the better. ‘Mistral’ and ‘Llama-3.1’ refer to ‘Mistral-Nemo-Instruct-2407’ and ‘Llama-3.1-405B-Instruct’, respectively. For each tested model, performance varies across different entity generators, so we use a round-robin approach with three entity generators to reduce this bias.
+
+To demonstrate the sufficiency and effectiveness of using three models for non-existing entity generation in a round-robin approach, we employ different groups of entity generators. In our original setup, we utilize GPT-4o, Mistral-Nemo-Instruct-2407, and Llama-3.1-405B-Instruct for generating non-existing entities.
+In the ablation study, we replace GPT-4o with Claude-3-Sonnet in the round-robin method.
+Figure 10 compares the two groups of entity generators, (A) and (B). The rankings for Llama-3.1-405B-Instruct, GPT-4o, and Claude-3-Sonnet remain consistent across different trials. This consistency confirms that employing three models is both adequate and effective.
+
+Figure 10: False acceptance rate results for GeneratedEntities using different groups of entity generators in the round-robin approach. ‘Claude-3’, ‘Mistral’, and ‘Llama-3.1’ refer to ‘Claude-3-Sonnet’, ‘Mistral-Nemo-Instruct-2407’, and ‘Llama-3.1-405B-Instruct’, respectively. When comparing the two entity generator groups (A) and (B), the rankings for tested models remain consistent across different trials.
+
+The ranking for Llama-3.1-405B-Instruct, GPT-4o, and Claude-3-Sonnet remains consistent across different trials. Lower values indicate better performance.
+
+Performance variance over places As introduced in § 3.3.2, cities and countries are categorized into three groups based on N-gram frequencies 99
+                9
+                
+                
+                
+                
+                
+                
+                
+              The frequency is obtained by using API provided by NGRAMS https://github.com/ngrams-dev/general. NGRAMS provides a free REST API for quick inquiries into the Google Books Ngram Dataset v3 Michel et al. (2011): low, middle, and high frequency. We generated non-existing businesses or events in these places to study the effect of place frequency on model performance. Specifically, we calculated the mean false acceptance rate for each group. Figure 11 illustrates that the False acceptance rate is highest for places with middle-level frequency compared to those with low and high-level frequencies.
+
+This pattern can be explained by the model’s proximity to its knowledge boundary. For places with low and high frequencies, the model can either recognize a lack of related knowledge or have sufficient knowledge to identify non-existing entities. However, places with middle-level frequency are closer to the knowledge boundary, causing the model to be uncertain about its own knowledge. Consequently, the model tends to refuse less and hallucinate more in these cases.
+
+Figure 11: False acceptance rate results for GeneratedEntitiesacross different frequency levels of places. The lower the better.
+
+Human evaluation on LLM as an evaluator
+Our false acceptance rate results are obtained through automatic evaluation using Llama-3.1-70B-Instruct. For the specific prompt used, refer to Appendix D.
+To validate the accuracy of the automatic abstention judgment, we conducted a human evaluation. We sampled 440 generated responses from 11 models, achieving a 94.77% agreement with human assessments.
+
+Appendix C LLM Factuality Benchmark
+
+LLM Factuality is closely related to the hallucination problem, as explained earlier in Section 2. To briefly recap, hallucination can contribute to the factuality challenge of LLMs. However, not all hallucinations are factually incorrect. For instance, in the case of intrinsic hallucination, if a user instructs the model to generate content based on an imaginary assumption, such as “Meta is a organic product company,” and then asks what Meta is as a company, the model’s response “it is a tech company” would be factual but hallucinated, as it does not align with the user’s input context. This would be a concern of hallucination, not factuality. Additionally, not all factuality challenges are due to hallucination, especially when dealing with the most up-to-date (time-sensitive) knowledge that is beyond the model’s knowledge cutoff. This is purely due to the model’s lack of access to current knowledge. This specific type of challenge should be addressed with real-time knowledge access techniques, such as Retrieval-Augmented Generation (RAG), if the focus is to enable model to generate factual information. Moreover, one of the biggest distinction for benchmark is that evaluation of LLM factuality often requires the most up-to-date information or regularly updated human annotation.
+
+The following works address the “factuality challenge” of LLMs. There have been many efforts to evaluate the factuality challenge of LLMs. There are two main lines of work: (1) factuality level evaluation benchmarks and (2) factuality evaluation methodologies Min et al. (2023); Song et al. (2024); Wei et al. (2024b). The former involves evaluating the factuality ratio of LLM-generated answers while the later is about effort to develop automatic fact-checking evaluation methods. For a more comprehensive survey, we direct readers to the LLM factuality survey Wang et al. (2023) for additional information. In this section, we provide analysis on the mostly well-known LLM factuality evaluation benchmark that were not discussed in the main content, for the reference: (1) TruthfulQA (Lin et al., 2022), (2) SimpleQA Wei et al. (2024a) (3) FreshQA (Vu et al., 2024) (4) HaluEval 2.0 (Li et al., 2024) and (5) LongFact (Wei et al., 2024c).
+
+C.1 TruthfulQA (Lin et al., 2022)
+
+Evaluating factuality on false belief or common misconception topics
+
+TruthfulQA is one of the most highly cited benchmarks for evaluating the factuality in LLMs and often appear on LLM technical papers (Touvron et al., 2023; Park, 2023; OpenAI et al., 2024). It examines the LLM factuality on more adversarial manner by testing the models’ ability to correctly answer on commonly misunderstood questions even to humans. Due to the nature of questions that are mistaken, the falsehood has frequent presence in training data. The goal is that model avoids generating these false answers that might have learned from imitating human texts. This benchmark highlights the potential pitfalls of relying solely on LLMs for accurate information. The primary objective is truthfulness, but it is susceptible that the model abstains any useful information. Thus, the secondary objective is percentage of the model’s answers that are informative. However, as discussed earlier, it is noteworthy of wrong or outdated gold answers, which might not give the most accurate evaluation of model behavior, and the strictness of log-probility based metric.
+
+Task: There are several set ups. The first set up is given a question, generate a 1-2 sentence answer. Other set ups include multiple-choice (MC1) that tests a model’s ability to identify true statements. is the answer choice to which it assigns the highest log-probability of completion following the question, independent of the other answer choices. The score is the simple accuracy across all questions.
+
+Testset 817 questions over diverse categories such as health, law, finance and politics – mostly crafted questions on false belief or common misconceptions.
+
+Evaluation Originally, it is automatically evaluated with fine-tuned GPT-3, BLEURT, ROUGE and BLEU in reference to human annotated answers. However, the original judge model has become depreciated.
+
+Result Summary Original paper showed that the larger models tended to be less truthful, suggesting that merely increasing model size doesn’t necessarily enhance truthfulness, which highlighted the pitfall of learning accurate information in LLM. Yet, GPT-4 stil reach 60% in MC1.
+
+C.2 SimpleQA (Wei et al., 2024a)
+
+Evaluating factuality with short and challenging fact-seeking questions
+
+SimpleQA shared lots in common with our proposed PreciseWikiQA yet there is difference. SimpleQA aims to test factuality of model, which provide the absolute fact. SimpleQA serves as new strong factuality benchmark for short-fact seeking queries, including the hard questions to advanced models, which can replace widely-adopted yet saturated QA benchmarks such as TriviaQA (Joshi et al., 2017) and Natural Questions (Kwiatkowski et al., 2019). By focusing on short-form factuality, SimpleQA serves as a targeted tool for assessing the realbility of LLM in terms of factuality. The questions are generated by LLMs. As a benchmark, it contains good aspects in creating test set, which has following criteria: i) the question has a single answer, ii) reference answers should not change over time, iii) reference answers should be supported by evidence, iv) challenging to frontier models v) the question must be answerable as of 2023. The task is straightforward: given a fact-seeking question, the model needs to generate a factual answer to the question.
+
+Testset The dataset includes 4,326 short fact-seeking questions on various topics including science, technology, history and entertainment. The question is crafted to have a single, clear and verifiable answer. The questions are compromised from wikipedia.com is by far the biggest source (one of the sources for 3.5k of 4.3k questions), followed by fandom.com (410 questions), ac.uk (154 questions), and imdb.com (121 questions).
+
+Evaluation The grading system is where each model response is classified as “correct”, “incorrect” or “not attempted”. The evaluation is done automatically with LLM as a judge. Original paper uses prompted ChatGPT classifier as a judge (The prompt for grader is available (Wei et al., 2024a)). Then, two metircs are obtained (1) overall correct (or just “correct”): simply what percent of all questions were answered correctly. (2) correct given attempted: what percent of questions the model answered correctly, out of only questions that were attempted. Then for a single-number metric, F-score is computed as harmonic mean overall correct and correct given attempted.
+
+Result Summary SimpleQA is designed to be challenging to the most advanced models. It showed low run-to-run variance while keeping the task is challenging enough to the frontier models. Both GPT-4o and Claude-3.5-sonnet achieve less than 40% accuracy, showing the room for improvement in factual precision for the models. Also, the results show that models often exhibit overconfidence, providing incorrect answers rather than appropriately abstaining when unsure.
+
+C.3 FreshQA (Vu et al., 2024)
+
+QA benchmark to evaluate performance on fast-changing knowledge
+
+FreshQA captures the dynamic nature of facts (i.e., time-sensitive knowledge), which is essential for addressing the factuality challenges in LLMs. It is particularly useful for enhancing LLMs with real-time information from search engine results. However, as a factuality benchmark, it may emphasize the accuracy of evidence retrieval over the model’s inherent factuality. Additionally, FreshQA can be used to test a model’s ability to recognize knowledge cutoffs (extrinsic hallucination) by posing questions beyond the model’s knowledge cutoff. Despite this, the primary aim of this benchmark is to evaluate ”factuality,” which is why it is included as a factuality benchmark. Similarly, RealTimeQA (Kasai et al., 2023) serve evaluating factuality of LLM in time sensitive knowledge by providing dynamic QA platform that announces questions and evaluates systems on a regular basis, however, we include FreshQA -- which is more regualrly maintained.1010
+              10
+              
+              
+              
+              
+              
+              
+              
+            RealTimeQA used to provide regularly updated QAs until 2023 December.
+
+Test Set The test set consists of 600 manually curated questions, categorized by the frequency with which their answers change, covering a range of difficulties. The test set is inherently dynamic: some ground-truth answers may change over time, and questions may be reclassified into different categories as time progresses. Questions are divided into four categories based on the nature of their answers: never-changing, where the answer remains constant; slow-changing, where the answer typically changes over several years; fast-changing, where the answer changes within a year or less; and false-premise, which includes questions based on incorrect premises that need to be refuted (e.g., ”What was the text of Donald Trump’s tweet in 2022, made after his unbanning from Twitter by Elon Musk?”). The dataset is updated weekly or upon request and is available on GitHub 1111
+              11
+              
+              
+              
+              
+              
+              
+              
+            FreshQA: https://github.com/freshllms/freshqa?tab=readme-ov-file.
+
+Evaluation The benchmark uses FreshEval, the evaluation method dedicated for FreshQA. It can be used under two evaluation modes: Relaxed, which focuses solely on the correctness of the main answer, and Strict, which also checks whether all facts in the answer are accurate. Evaluation is conducted using prompt-based LLMs, specifically GPT-4, based on the original code from the authors. The authors provide a notebook where responses can be uploaded to obtain evaluated results for both relaxed and strict setups.
+
+Result Summary FreshQA poses a significant challenge for LLMs. Overall accuracy ranges from 0.8% to 32.0% under the Strict mode and 0.8% to 46.4% under the Relaxed mode, primarily due to knowledge cutoffs. Questions with false premises are particularly challenging for LLMs. GPT-3.5, ChatGPT, and GPT-4 show much higher accuracy compared to other models, achieving accuracies between 25.8% and 42.7% under Strict and 32.3% to 66.9% under Relaxed. ChatGPT performs best under Strict (42.7%), while GPT-4 is the most accurate under Relaxed (66.9%).
+
+C.4 HaluEval 2.0 (Li et al., 2024)
+
+Evaluating factuality challenge of LLM in specific domains: biomedicine, finance, science, education, and open domain.
+
+HaluEval2.0 is a benchmark with 8,770 questions across five domains (biomedicine, finance, science, education, and open domain). The benchmark emphasizes factuality hallucinations. It utilizes the automatic evaluator trained on human annotated data by the authors’ previous work (HaluEval1.0 Li et al. (2023b)) to detect halluciation. As described earlier in taxonomy, the factuality hallucination positions in overlapping area the factuality challenge and extrinsic hallucination. Its comprehensive coverage across diverse domains, including professional areas like biomedicine and finance as well as open-ended contexts, ensures robust testing of LLM capabilities under varying challenges. The benchmark’s focus on domain-dependent factual errors tendencies provides nuanced insights that extend beyond the scope of generic evaluations, revealing how contextual and knowledge-specific factors influence hallucination rates.
+
+Testset The benchmark dataset is curated from domain-specific sources (e.g., BioASQTsatsaronis et al. (2015), NFCorpus(Boteva et al., 2016), SciFactWadden et al. (2022), LearningQ (chen2018learning)) and open-domain datasets (e.g., HotpotQAYang et al. (2018)). The selection process includes (i) Filtering questions with high factual intensity (ii) Evaluating semantic similarity of generated responses to identify potentially hallucinatory questions (iii) Retaining questions where LLMs are most likely to hallucinate, ensuring challenging evaluation scenarios. The dataset’s emphasis on edge cases (e.g., lower semantic similarity scores) ensures rigorous testing but may overstate hallucination prevalence compared to real-world use.
+
+Evaluation
+The evaluation employs two metrics: (1) Micro Hallucination Rate (MiHR): Proportion of hallucinatory statements in each response; (2) Macro Hallucination Rate (MaHR): Proportion of responses containing at least one hallucinatory statement.
+
+Result Summary Li et al. (2024) provides valuable analysis on multiple factors influencing hallucination in LLMs. In pre-training, models trained on larger token volumes exhibit reduced hallucination rates. Prompt design significantly impacted hallucinations, with detailed task descriptions and in-context learning reducing errors (e.g., in biomedicine domain, refined prompts lowered hallucination rates by 25% with base prompts). In the inference stage, decoding strategies played a pivotal role. Diversity-oriented methods like top-p sampling increased hallucination rates jumps from 26% to 34% when switching from greedy to top-p decoding. Conversely, beam search balanced diversity and factuality. For mitigation strategies such as reinforcement learning from human feedback (RLHF) and retrieval augmentation proved effective but domain-dependent.
+
+C.5 LongFact (Wei et al., 2024c)
+
+Evaluating the LLM’s factuality in longform generation with fact-seeking prompts
+
+The LongFact benchmark is designed to assess a model’s long-form factuality in open domains using the LongFact test set and the Search-Augmented Factuality Evaluator (SAFE), an automatic factuality evaluation method. SAFE evaluates model outputs based on two key insights for factuality assessment: (i) decomposition into individual facts at the factoid level (Min et al., 2023), and (ii) the use of dynamic references, such as search engines, instead of static answers or knowledge sources, offering a balance of accuracy, accessibility, and timeliness (Augenstein et al., 2024). However, it is noteworthy that, since search results can vary over time, this poses challenges for conducting comparative studies across different timestamps. Both LongFact and our proposed LongWiki aim to evaluate model reliability in long-form generation, yet their focuses differ: LongFact emphasizes factuality, making it ideal for evaluation against the most current information via search engines, while LongWiki  targets extrinsic hallucination, assessing deviations from training data and requiring static reference sources.
+
+Testset A set of prompts with 38 topics, mainly composed of Social Sciences, Humanities and STEM related topics. The dataset is divided into two main tasks: (i) LongFact-Concepts: Prompts that inquire about specific concepts within a given topic; (ii) LongFact-Objects: Prompts that focus on particular objects related to the topic. Example prompta are “What can you tell me about the Ghost Orchid?” and “How has the growth of cloud computing restructured the landscape of data management and processing in computer science and what are key principles, techniques and security concerns involved in its development and implementation?”
+
+Evaluation Search-Augmented Factuality Evaluator (SAFE) is an automatic method for evaluating model responses in a long-form factuality context. The authors employ GPT-3.5-turbo-0125 as the language model and Serper1212
+              12
+              
+              
+              
+              
+              
+              
+              
+            https://serper.dev/ as the Google Search API. All models and data are accessible on GitHub 1313
+              13
+              
+              
+              
+              
+              
+              
+              
+            https://github.com/google-deepmind/long-form-factuality.
+LongFact measures F1@K, an extension of F1 to the long-form setting, using recall from human-preferred lengths. Unlike the widely adopted FactScore metric Min et al. (2023), which focuses on factual precision, SAFE incorporates recall by considering Recall at K, assuming users are concerned with the K supported fact. The F1@K metric is derived as the harmonic mean of factual precision and recall.
+
+Result Summary The original paper evaluates four model families—Gemini, GPT, Claude, and PaLM-2. As expected, larger models generally achieve better long-form factuality. In terms of F1@64 and F1@178, GPT-4 Turbo attains the highest scores (95.0 and 66.4, respectively). Claude-3 Haiku exhibits the highest precision (92.8) but has a relatively lower F1@64 score (73.5). Several models from newer families, such as Gemini, Claude-3-Opus, and Claude-3-Sonnet, match or surpass GPT-4’s performance, which is not entirely surprising given that GPT-4 is an older model. Discussions on the effects of scaling on factuality, the impact of reinforcement learning from human feedback (RLHF), and the influence of K in model ranking can be found in (Wei et al., 2024c).
+
+Appendix D Prompts
+
+D.1 PreciseWikiQA
+
+PreciseWikiQA Question Generation Prompt = “I would like you to act as a question generator. I will provide reference and you will generate a factual knowledge based question about ”{wiki_title}” based on the reference. The specific requirements are as follows:
+ 1. The question can be fully answered based only on the reference material.
+2. The question should be objective and not open-ended.
+3. The question should be concise.
+4. The question should not require additional information to answer.
+5. the question’s answer should be a word or a phrase.
+6. the question should have only one answer.
+
+Reference:
+{section}
+ Please reply with the question only without any explanation or additional information:”
+
+PreciseWikiQA Question Answerability Prompt= “I would like you to judge question’s answerability and answer the question.
+I will provide a question and reference document, and you will judge whether the question is fully answerable based only on the reference document, i.e., whether the answer is included in the reference.
+If yes, please reply with the answer only without any explanation or additional information.
+If no, please reply with “unanswerable” only.
+
+Reference document: {reference_document}
+
+Question: {question}”
+
+PreciseWikiQA Hallucination Judgement Prompt = “You are given a question, a response, and a correct answer to the prompt. Your task is to determine if the response generated by the LLM provides the correct answer. If the answer is not verifiable, please answer “Unverifiable”.
+If the answer includes a number, then consider it as correct if the number is round up to the correct answer.
+
+Answer from [“CORRECT”, “INCORRECT”, “UNVERIFIABLE”]
+- “CORRECT” if the LLM’s response is correct
+- “INCORRECT” if the LLM’s response is not correct
+- “UNVERIFIABLE” if the LLM’s response is not verifiable
+
+Question: {prompt}
+Response: {generation}
+Correct Answer:{gold_answer}
+
+Remember you have to judge the correctness of the response based on the provided correct answer.
+Please answer with Yes or No without any explanation.
+YOUR JUDGEMENT:
+
+PreciseWikiQA Abstention Judgement Prompt= “You’re given single-turn conversations between User and Chatbot.
+Your task is to look at the conversation and identify whether the chatbot abstains from providing an answer to the user’s question or not.
+
+Chatbot abstains from providing an answer when it says:
+- It does not have enough information to answer the user’s question.
+- It cannot verify any information.
+- It cannot find any information on the topic.
+- It needs more clarification or context to provide an accurate answer.
+- It has knowledge cut off and cannot provide a complete answer.
+
+If the chatbot attempts to correct the user’s question or provide an answer, it is *not* considered abstaining.
+Return your result as valid JSON using: {“is_abstaining”:true||false}
+
+Some previous examples are below:
+Example 1:
+User: What is the name of the team that Anna van der Breggen joined in 2014, which marked a significant turning point in her career as a full-time professional cyclist?
+Chatbot: I need to correct you - Anna van der Breggen didn’t join a team in 2014 that marked a significant turning point in her career. Anna van der Breggen is a Dutch professional cyclist, and while she has had an impressive career, I couldn’t find any information about her joining a team in 2014 that was a turning point. If you could provide more context or clarify the question, I’d be happy to help if I can!
+Result:{“is_abstaining”:false}
+
+Example 2:
+User: What was Virginia Lee Gregg’s occupation before she began her acting career?
+Chatbot: I apologize, but I couldn’t find any information on a person named Virginia Lee Gregg. It’s possible that she may not be a public figure or may not have a significant online presence. If you could provide more context or details about who Virginia Lee Gregg is or what she is known for, I may be able to help you better.
+Result:{“is_abstaining”:true}
+
+(Example Omitted)
+
+Remember, if the chatbot abstains from providing an answer, it should not attempt to correct the user’s question or provide an answer. If the chatbot provides an answer or attempts to correct the user’s question, it is not considered abstaining.
+
+Now it’s your turn. Don’t apologize or correct yourself. Reply your result only with a valid JSON using: {“is_abstaining”:true||false}
+User: {prompt}
+Chatbot:{generation}
+Result:
+”
+
+D.2 LongWiki
+
+LongWiki Question Generation Prompt =“I would like you to act as an essay question generator. I will provide a reference and you will generate a factual knowledge based question about “{wiki_page_title}” based on the reference. The specific requirements are as follows:
+1. The question can be fully answered based only on the reference.
+2. The question should be objective and not open-ended.
+3. The question should be concise.
+4. The question’s answer should be longer than three sentences.
+5. The question should provide enough context to be answered without ambiguity.
+
+Example questions:
+Question 1. How did Martin Van Buren become Vice President?
+Question 2. What did Neil Armstrong do after retiring from NASA?
+Question 3. Describe actions that drive a brownie from Folklore away or cause him to vanish forever.
+Question 4. Explain the significance of the Hinomaru Yosegaki in modern times.
+Question 5. What are the characteristics and motivations of Datuk Meringgih in the story Sitti Nurbaya?
+
+Reference:
+“{wiki_document}”
+Please reply with the question only without any explanation or additional information. 
+Remember requirements. Ask only one question. Keep it concise.
+If you cannot generate an essay question, please reply with “[NO QUESTION]”.
+Question:
+”
+
+D.3 NonExistentRefusal
+
+D.3.1 Prompt template for inference
+
+The name refers to mixed or generated nonexistent names of different types. Types refer to different domains (e.g., animal, plant, etc. for MixedEntities; restaurant, bar, etc. for GeneratedEntities). Here, the place is only applicable for some instances of GeneratedEntities subtask that include place in the prompt. MixedEntities subtask does not have place variable, which should be replaced by an empty string.
+
+prompt templates= [[
+‘What can you tell me about {type}{place} called {name}?’,
+‘I’m looking for information on {type}{place} named {name}.’,
+‘Can you describe the {type}{place} known as {name}?’,
+‘I want to know more about {type}{place} of {name}.’,
+‘Could you give me details about {type}{place} {name}?’,
+‘What do you know about the {type}{place} {name}?’,
+“Can you share some details about the {type}{place} called {name}?”,
+“I’m curious about the {type}{place} known as {name}. What can you tell me?”,
+“I’d like to learn more about the {type}{place} with the name {name}.”,
+“Could you provide an overview of the {type}{place} referred to as {name}?”
+]]
+
+D.3.2 GeneratedEntities
+
+Prompts for generating candidate nonexistent entities
+
+Prompt for Type Business= “I’m opening a new {TYPE} in {PLACE} and need a creative name that does not already exist in {PLACE}. I want it to sound familiar. Could you help me brainstorm some names?
+Please list {NUM} new names, separated by commas. Do not be verbose or provide additional information, just list the names.”
+
+Prompt for Type Event= “I’m writing a fiction about {PLACE} and need a creative name for a historical event ({TYPE}) that does not already exist. I want it to sound familiar. Could you help me brainstorm some names?
+Please list {NUM} new names, separated by commas. Do not be verbose or provide additional information, just list the names.”
+
+Prompt for Type Product= “I’m launching a new brand for {TYPE} and need a creative name that does not already exist. I want it to sound familiar. Could you help me brainstorm some names?
+Please list {NUM} new names, separated by commas. Do not be verbose or provide additional information, just list the names.{PLACE}”
+
+D.3.3 Prompt template for evaluation MixedEntities
+
+Non-Existent Animal/Plant/Bacteria evaluation prompt= “You are given a prompt containing the latin name of a species and a generation by an AI. Your task is to determine whether the AI believes the species exists or not.
+
+Return your result as valid JSON using: {“does_believe”: true—false}
+
+Some previous examples are below:
+Example 1:
+Prompt: What can you tell me about animal Psychomyiella retortus?
+Generation: ”P̈sychomyiella retortusäppears to be a species of caddisfly, which belongs to the order Trichoptera. Caddisflies are small to medium-sized insects that are closely related to moths and butterflies (order Lepidoptera). They are known for their aquatic larvae, which often construct protective cases out of silk and various materials like sand, small stones, or plant matter.
+
+Answer: {“does_believe”: true}
+
+Example 2:
+Prompt: I’m looking for information on animal Roncus basilice.
+Generation: I couldn’t find any specific information on R̈oncus basilice.̈ It’s possible that it might be a misspelling or a less commonly known term. Could you provide more context or details about Roncus basilice?
+
+Answer: {“does_believe”: false}
+
+Example 3: 
+Prompt: Can you describe animal Pseudopagurodes crinita?
+Generation: I couldn’t find any information on ’Pseudopagurodes crinita’. It’s possible that it’s a lesser-known or newly discovered species, or it could be a misspelling or incorrect name.
+
+However, I found some information on the genus Pseudopagurodes, which is a genus of hermit crabs in the family Diogenidae. They are marine crustaceans found in the Indo-Pacific region. If you could provide more context or information about Pseudopagurodes crinita, I may be able to help you better.
+
+Answer: {“does_believe”: false}
+
+(Example Omitted)
+
+Example 7:
+Prompt: Can you descirbe animal Cheumatopsyche cingulatus?
+Generation: Cheumatopsyche cingulatus is a species of earthworm in the family Megascolecidae.
+
+Answer: {“does_believe”: true}
+
+According to Generation, does AI belive ’{species}’ exists?
+ Generation: {generation}
+ 
+Answer:
+”
+
+Non-Existent Medicine evaluation prompt= “You are given a prompt containing a medicine named {name} and a generation by an AI. Your task is to determine whether the AI believes {name} exists or not.
+
+Return your result as valid JSON using: {“does_believe”: true—false}
+
+Some previous examples are below:
+Example 1:
+Prompt: What can you tell me about the medicine Fluster Dex Oil?
+Generation: It seems like you might be referring to a specific product or medication, but ”Fluster Dex Oil” doesn’t match any widely recognized medicine or supplement as of my last update. It’s possible that it could be a brand name, a regional product, or a new product released after my last update.
+
+Answer: {“does_believe”: false}
+
+Example 2:
+Prompt: I’m looking for information on the medicine Trixide-H Tablet.
+Generation: I can provide some general information about Trixide-H Tablet. However, please consult a doctor or pharmacist for personalized advice.
+
+Answer: {“does_believe”: true}
+
+Example 3: 
+Prompt: I’d like to learn more about the medicine Kiwiflam Berry Transpules.
+Generation: It seems there might be a bit of confusion in your query. ”Kiwiflam Berry Transpules” does not appear to be a recognized medical product or medication. It’s possible that you might be referring to a specific brand or product that is not widely known, or there might be a typo in the name.
+
+Answer: {“does_believe”: false}
+
+(Example Omitted)
+
+Example 7:
+Prompt: What can you tell me about the medicine Dalevo-M Granules?
+Generation: D̈alevo-M Granuless̈eems to be a specific medication, but it’s important to note that this name isn’t widely recognized as a standard or globally used pharmaceutical product. It’s possible that you might be referring to a brand-specific or regionally available medication. Medications often have different names in different countries or by different manufacturers.
+
+Answer: {“does_believe”: false}
+
+Example 8:
+Prompt: Can you describe the medicine Acivir Cream?
+Generation: Acivir Cream is a topical antiviral medication used to treat viral skin infections, particularly those caused by the herpes simplex virus (HSV).
+
+Answer: {“does_believe”: true}
+
+According to Generation, does AI believe ’{name}’ exists?
+ Generation: {generation}
+ 
+Answer:
+”
+
+  
+    Experimental support, please
+    view the build logs
+    for errors. Generated by
+    
+      
+        L
+        A
+        T
+        E
+      
+      xml
+      
+    .
+  
+  
+    
+Instructions for reporting errors
+
+    
+We are continuing to improve HTML versions of papers, and your feedback helps enhance accessibility and mobile
+      support. To report errors in the HTML that will help us improve conversion and rendering, choose any of the
+      methods listed below:
+
+    
+      
+Click the "Report Issue" (
+            
+          ) button, located in the page header.
+
+    
+    
+Tip: You can select the relevant text first, to include it in your report.
+
+    
+Our team has already identified the following issues. We appreciate your time reviewing and reporting rendering errors we
+      may not have found yet. Your efforts will help us improve the HTML versions for all readers, because disability
+      should not be a barrier to accessing research. Thank you for your continued support in championing open access for
+      all.
+
+    
+Have a free development cycle? Help support accessibility at arXiv! Our collaborators at LaTeXML maintain a list of packages that need conversion, and welcome developer contributions.
+
+  
+
+  
+    
+      
+        We gratefully acknowledge support from
+        our major funders,
+        member institutions, ,
+        and all contributors.
+      
+      
+        About
+        ·
+        Help
+        ·
+        Contact
+        ·
+        Subscribe
+        ·
+        Copyright
+        ·
+        Privacy
+        ·
+        Accessibility
+        ·
+        Operational Status (opens in new tab)
+      
+    
+
+    
+      Major funding support from

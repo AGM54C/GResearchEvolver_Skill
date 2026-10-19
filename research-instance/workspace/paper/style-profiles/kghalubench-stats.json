@@ -1,0 +1,139 @@
+{
+  "corpus": {
+    "path": "../../literature/inbox/fulltext/kghalubench.txt",
+    "line_range": [
+      233,
+      505
+    ],
+    "words_clean": 4401,
+    "sentences": 215,
+    "paragraphs": 80
+  },
+  "S1_sent_len": {
+    "mean": 20.5,
+    "sd": 6.9,
+    "p25": 15.0,
+    "p50": 20.0,
+    "p75": 24.0
+  },
+  "S2_hedging_spectrum": {
+    "suggest": 4,
+    "indicate": 3,
+    "show": 6,
+    "demonstrate": 2,
+    "prove": 0,
+    "establish": 1,
+    "reveal": 2
+  },
+  "S3_connectives": {
+    "However": {
+      "n": 16,
+      "per_k": 3.64
+    },
+    "Yet": {
+      "n": 3,
+      "per_k": 0.68
+    },
+    "Nevertheless": {
+      "n": 0,
+      "per_k": 0.0
+    },
+    "Moreover": {
+      "n": 0,
+      "per_k": 0.0
+    },
+    "Furthermore": {
+      "n": 0,
+      "per_k": 0.0
+    },
+    "Additionally": {
+      "n": 1,
+      "per_k": 0.23
+    },
+    "Instead": {
+      "n": 3,
+      "per_k": 0.68
+    },
+    "Therefore": {
+      "n": 11,
+      "per_k": 2.5
+    },
+    "Thus": {
+      "n": 0,
+      "per_k": 0.0
+    },
+    "While": {
+      "n": 8,
+      "per_k": 1.82
+    }
+  },
+  "S4_passive": {
+    "n": 47,
+    "ratio_vs_sents": 0.219
+  },
+  "S5_nominalization": {
+    "n": 354,
+    "per_k": 80.4
+  },
+  "S6_fig_table_refs": {
+    "n": 8,
+    "per_k": 1.82
+  },
+  "S7_ai_tel": {
+    "delve": 0,
+    "underscore": 0,
+    "intricate": 0,
+    "tapestry": 0,
+    "pivotal": 0,
+    "showcase": 0,
+    "foster": 0,
+    "leverage": 4,
+    "realm": 0,
+    "seamless": 0,
+    "landscape": 0,
+    "paves_the_way": 0,
+    "opens_avenues": 0,
+    "sheds_light": 0,
+    "bridges_gap": 0,
+    "paramount": 0,
+    "novel": 6,
+    "first_time": 0,
+    "best_knowledge": 0,
+    "extensive": 2,
+    "comprehensive": 5,
+    "numerous": 1,
+    "various": 0,
+    "wide_range": 0,
+    "em_dash": 0,
+    "worth_noting": 0,
+    "in_order_to": 0,
+    "not_just_but": 0
+  },
+  "S8_first_person": {
+    "n": 85,
+    "per_k": 19.3
+  },
+  "S9_number_style": {
+    "delta_form": 5,
+    "absolute_form": 6
+  },
+  "S10_para_sents": {
+    "mean": 2.7,
+    "sd": 1.8,
+    "max": 8,
+    "n_paras": 80
+  },
+  "S11_pivot": {
+    "however_sent_initial": 13,
+    "however_total": 16,
+    "initial_ratio": 0.81
+  },
+  "S12_this_np_v": {
+    "n": 2,
+    "examples_pattern": "This + NP + reporting-verb"
+  },
+  "S13_spelling": {
+    "british_ise": 13,
+    "american_ize": 0
+  }
+}

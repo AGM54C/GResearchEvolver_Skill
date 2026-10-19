@@ -1,0 +1,38 @@
+{
+  "archive": "archive-001",
+  "extracted_at": "2026-10-19T15:30:00+08:00",
+  "reconstructed": true,
+  "note": "追溯重建 diff：rsi-1 与干预轮 1 执行时 P5 协议尚未生效，首版未留快照；after 均取自当前文件真实内容，before 按诚实规则标 null（session-archive.md §5.2）。",
+  "operations": {
+    "adds": [
+      {
+        "path": "memory/experiences/multisource-retrieval-pitfalls.md",
+        "after": "（结构摘要）skill: literature-miner；failure_mode: 条件错误合并 + 限速处理不当；正文四节：skill / failure_mode / 为什么（三坑根因）/ 如何应用（ID 规范化 + S2 降级 + OA key）。创建于 rsi-1；现版另含干预轮 update 增量节（见 updates）。",
+        "note": "rsi-1 distill 创建"
+      },
+      {
+        "path": "memory/experiences/parallel-task-cwd-pitfall.md",
+        "after": "（结构摘要）skill: research-autopilot/所有并发场景；failure_mode: 产物落盘位置错误；为什么（& 后台从解析点 fork 不继承 cd，5 文件散落实测）；如何应用（显式绝对路径 + ls 验证 + Gate Check 兜底）。",
+        "note": "rsi-1 distill 创建；INT-2 重放为验证回链，内容未变"
+      }
+    ],
+    "updates": [
+      {
+        "path": "memory/experiences/multisource-retrieval-pitfalls.md",
+        "before": null,
+        "before_note": "协议前执行（rsi-1 首版），未留快照；变更范围依据 evolution-log 干预轮 1 distill 记录重构",
+        "after": "- **增量（2026-10-19 干预重放验证）**: ① ID 归一化的有效性已由重放独立验证（31 条→27 unique，跨源键不归一 + 同源多查询重复两类机制一并覆盖）；② S2 未认证限速下 **30s 间隔不够**（2 轮 4 请求全 429）——降级阈值应更激进：1 次间隔重试仍 429 即降级，勿恋战。",
+        "note": "干预轮 1 INT-3 增量蒸馏（Validated）；after 为新增节全文"
+      }
+    ],
+    "deletes": []
+  },
+  "skipped": [
+    {
+      "op": "新增 INT-1（ID 归一化）与 INT-2（绝对路径）独立经验条目",
+      "reason_code": "dedup_merged",
+      "reason": "干预轮 1 distill：INT-1/2 判定为既有经验（multisource-retrieval-pitfalls / parallel-task-cwd-pitfall）的验证回链，合并确认而非新增（依据 evolution-log）"
+    }
+  ],
+  "summary": {"adds": 2, "updates": 1, "deletes": 0, "skipped": 1}
+}

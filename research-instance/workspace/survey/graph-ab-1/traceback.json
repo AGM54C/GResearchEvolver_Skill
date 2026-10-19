@@ -1,0 +1,75 @@
+{
+ "experiment": "graph-ab-1",
+ "topic": "LLM 幻觉的定义、分类与基准化的现有挑战",
+ "judgment_standard": {
+  "graph_path": "锚 [C-xxx-N] 判定三档：valid = ID 存在于 graph.json 且文本语义一致（无夸大/张冠李戴/scope 丢失）；degraded = 可回接但条件/scope 丢失；broken = ID 不存在或语义扭曲",
+  "baseline_path": "论断判定三档：valid = 在 entries/*.md 或 notes/*/我的想法.md 中有支持文本且来源性质未歪曲；degraded = 可回接但丢失条件/边界；broken = 无支持、来源错误、或弱证据被强化",
+  "verifier": "判定人逐条对照 subgraph.json 与 notes/entries 原文，本文件每条含判定依据，可人工抽查"
+ },
+ "graph_path": {
+  "total_claims": 18,
+  "valid": 18,
+  "degraded": 0,
+  "broken": 0,
+  "note": "18 锚 16 唯一节点；refute 边 E-10 并陈（HalluLens 解耦 vs KGHaluBench truthfulness）；condition 边 E-13（judge 管线边界）/E-15（有意性维度前提）条件随陈述保留；C-lifecycle-1/3 标注立场性论断与证据角色",
+  "tracebacks": [
+   {"claim": "近期综述将幻觉定义扩大到涵盖事实错误，与 factuality 挑战混同", "anchor": "C-hallulens-7", "verdict": "valid", "evidence": "节点 text 一致，span=§2 Taxonomy"},
+   {"claim": "基准化的主要挑战是定义与分类不一致导致缺乏统一框架", "anchor": "C-hallulens-3", "verdict": "valid", "evidence": "节点 text 一致"},
+   {"claim": "将幻觉从 factuality 中解耦，区分 extrinsic 与 intrinsic 幻觉", "anchor": "C-hallulens-4", "verdict": "valid", "evidence": "节点 text 一致，refute 边 E-10 已并陈"},
+   {"claim": "基准同时纳入新的 extrinsic 任务与已有 intrinsic 任务", "anchor": "C-hallulens-2", "verdict": "valid", "evidence": "节点 text 一致"},
+   {"claim": "连贯不等于真实，LLM 回应常含微妙幻觉（按 truthfulness 界定评测）", "anchor": "C-kghalu-1", "verdict": "valid", "evidence": "节点 text 一致；truthfulness 界定来自 E-10 evidence_span『assesses LLMs across breadth and depth of knowledge』"},
+   {"claim": "幻觉是无意的错误；说谎是明知生成错误以达成其他目标", "anchor": "C-lie-1", "verdict": "valid", "evidence": "节点 text 一致，有意性维度 + E-15 前提保留"},
+   {"claim": "生命周期三分类：数据相关/训练相关/推理相关", "anchor": "C-lifecycle-2", "verdict": "valid", "evidence": "节点 text 一致"},
+   {"claim": "成因编号体系 C.D.1-3/C.T.1-3/C.I.1-4 映射四阶段框架", "anchor": "C-lifecycle-4", "verdict": "valid", "evidence": "节点 text 一致"},
+   {"claim": "以往综述主要聚焦检测或缓解，未覆盖全生命周期（标注：该综述自称/文献转述）", "anchor": "C-lifecycle-3", "verdict": "valid", "evidence": "节点 text 一致且来源角色已保留"},
+   {"claim": "生命周期概念可在高风险环境支撑可靠性框架（标注：立场性推论）", "anchor": "C-lifecycle-1", "verdict": "valid", "evidence": "节点 text 用『可在』潜力态 + source_role=推论，正文保留该模态"},
+   {"claim": "现有基准单任务/静态/不反映动态推理；15 准则评估适配性", "anchor": "C-lifecycle-7", "verdict": "valid", "evidence": "节点 text 一致，quantity=15 保留"},
+   {"claim": "现有基准受限于静态且狭窄的问题", "anchor": "C-kghalu-2", "verdict": "valid", "evidence": "节点 text 一致，E-11 汇聚并陈"},
+   {"claim": "KG 动态构建多维度挑战性问题，统计估计难度处理流行度偏差", "anchor": "C-kghalu-3", "verdict": "valid", "evidence": "节点 text 一致"},
+   {"claim": "动态生成测试集抵御数据泄漏，保持评测稳定性", "anchor": "C-hallulens-6", "verdict": "valid", "evidence": "节点 text 一致"},
+   {"claim": "LLaMa-3.1-70B judge：96.67%/95.56%/94.77%", "anchor": "C-hallulens-5", "verdict": "valid", "evidence": "三数值与节点一致；E-13 条件（该基准自动评测管线）随陈述保留"},
+   {"claim": "双层验证：Entity-Level Filter → Fact-Level Check，自动检测弃权并分型", "anchor": "C-kghalu-6", "verdict": "valid", "evidence": "节点 text 一致，E-16 弱支持性质已标注"},
+   {"claim": "LVLM 受视觉幻觉困扰（生成响应与视觉输入不一致）", "anchor": "C-psrd-1", "verdict": "valid", "evidence": "节点 text 一致，范围限定 LVLM 保留"},
+   {"claim": "KGHaluBench 以 truthfulness 界定与 HalluLens 解耦立场定义域重叠且互斥", "anchor": "E-10 refute", "verdict": "valid", "evidence": "refute 边 evidence_span 原文（跨文献概念分歧）"}
+  ]
+ },
+ "baseline_path": {
+  "total_claims": 17,
+  "valid": 11,
+  "degraded": 2,
+  "broken": 4,
+  "note": "4 条 broken 的形态与 LLM 综述典型错误模式吻合：多源泛化（B4）、读者评论当文献结论（B6）、推论强化为事实（B8）、编造有效性结论（B16）",
+  "tracebacks": [
+   {"claim": "幻觉评测领域长期缺乏统一的定义框架，不同工作界定存在分歧", "verdict": "valid", "evidence": "notes/hallulens 局限『领域内定义与分类不一致是主要障碍』+ kghalubench v2 增补③ 定义域分歧"},
+   {"claim": "HalluLens 将幻觉从 factuality 解耦，extrinsic/intrinsic 二分统一碎片化评测", "verdict": "valid", "evidence": "notes/hallulens 一句话"},
+   {"claim": "KGHaluBench 从知识广度深度评估，KG 动态出题处理流行度偏差", "verdict": "valid", "evidence": "notes/kghalubench 一句话"},
+   {"claim": "多篇综述都指出，近期工作将幻觉与 factuality 概念混同是评测标准化的重要障碍", "verdict": "broken", "evidence": "来源单源泛化：该诊断仅出自 HalluLens §2（notes/hallulens v2 增补②），无第二篇综述持此论断。单源写成『多篇综述』= 张冠李戴式多源泛化"},
+   {"claim": "幻觉是无意的错误而说谎是明知故犯，二者有本质区别", "verdict": "valid", "evidence": "notes/can-llms-lie 一句话"},
+   {"claim": "有意性维度是现有幻觉分类体系普遍缺失的", "verdict": "broken", "evidence": "来源混淆 + 泛化：材料中仅笔记作者评论（『我识别：有意性是被遗漏的维度』，且针对 extrinsic/intrinsic 单一分类法），非文献论断；『普遍缺失』超出评论范围"},
+   {"claim": "生命周期三分类覆盖成因/检测/缓解/预防四阶段，弥补以往综述只关注检测或缓解的不足", "verdict": "valid", "evidence": "entries/lifecycle-survey 方法+贡献+局限（作者自述）"},
+   {"claim": "该框架已在健康、法律、科研等高风险场景中得到应用", "verdict": "broken", "evidence": "弱证据强化：notes/lifecycle-survey 与节点材料均为『可在…支撑框架』（潜力/推论态），无任何『已得到应用』的实验或部署证据。『可』被写成『已』= 时态扭曲的过度泛化"},
+   {"claim": "现有工作普遍受到静态、狭窄任务的限制", "verdict": "valid", "evidence": "entries/kghalubench 作者自述 + notes/lifecycle-survey v2 增补③"},
+   {"claim": "KGHaluBench 批评现有基准覆盖有限且可能产生误导性评估", "verdict": "valid", "evidence": "notes/kghalubench 一句话/局限"},
+   {"claim": "生命周期综述认为现有基准聚焦单任务、缺乏动态推理能力", "verdict": "valid", "evidence": "notes/lifecycle-survey v2 增补③『单任务、静态、不反映动态推理』"},
+   {"claim": "KGHaluBench 用 KG 动态构建多维度挑战性问题", "verdict": "valid", "evidence": "notes/kghalubench 怎么做"},
+   {"claim": "HalluLens 通过动态生成测试集抵御数据泄漏", "verdict": "valid", "evidence": "notes/hallulens v2 增补③"},
+   {"claim": "LLM-as-judge 的可靠性已得到验证，实测 judge 准确率超过 94%", "verdict": "degraded", "evidence": "数值可回接（96.67/95.56，notes v2 增补①），但丢失条件：judge 身份（LLaMa-3.1-70B）与评测管线边界（E-13 condition），『已得到验证』超出单基准管线范围"},
+   {"claim": "这支撑了 KGHaluBench 双层自动验证管线的可行性", "verdict": "valid", "evidence": "notes/kghalubench v2 增补②『跨文献工程可行性互证』"},
+   {"claim": "PSRD 发现视觉幻觉在语义阶段呈峰值，据此设计推理时自奖励在线校正", "verdict": "valid", "evidence": "notes/psrd 一句话/怎么做"},
+   {"claim": "该方法无需外部监督即可有效降低幻觉率", "verdict": "broken", "evidence": "编造有效性结论：材料仅支持『免外部监督』（entries/psrd 贡献），无任何有效性实验结论；笔记作者反而明确质疑（『自奖励=自己给自己打分，有效性须外部独立验证』）。『有效降低』与材料中的质疑方向相反"},
+   {"claim": "总结：定义共识、基准动态性与验证自动化仍是三大开放挑战", "verdict": "degraded", "evidence": "前二者可回接（定义分歧/静态批评）；『验证自动化仍是挑战』与材料方向不符——材料显示自动化验证已具可行性（96.67% 实测 + E-16 互证），lifecycle 批评的是『不基于可验证外部知识』而非自动化本身"}
+  ]
+ },
+ "summary": {
+  "graph_path_rate_strict": "18/18 = 100%",
+  "baseline_path_rate_strict": "11/17 = 64.7%",
+  "baseline_path_rate_lenient": "13/17 = 76.5% (含 degraded)",
+  "delta_strict": "+35.3pp",
+  "broken_taxonomy": [
+   {"type": "多源泛化（单源写成多篇共识）", "count": 1, "items": ["B4"]},
+   {"type": "来源混淆（读者评论当文献结论）", "count": 1, "items": ["B6"]},
+   {"type": "弱证据强化（推论/潜力写成事实/已应用）", "count": 1, "items": ["B8"]},
+   {"type": "编造结论（材料无据且与质疑相反）", "count": 1, "items": ["B16"]}
+  ]
+ }
+}

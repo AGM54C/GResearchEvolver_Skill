@@ -1,0 +1,385 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/wXQ+9uitj8Z3Dj/Gz4ZjrT5I1Fo</id>
+  <title>arXiv Query: search_query=all:LLM OR all:hallucination OR all:survey&amp;id_list=&amp;start=0&amp;max_results=8</title>
+  <updated>2026-10-19T05:20:42Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:LLM+OR+(all:hallucination+OR+all:survey)&amp;start=0&amp;max_results=8&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>8</opensearch:itemsPerPage>
+  <opensearch:totalResults>181560</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2506.14634v3</id>
+    <title>AIn't Nothing But a Survey? Using Large Language Models for Coding German Open-Ended Survey Responses on Survey Motivation</title>
+    <updated>2025-07-03T07:58:18Z</updated>
+    <link href="https://arxiv.org/abs/2506.14634v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2506.14634v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The recent development and wider accessibility of LLMs have spurred discussions about how they can be used in survey research, including classifying open-ended survey responses. Due to their linguistic capacities, it is possible that LLMs are an efficient alternative to time-consuming manual coding and the pre-training of supervised machine learning models. As most existing research on this topic has focused on English-language responses relating to non-complex topics or on single LLMs, it is unclear whether its findings generalize and how the quality of these classifications compares to established methods. In this study, we investigate to what extent different LLMs can be used to code open-ended survey responses in other contexts, using German data on reasons for survey participation as an example. We compare several state-of-the-art LLMs and several prompting approaches, and evaluate the LLMs' performance by using human expert codings. Overall performance differs greatly between LLMs, and only a fine-tuned LLM achieves satisfactory levels of predictive performance. Performance differences between prompting approaches are conditional on the LLM used. Finally, LLMs' unequal classification performance across different categories of reasons for survey participation results in different categorical distributions when not using fine-tuning. We discuss the implications of these findings, both for methodological research on coding open-ended responses and for their substantive analysis, and for practitioners processing or substantively analyzing such data. Finally, we highlight the many trade-offs researchers need to consider when choosing automated methods for open-ended response classification in the age of LLMs. In doing so, our study contributes to the growing body of research about the conditions under which LLMs can be efficiently, accurately, and reliably leveraged in survey research.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CY" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-06-17T15:28:53Z</published>
+    <arxiv:comment>to appear in Survey Research Methods</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <arxiv:journal_ref>Survey Research Methods (2025)</arxiv:journal_ref>
+    <author>
+      <name>Leah von der Heyde</name>
+    </author>
+    <author>
+      <name>Anna-Carolina Haensch</name>
+    </author>
+    <author>
+      <name>Bernd Weiß</name>
+    </author>
+    <author>
+      <name>Jessica Daikeler</name>
+    </author>
+    <arxiv:doi>10.18148/srm/2025.v19i4.8568</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.18148/srm/2025.v19i4.8568" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/astro-ph/0611654v1</id>
+    <title>A rich bounty of AGN in the 9 square degree Bootes survey: high-z obscured AGN and large-scale structure</title>
+    <updated>2006-11-21T20:38:37Z</updated>
+    <link href="https://arxiv.org/abs/astro-ph/0611654v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/astro-ph/0611654v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>  We use observations from the 9 square degree multiwavelength survey in Bootes to identify hundreds of obscured active galactic nuclei (AGN) with high redshifts (z &gt; 0.7), luminosities (L_bol &gt; 10^45 ergs/s), and moderate obscuring columns (N_H &gt; 10^22 cm^-2), and to measure the clustering properties of X-ray AGN at z &gt; 1. In the Bootes region, shallow (5 ks) Chandra X-ray observations have detected ~4,000 X-ray sources, and the same region has been mapped with deep optical imaging and by Spitzer IRAC, which detects ~300,000 point sources, of which ~30,000 have detections in all four IRAC bands, for which we can select AGN on the basis of their mid-IR colors. With the MMT/Hectospec we have obtained modest resolution optical spectra for about half the X-ray sources (out to z &gt; 3) and ~20,000 galaxies (out to z = 0.7). With this multiwavelength data we select &gt;400 AGN per square degree (compared to 12 per square degree from SDSS). Among a sample of IRAC-selected AGN we identify 641 candidate obscured objects based on their R band and IRAC luminosities. We use X-ray stacking techniques to verify that they are obscured AGN and measure their absorbing column densities. We also measure the three-dimensional two-point correlation function for X-ray selected AGN.</summary>
+    <category term="astro-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2006-11-21T20:38:37Z</published>
+    <arxiv:comment>5 pages, 3 figures, to appear in the proceedings of "Cosmic Frontiers", Durham, UK, 31 July - 4 August 2006, ASP Conference Series</arxiv:comment>
+    <arxiv:primary_category term="astro-ph"/>
+    <author>
+      <name>R. C. Hickox</name>
+      <arxiv:affiliation>Harvard-Smithsonian Center for Astrophysics</arxiv:affiliation>
+    </author>
+    <author>
+      <name>C. Jones</name>
+      <arxiv:affiliation>Harvard-Smithsonian Center for Astrophysics</arxiv:affiliation>
+    </author>
+    <author>
+      <name>W. R. Forman</name>
+      <arxiv:affiliation>Harvard-Smithsonian Center for Astrophysics</arxiv:affiliation>
+    </author>
+    <author>
+      <name>S. S. Murray</name>
+      <arxiv:affiliation>Harvard-Smithsonian Center for Astrophysics</arxiv:affiliation>
+    </author>
+    <author>
+      <name>A. Kenter</name>
+      <arxiv:affiliation>Harvard-Smithsonian Center for Astrophysics</arxiv:affiliation>
+    </author>
+    <author>
+      <name>M. Brodwin</name>
+      <arxiv:affiliation>JPL/Caltech</arxiv:affiliation>
+    </author>
+    <author>
+      <name>the Chandra XBootes</name>
+    </author>
+    <author>
+      <name>NOAO Deep Wide-Field Survey</name>
+    </author>
+    <author>
+      <name>Spitzer IRAC Shallow Survey</name>
+    </author>
+    <author>
+      <name>AGES Teams</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2608.26168v1</id>
+    <title>Hallucinations in LLMs: A Lifecycle-Based Survey of Causes, Detection, Mitigation, and Prevention</title>
+    <updated>2026-07-20T05:03:20Z</updated>
+    <link href="https://arxiv.org/abs/2608.26168v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2608.26168v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>The lifecycle of hallucination in LLMs is a concept that enables building solid frameworks on the control and reliability of LLMs in high-stakes environments, including health, legal, and scientific research. Although previous surveys have primarily focused on detection or mitigation, this survey provides a lifecycle-based overview of the hallucinations in the LLMs, their cause, detection, mitigation, and prevention.We propose a three-fold categorization of hallucinations across the LLM lifecycle: data-related, training-related, and inference-related, which is consistent with the lifecycle of the development of the LLM. Each of these stages is discussed regarding the cause of hallucinations, their detection, and the ways they can be addressed under specific mitigation or prevention interventions. In addition, we discuss the available benchmark data using a number of parameters so as to establish their suitability in identifying, restricting and managing hallucinations. The survey provides researchers and practitioners with a standardized framework to understand, diagnose, and cure hallucinations in a systematic system to present actionable data to build safer and more reliable LLMs.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-07-20T05:03:20Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <arxiv:journal_ref>Lamba, N., Tiwari, S. &amp; Gaur, M. Hallucinations in LLMs: A Lifecycle-Based Survey of Causes, Detection, Mitigation, and Prevention. International Journal of Data Science and Analytics 22, 232 (2026)</arxiv:journal_ref>
+    <author>
+      <name>Naveen Lamba</name>
+    </author>
+    <author>
+      <name>Sanju Tiwari</name>
+    </author>
+    <author>
+      <name>Manas Gaur</name>
+    </author>
+    <arxiv:doi>10.1007/s41060-026-01214-6</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1007/s41060-026-01214-6" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/1210.0979v1</id>
+    <title>The Methanol Multibeam Survey</title>
+    <updated>2012-10-03T05:09:44Z</updated>
+    <link href="https://arxiv.org/abs/1210.0979v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/1210.0979v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>A purpose built 7-beam methanol receiver, installed on the Parkes Radio Telescope, was used to survey the Galactic plane for newly forming high mass stars, pinpointed by strong methanol maser emission at 6.7 GHz. The Methanol Multibeam (MMB) survey observed over 60% of the Galactic plane, detecting close to 1000 sources. The MMB survey provides a huge resource for studies of high-mass star formation, an important stage in the evolution of the interstellar medium. The MMB survey is also a valuable resource for investigations into the structure and dynamics of our Galaxy: with narrow velocity ranges of emission (typically only a few km/s) and velocities closely correlated with the systemic velocity of their surrounding molecular clouds, 6.7-GHz methanol masers provide estimates of the spiral arm velocities and their structure. I will discuss the techniques and properties of the MMB survey, before outlining recent results, which include the identification of regions of enhanced star formation believed to be indicative of the origins of the spiral arms and the interaction of the Galactic bar with the 3-kpc arms. I will also discuss the various follow-up programmes including a study of magnetic fields through associated hydroxyl masers.</summary>
+    <category term="astro-ph.IM" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="astro-ph.GA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2012-10-03T05:09:44Z</published>
+    <arxiv:comment>Published electronically in Proceedings "Science with Parkes @ 50 Years Young", 2012, Ed. Robert Braun. Conference link is, http://www.atnf.csiro.au/research/conferences/Parkes50th/ProcPapers/green.pdf</arxiv:comment>
+    <arxiv:primary_category term="astro-ph.IM"/>
+    <author>
+      <name>J. A. Green</name>
+    </author>
+    <author>
+      <name>the Methanol Multibeam Survey Collaboration</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2606.05868v1</id>
+    <title>YouZhi: Towards High-Concurrency Financial LLMs via Adaptive GQA-to-MLA Transition</title>
+    <updated>2026-06-04T08:44:37Z</updated>
+    <link href="https://arxiv.org/abs/2606.05868v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2606.05868v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models (LLMs) drive significant financial innovations, yet their high-concurrency deployment is severely bottlenecked by KV cache memory overhead, which inflates infrastructure costs and throttles scalability. To address this, we propose YouZhi-LLM, a highly efficient financial LLM empowered by a comprehensive structural transition and training pipeline natively built on the Huawei Ascend ecosystem. At its algorithmic core, YouZhi-LLM features a layer-adaptive GQA-to-MLA transition framework that dynamically assigns per-layer FreqFold sizes, maximizing KV-cache compression while minimizing perplexity degradation. To recover representation capacity and inject domain expertise, the Ascend-based training pipeline seamlessly integrates generalized knowledge distillation with financial-specific supervised fine-tuning. Evaluations demonstrate the superiority of this systematic approach, with the adaptive transition reducing perplexity degradation by up to 35% over uniform baselines. Crucially, when evaluated on Ascend NPUs via vLLM-Ascend, the massive KV-cache reduction translates directly into deployment efficiency. Compared to their respective base models, YouZhi-7B yields a 12.3% improvement in average financial benchmark score alongside a 2.69$\times$ increase in maximum concurrency; similarly, YouZhi-14B achieves a 7.0% accuracy gain and a 2.43$\times$ concurrency boost, establishing a new paradigm for cost-effective, high-throughput financial inference.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-06-04T08:44:37Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name> PSBC LLM Team</name>
+    </author>
+    <author>
+      <name> Huawei LLM Team</name>
+    </author>
+    <author>
+      <name>Ruihan Long</name>
+    </author>
+    <author>
+      <name>Junjie Wu</name>
+    </author>
+    <author>
+      <name>Tianan Zhang</name>
+    </author>
+    <author>
+      <name>Duo Zhang</name>
+    </author>
+    <author>
+      <name>Yaozong Wu</name>
+    </author>
+    <author>
+      <name>Jinbin Fu</name>
+    </author>
+    <author>
+      <name>Chang Liu</name>
+    </author>
+    <author>
+      <name>Zhentao Tang</name>
+    </author>
+    <author>
+      <name>Wenshuang Yang</name>
+    </author>
+    <author>
+      <name>Xin Wang</name>
+    </author>
+    <author>
+      <name>Zhihao Song</name>
+    </author>
+    <author>
+      <name>Ning Huang</name>
+    </author>
+    <author>
+      <name>Wenjing Xu</name>
+    </author>
+    <author>
+      <name>Shuai Zong</name>
+    </author>
+    <author>
+      <name>Shupei Sun</name>
+    </author>
+    <author>
+      <name>Sen Wang</name>
+    </author>
+    <author>
+      <name>Jing Hu</name>
+    </author>
+    <author>
+      <name>Bin Wang</name>
+    </author>
+    <author>
+      <name>Xinyu Wang</name>
+    </author>
+    <author>
+      <name>Junkui Ju</name>
+    </author>
+    <author>
+      <name>Zequn Ding</name>
+    </author>
+    <author>
+      <name>Jie Ran</name>
+    </author>
+    <author>
+      <name>Man Luo</name>
+    </author>
+    <author>
+      <name>Shixiong Kai</name>
+    </author>
+    <author>
+      <name>Linkai Hou</name>
+    </author>
+    <author>
+      <name>Kaichao Liang</name>
+    </author>
+    <author>
+      <name>Hu Zhao</name>
+    </author>
+    <author>
+      <name>Yang Zhao</name>
+    </author>
+    <author>
+      <name>Shucheng Lin</name>
+    </author>
+    <author>
+      <name>Wei Yu</name>
+    </author>
+    <author>
+      <name>Chenghan Jiang</name>
+    </author>
+    <author>
+      <name>Jingjing Ding</name>
+    </author>
+    <author>
+      <name>Jiahui Zhang</name>
+    </author>
+    <author>
+      <name>Tian Jin</name>
+    </author>
+    <author>
+      <name>Yuhang Zhang</name>
+    </author>
+    <author>
+      <name>Dong Guo</name>
+    </author>
+    <author>
+      <name>Wei Sun</name>
+    </author>
+    <author>
+      <name>Jun Xie</name>
+    </author>
+    <author>
+      <name>Jianwei Li</name>
+    </author>
+    <author>
+      <name>Lei Cao</name>
+    </author>
+    <author>
+      <name>Pei Li</name>
+    </author>
+    <author>
+      <name>Jiabin Li</name>
+    </author>
+    <author>
+      <name>Jia Yuan</name>
+    </author>
+    <author>
+      <name>Rui Yuan</name>
+    </author>
+    <author>
+      <name>Jing Zhu</name>
+    </author>
+    <author>
+      <name>Mingxuan Yuan</name>
+    </author>
+    <author>
+      <name>Zhangcheng Lv</name>
+    </author>
+    <author>
+      <name>Xin Jiang</name>
+    </author>
+    <author>
+      <name>Xiuhong Fei</name>
+    </author>
+    <author>
+      <name>Xiaozhe Ren</name>
+    </author>
+    <author>
+      <name>Yulong Li</name>
+    </author>
+    <author>
+      <name>Zhipeng Zhang</name>
+    </author>
+    <author>
+      <name>Hang Wang</name>
+    </author>
+    <author>
+      <name>Zhaohui Xu</name>
+    </author>
+    <author>
+      <name>Rui Zhao</name>
+    </author>
+    <author>
+      <name>Yibo He</name>
+    </author>
+    <author>
+      <name>Xinzhuang Niu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/astro-ph/0510346v1</id>
+    <title>The Dark Energy Survey</title>
+    <updated>2005-10-12T13:33:59Z</updated>
+    <link href="https://arxiv.org/abs/astro-ph/0510346v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/astro-ph/0510346v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>  We describe the Dark Energy Survey (DES), a proposed optical-near infrared survey of 5000 sq. deg of the South Galactic Cap to ~24th magnitude in SDSS griz, that would use a new 3 sq. deg CCD camera to be mounted on the Blanco 4-m telescope at Cerro Telolo Inter-American Observatory (CTIO). The survey data will allow us to measure the dark energy and dark matter densities and the dark energy equation of state through four independent methods: galaxy clusters, weak gravitational lensing tomography, galaxy angular clustering, and supernova distances. These methods are doubly complementary: they constrain different combinations of cosmological model parameters and are subject to different systematic errors. By deriving the four sets of measurements from the same data set with a common analysis framework, we will obtain important cross checks of the systematic errors and thereby make a substantial and robust advance in the precision of dark energy measurements.</summary>
+    <category term="astro-ph" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2005-10-12T13:33:59Z</published>
+    <arxiv:comment>White Paper submitted to the Dark Energy Task Force, 42 pages</arxiv:comment>
+    <arxiv:primary_category term="astro-ph"/>
+    <author>
+      <name> The Dark Energy Survey Collaboration</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2509.03518v1</id>
+    <title>Can LLMs Lie? Investigation beyond Hallucination</title>
+    <updated>2025-09-03T17:59:45Z</updated>
+    <link href="https://arxiv.org/abs/2509.03518v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2509.03518v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models (LLMs) have demonstrated impressive capabilities across a variety of tasks, but their increasing autonomy in real-world applications raises concerns about their trustworthiness. While hallucinations-unintentional falsehoods-have been widely studied, the phenomenon of lying, where an LLM knowingly generates falsehoods to achieve an ulterior objective, remains underexplored. In this work, we systematically investigate the lying behavior of LLMs, differentiating it from hallucinations and testing it in practical scenarios. Through mechanistic interpretability techniques, we uncover the neural mechanisms underlying deception, employing logit lens analysis, causal interventions, and contrastive activation steering to identify and control deceptive behavior. We study real-world lying scenarios and introduce behavioral steering vectors that enable fine-grained manipulation of lying tendencies. Further, we explore the trade-offs between lying and end-task performance, establishing a Pareto frontier where dishonesty can enhance goal optimization. Our findings contribute to the broader discourse on AI ethics, shedding light on the risks and potential safeguards for deploying LLMs in high-stakes environments. Code and more illustrations are available at https://llm-liar.github.io/</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-09-03T17:59:45Z</published>
+    <arxiv:comment>Website at https://llm-liar.github.io/</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Haoran Huan</name>
+    </author>
+    <author>
+      <name>Mihir Prabhudesai</name>
+    </author>
+    <author>
+      <name>Mengning Wu</name>
+    </author>
+    <author>
+      <name>Shantanu Jaiswal</name>
+    </author>
+    <author>
+      <name>Deepak Pathak</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2506.09886v2</id>
+    <title>Probabilistic distances-based hallucination detection in LLMs with RAG</title>
+    <updated>2026-02-24T19:13:55Z</updated>
+    <link href="https://arxiv.org/abs/2506.09886v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2506.09886v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Detecting hallucinations in large language models (LLMs) is critical for their safety in many applications. Without proper detection, these systems often provide harmful, unreliable answers. In recent years, LLMs have been actively used in retrieval-augmented generation (RAG) settings. However, hallucinations remain even in this setting, and while numerous hallucination detection methods have been proposed, most approaches are not specifically designed for RAG systems. To overcome this limitation, we introduce a hallucination detection method based on estimating the distances between the distributions of prompt token embeddings and language model response token embeddings. The method examines the geometric structure of token hidden states to reliably extract a signal of factuality in text, while remaining friendly to long sequences. Extensive experiments demonstrate that our method achieves state-of-the-art or competitive performance. It also has transferability from solving the NLI task to the hallucination detection task, making it a fully unsupervised and efficient method with a competitive performance on the final task.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-06-11T15:59:15Z</published>
+    <arxiv:comment>Updated approach to constructing a hallucination detection score. Added results from experiments with the NLI task. The approach with trainable deep kernels has been removed, with a focus on the unsupervised approach</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Rodion Oblovatny</name>
+    </author>
+    <author>
+      <name>Alexandra Kuleshova</name>
+    </author>
+    <author>
+      <name>Konstantin Polev</name>
+    </author>
+    <author>
+      <name>Alexey Zaytsev</name>
+    </author>
+  </entry>
+</feed>
