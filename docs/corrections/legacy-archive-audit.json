@@ -1,0 +1,30 @@
+{
+  "baseline": "bba13cd3c55290b58231bf0e75c9973ef30f867f",
+  "archives": [
+    {
+      "archive": "archive-001",
+      "count": 60,
+      "different_from_current_snapshot": 1,
+      "exact_match": 40,
+      "missing_from_published_snapshot": 9,
+      "matches_after_crlf_conversion": 10
+    },
+    {
+      "archive": "archive-002",
+      "count": 66,
+      "different_from_current_snapshot": 1,
+      "exact_match": 45,
+      "missing_from_published_snapshot": 9,
+      "matches_after_crlf_conversion": 11
+    },
+    {
+      "archive": "archive-003",
+      "count": 80,
+      "exact_match": 58,
+      "different_from_current_snapshot": 1,
+      "missing_from_published_snapshot": 9,
+      "matches_after_crlf_conversion": 12
+    }
+  ],
+  "action": "historical files left unchanged; v2 archives preserve original bytes and checkpoint objects"
+}

@@ -1,0 +1,420 @@
+[
+  {
+    "id": "P01",
+    "file": "Actionable Hallucination Detection： Translating Latent Uncertainty into Agentic Critique.pdf",
+    "pages": 22,
+    "sha256": "6e4506931824f4cf643e55ae755a4c8be355d8a28483566e2faeb2abcd9ae4b4",
+    "metadata": {
+      "format": "PDF 1.7",
+      "title": "Actionable Hallucination Detection: Translating Latent Uncertainty into Agentic Critique",
+      "author": "Sanidhya Vijayvargiya; Rahul Lokesh",
+      "subject": "",
+      "keywords": "",
+      "creator": "arXiv GenPDF (tex2pdf:8def8d8)",
+      "producer": "pikepdf 8.15.1",
+      "creationDate": "",
+      "modDate": "",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P02",
+    "file": "Auditing Failure Attribution： Label Predictability and Judge Behavior.pdf",
+    "pages": 26,
+    "sha256": "2108f980f727b66f252fcca25da75d88439f280cdd4cd10516d3875f2c484c84",
+    "metadata": {
+      "format": "PDF 1.7",
+      "title": "Auditing Failure Attribution: Label Predictability and Judge Behavior",
+      "author": "Tianyang Xu; Jing Gao",
+      "subject": "",
+      "keywords": "",
+      "creator": "arXiv GenPDF (tex2pdf:07e334b)",
+      "producer": "pikepdf 8.15.1",
+      "creationDate": "",
+      "modDate": "",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P03",
+    "file": "Automated Hypothesis Validation with Agentic Sequential Falsifications.pdf",
+    "pages": 65,
+    "sha256": "0df7ebac15ec1a3084a00ecedac1f1051f765634f202d1bce84a1fec9b18b27a",
+    "metadata": {
+      "format": "PDF 1.5",
+      "title": "Automated Hypothesis Validation with Agentic Sequential Falsifications",
+      "author": "Kexin Huang, Ying Jin, Ryan Li, Michael Y. Li, Emmanuel Candès, Jure Leskovec",
+      "subject": "Proceedings of the International Conference on Machine Learning 2025",
+      "keywords": "Machine Learning, ICML",
+      "creator": "LaTeX with hyperref",
+      "producer": "pdfTeX-1.40.25",
+      "creationDate": "D:20250217011903Z",
+      "modDate": "D:20250217011903Z",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P04",
+    "file": "DeFA： Dependency-Guided Failure Attribution for LLM Agents.pdf",
+    "pages": 12,
+    "sha256": "bebfc004f81e7a4e056de26a86adc1dd21b07ea6609e47805fb144b0a29f64f4",
+    "metadata": {
+      "format": "PDF 1.7",
+      "title": "DeFA: Dependency-Guided Failure Attribution for LLM Agents",
+      "author": "Bo Deng; Xinlei Zheng; Yi Wei; Kang Zhou; Chongyang Tao; Renzhao Liang; Xuanren Chen; Lifan Guo; Chi Zhang",
+      "subject": "",
+      "keywords": "",
+      "creator": "arXiv GenPDF (tex2pdf:0d14211)",
+      "producer": "pikepdf 8.15.1",
+      "creationDate": "",
+      "modDate": "",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P05",
+    "file": "DiLLS： Interactive Diagnosis of LLM-based Multi-agent Systems via Layered Summary of Agent Behaviors.pdf",
+    "pages": 17,
+    "sha256": "d6cdea748281361f57d092a8aa4f80077e0a69a1d0a85606abc2bd7f1136e30e",
+    "metadata": {
+      "format": "PDF 1.7",
+      "title": "DiLLS: Interactive Diagnosis of LLM-based Multi-agent Systems via Layered Summary of Agent Behaviors",
+      "author": "Rui Sheng; Yukun Yang; Chuhan Shi; Yanna Lin; Zixin Chen; Huamin Qu; Furui Cheng",
+      "subject": "-  Human-centered computing  ->  Interactive systems and tools.-  Computing methodologies  ->  Multi-agent systems.",
+      "keywords": "Large Language Models, Multi-agent Systems, Interactive Diagnosis",
+      "creator": "arXiv GenPDF (tex2pdf:57610bf)",
+      "producer": "pikepdf 8.15.1",
+      "creationDate": "D:20260206014021+00'00'",
+      "modDate": "D:20260206014021+00'00'",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P06",
+    "file": "DISCOVERYWORLD： A Virtual Environment for Developing and Evaluating Automated Scientific Discovery Agents.pdf",
+    "pages": 29,
+    "sha256": "28793ae05bbb22ed6e02fbdceb697a2b9ea8ebff6932c4dd8fb5b70bba5dde91",
+    "metadata": {
+      "format": "PDF 1.5",
+      "title": "",
+      "author": "",
+      "subject": "",
+      "keywords": "",
+      "creator": "LaTeX with hyperref",
+      "producer": "pdfTeX-1.40.25",
+      "creationDate": "D:20241010001328Z",
+      "modDate": "D:20241010001328Z",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P07",
+    "file": "Does Reinforcement Learning Really Incentivize Reasoning Capacity in LLMs Beyond the Base Model？.pdf",
+    "pages": 31,
+    "sha256": "76139ea0ba0e9155569c7aa7b8153502f6a5b23fed717af0ca9934ec9d764f9a",
+    "metadata": {
+      "format": "PDF 1.7",
+      "title": "Does Reinforcement Learning Really Incentivize Reasoning Capacity in LLMs Beyond the Base Model?",
+      "author": "Yang Yue; Zhiqi Chen; Rui Lu; Andrew Zhao; Zhaokai Wang; Yang Yue; Shiji Song; Gao Huang",
+      "subject": "",
+      "keywords": "",
+      "creator": "arXiv GenPDF (tex2pdf:4177c2c)",
+      "producer": "pikepdf 8.15.1",
+      "creationDate": "",
+      "modDate": "",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P08",
+    "file": "DoVer： Intervention-Driven Auto Debugging for LLM Multi-Agent Systems.pdf",
+    "pages": 29,
+    "sha256": "b741f3a46ff93e067f2174939b16857e867b132b1ce14914a6b8f134b611433a",
+    "metadata": {
+      "format": "PDF 1.7",
+      "title": "DoVer: Intervention-Driven Auto Debugging for LLM Multi-Agent Systems",
+      "author": "Ming Ma; Jue Zhang; Fangkai Yang; Yu Kang; Qingwei Lin; Saravan Rajmohan; Dongmei Zhang",
+      "subject": "",
+      "keywords": "",
+      "creator": "arXiv GenPDF (tex2pdf:57610bf)",
+      "producer": "pikepdf 8.15.1",
+      "creationDate": "",
+      "modDate": "",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P09",
+    "file": "InconLens： Interactive Visual Diagnosis of Behavioral Inconsistencies in LLM-based Agentic Systems.pdf",
+    "pages": 11,
+    "sha256": "fb948333309cde633cbee130bdb51f96defd52edb161bb6ab411c58b3f0f9f7a",
+    "metadata": {
+      "format": "PDF 1.7",
+      "title": "InconLens: Interactive Visual Diagnosis of Behavioral Inconsistencies in LLM-based Agentic Systems",
+      "author": "Shuo Yan; Xiaolin Wen; Shaolun Ruan; Yanjie Zhang; Jiaming Mi; Yushi Sun; Huamin Qu; Rui Sheng",
+      "subject": "",
+      "keywords": "",
+      "creator": "arXiv GenPDF (tex2pdf:a6404ea)",
+      "producer": "pikepdf 8.15.1",
+      "creationDate": "",
+      "modDate": "",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P10",
+    "file": "Interactive Debugging and Steering of Multi-Agent AI Systems.pdf",
+    "pages": 15,
+    "sha256": "d83518ae8ba9035ca092ee99ffd26e91ef990a5f641403aecfbb4281e9fb14fd",
+    "metadata": {
+      "format": "PDF 1.5",
+      "title": "",
+      "author": "",
+      "subject": "",
+      "keywords": "",
+      "creator": "LaTeX with hyperref",
+      "producer": "pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023) kpathsea version 6.3.5",
+      "creationDate": "D:20250305011212Z",
+      "modDate": "D:20250305011212Z",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P11",
+    "file": "One Reflection Is Not Enough： Self-Correcting Autonomous Research via Multi-Hypothesis Failure Attribution.pdf",
+    "pages": 24,
+    "sha256": "a58f10624eab91350e3d78dfc87ab4ab6bed6b48396511d0d691a5ad132bd3aa",
+    "metadata": {
+      "format": "PDF 1.7",
+      "title": "One Reflection Is Not Enough: Self-Correcting Autonomous Research via Multi-Hypothesis Failure Attribution",
+      "author": "Jie Ma; Binfei Chu; Jie Gao; Jinlu Zhang; Yiwei Ma; Yi Tan; Jiayi Ji; Xiaoshuai Sun; Rongrong Ji",
+      "subject": "",
+      "keywords": "",
+      "creator": "arXiv GenPDF (tex2pdf:a6404ea)",
+      "producer": "pikepdf 8.15.1",
+      "creationDate": "",
+      "modDate": "",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P12",
+    "file": "ProRL： Prolonged Reinforcement Learning Expands Reasoning Boundaries in Large Language Models.pdf",
+    "pages": 26,
+    "sha256": "0e4f6a40873159f4b51d0376ef7275bade384a2ce5558933e463353558515276",
+    "metadata": {
+      "format": "PDF 1.5",
+      "title": "ProRL: Prolonged Reinforcement Learning Expands Reasoning Boundaries in Large Language Models",
+      "author": "Mingjie Liu; Shizhe Diao; Ximing Lu; Jian Hu; Xin Dong; Yejin Choi; Jan Kautz; Yi Dong",
+      "subject": "",
+      "keywords": "",
+      "creator": "arXiv GenPDF (tex2pdf:)",
+      "producer": "pikepdf 8.15.1",
+      "creationDate": "",
+      "modDate": "",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P13",
+    "file": "ReCast： Attribution-Oriented Step Representation Learning for LLM-Based Agent Systems.pdf",
+    "pages": 30,
+    "sha256": "6ecfbefae6f08665f1864bb01f55bf774e4627fed4df3ea04d90baf1dd377960",
+    "metadata": {
+      "format": "PDF 1.7",
+      "title": "ReCast: Attribution-Oriented Step Representation Learning for LLM-Based Agent Systems",
+      "author": "Weilin Jin; Mingyu Wang; Taiyu Zhu; Ziqi Zhou; Wenbo Li; Haoyang Huang; Nan Duan; Yifan Wu; Ying Li; Zhonghai Wu",
+      "subject": "",
+      "keywords": "",
+      "creator": "arXiv GenPDF (tex2pdf:07e334b)",
+      "producer": "pikepdf 8.15.1",
+      "creationDate": "",
+      "modDate": "",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P14",
+    "file": "Recursive Self-Improvement in AI： From Bounded Self-Refinement to Autonomous Research Loops.pdf",
+    "pages": 44,
+    "sha256": "a7622a4816c873ea45d511de909b5cbbf5c8f366a4515ea31e00ef2362e2a3f7",
+    "metadata": {
+      "format": "PDF 1.7",
+      "title": "Recursive Self-Improvement in AI: From Bounded Self-Refinement to Autonomous Research Loops",
+      "author": "Mingguang Chen; Licheng Wang; Bo Qu",
+      "subject": "",
+      "keywords": "",
+      "creator": "arXiv GenPDF (tex2pdf:0d14211)",
+      "producer": "pikepdf 8.15.1",
+      "creationDate": "",
+      "modDate": "",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P15",
+    "file": "Recursive self-improvement of AI research agents.pdf",
+    "pages": 28,
+    "sha256": "8ba79e0ad1028e43b0a47ee06162c9b3996ec90f7990b7ec35993444e505409b",
+    "metadata": {
+      "format": "PDF 1.5",
+      "title": "Recursive self-improvement of AI research agents",
+      "author": "Dhruv Srikanth; Bingchen Zhao; Dixing Xu; Yuxiang Wu; Zhengyao Jiang",
+      "subject": "",
+      "keywords": "",
+      "creator": "arXiv GenPDF (tex2pdf:0d14211)",
+      "producer": "pikepdf 8.15.1",
+      "creationDate": "",
+      "modDate": "",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P16",
+    "file": "SCIRIGOR： Evaluating Open-Ended Scientific Analysis Beyond Final Scores.pdf",
+    "pages": 21,
+    "sha256": "94d65d556cdd779ed06cccf9a280bc37dbfdc4f789cf428332866c7ae431a612",
+    "metadata": {
+      "format": "PDF 1.7",
+      "title": "SCIRIGOR:Evaluating Open-Ended Scientific Analysis Beyond Final Scores",
+      "author": "Bowen Liu; Shuo Nie; Bodong Du; Xiaomeng Li",
+      "subject": "",
+      "keywords": "",
+      "creator": "arXiv GenPDF (tex2pdf:0d14211)",
+      "producer": "pikepdf 8.15.1",
+      "creationDate": "",
+      "modDate": "",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P17",
+    "file": "Self-Authored Verification Is Unreliable in Heuristic Self-Improving Agents.pdf",
+    "pages": 9,
+    "sha256": "0a1434ea1c9b533855c856bf49ff5271d1bcc70aa1cb3ac8f040250b5f46f372",
+    "metadata": {
+      "format": "PDF 1.7",
+      "title": "Self-Authored Verification Is Unreliable in Heuristic Self-Improving Agents",
+      "author": "Diandian Guo; Cong Cao; Fangfang Yuan; Yingqi Wang; Yueshan Wang; Dakui Wang",
+      "subject": "",
+      "keywords": "",
+      "creator": "arXiv GenPDF (tex2pdf:8def8d8)",
+      "producer": "pikepdf 8.15.1",
+      "creationDate": "",
+      "modDate": "",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P18",
+    "file": "The Red Queen Gödel Machine： Co-Evolving Agents and Their Evaluators.pdf",
+    "pages": 40,
+    "sha256": "55b0c6339fb957435b321dff648d10ca1f49a54d3cda2c140ba46a6feddfbb9d",
+    "metadata": {
+      "format": "PDF 1.7",
+      "title": "The Red Queen Gödel Machine: Co-Evolving Agents and Their Evaluators",
+      "author": "Alex Iacob; Andrej Jovanović; William F. Shen; Daniel Burkhardt; Meghdad Kurmanji; Nurbek Tastan; Lorenzo Sani; Niccolò Alberto Elia Venanzi; Jiayi Nie; Ambroise Odonnat; Zeyu Cao; Bill Marino; Xinchi Qiu; Rika Antonova; Nicholas D. Lane",
+      "subject": "",
+      "keywords": "",
+      "creator": "arXiv GenPDF (tex2pdf:07e334b)",
+      "producer": "pikepdf 8.15.1",
+      "creationDate": "",
+      "modDate": "",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P19",
+    "file": "Tracing the Cascade： A Topology-Aware Evaluation Framework for Scientific Agent Hallucinations.pdf",
+    "pages": 36,
+    "sha256": "243d7bf2a0dc85c313a53f212b724e8ff6943a68f511dfb9656dd02b29d663ec",
+    "metadata": {
+      "format": "PDF 1.7",
+      "title": "Tracing the Cascade: A Topology-Aware Evaluation Framework for Scientific Agent Hallucinations",
+      "author": "Xinshun Feng; Ziqi Miao; Lijun Li; Jing Shao",
+      "subject": "",
+      "keywords": "",
+      "creator": "arXiv GenPDF (tex2pdf:8def8d8)",
+      "producer": "pikepdf 8.15.1",
+      "creationDate": "",
+      "modDate": "",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P20",
+    "file": "TruthInsightBench： An Evidence-Grounded Benchmark for Automated Evaluation of Open-Ended Scientific Discovery Agents.pdf",
+    "pages": 27,
+    "sha256": "c3df4fd501de18086141713603d2744af39a70582f9cde1fd0d1ecccd4766d96",
+    "metadata": {
+      "format": "PDF 1.7",
+      "title": "TruthInsightBench: An Evidence-Grounded Benchmark for Automated Evaluation of Open-Ended Scientific Discovery Agents",
+      "author": "Zhibo Yang; Chen Zhang; Yuewei Zhang; Hao Wang",
+      "subject": "",
+      "keywords": "",
+      "creator": "arXiv GenPDF (tex2pdf:0d14211)",
+      "producer": "pikepdf 8.15.1",
+      "creationDate": "",
+      "modDate": "",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P21",
+    "file": "Who&When Pro： Can LLMs Really Attribute Failures in AI Agents？.pdf",
+    "pages": 47,
+    "sha256": "a85506fa6d8235758e3495f2a8037e8e06dd85fa0ce5c8f1ccf96be8470272af",
+    "metadata": {
+      "format": "PDF 1.7",
+      "title": "Who   When Pro: Can LLMs Really Attribute Failures in AI Agents?",
+      "author": "Jiale Liu; Huajun Xi; Shaokun Zhang; Yifan Zeng; Tianwei Yue; Chi Wang; Jian Kang; Qingyun Wu; Huazheng Wang",
+      "subject": "",
+      "keywords": "",
+      "creator": "arXiv GenPDF (tex2pdf:07e334b)",
+      "producer": "pikepdf 8.15.1",
+      "creationDate": "",
+      "modDate": "",
+      "trapped": "",
+      "encryption": null
+    }
+  },
+  {
+    "id": "P22",
+    "file": "XAgen： An Explainability Tool for Identifying and Correcting Failures in Multi-Agent Workflows.pdf",
+    "pages": 11,
+    "sha256": "6535bf02348e21959dd20768b692ed2d47696c64b48972ef0ab084e770e59f66",
+    "metadata": {
+      "format": "PDF 1.7",
+      "title": "XAgen: An Explainability Tool for Identifying and Correcting Failures in Multi-Agent Workflows",
+      "author": "Xinru Wang; Ming Yin; Eunyee Koh; Mustafa Doga Dogan",
+      "subject": "-  Human-centered computing  ->  Interactive systems and tools.Empirical studies in HCI.-  Computing methodologies  ->  Multi-agent systems.",
+      "keywords": "Multi-agent systems, explainable AI, interactive debugging, log visualization, user study",
+      "creator": "arXiv GenPDF (tex2pdf:7b1e169)",
+      "producer": "pikepdf 8.15.1",
+      "creationDate": "D:20260305015953+00'00'",
+      "modDate": "D:20260305015953+00'00'",
+      "trapped": "",
+      "encryption": null
+    }
+  }
+]

@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+.research-v2/
+.gresearch-stage-*/
+.gresearch-backup-*/
+tests/.artifacts/

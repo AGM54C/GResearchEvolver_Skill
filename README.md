@@ -1,69 +1,49 @@
-# GResearchEvolver
+# GResearchEvolver — Evidence-based AI4Research
 
-> **G**raph · **R**esearch · **Evolver** —— 用论断图对抗遗忘幻觉、全程可归档复现、会从每次运行中沉淀经验自我进化的科研 Skill 集合。
+面向科研全过程的技能包与轻量 Python runtime：将文献来源、实验执行、统计结果和论文论断连起来，允许研究者查看原始证据、暂停、修改、分支重跑与回滚策略。
 
-丢给一个研究主题，它走完：文献检索 → 论断图构建 → 综述 → IDEA 生成 → 实验设计与复现 → 失败诊断 → 论文成稿 → 模拟评审 → rebuttal 起草——**每一步的数字、引用、结论都可回接到证据，无锚论断不得写**。
+本次 v2 从提示词约定推进到可执行的状态与证据检查。包含 **25 个技能**：原 17 个中 15 个科研技能已升级，新增系统综述、文献库、统计、假设验证、人机控制、形式化证明、基金申请和文献监测。绘图与 PPT 不在本次功能升级范围；原模块保留，仅规范安装所需的元数据。
 
-## 三条底线（为什么可以信它）
+## 上手
 
-1. **反捏造红线**：所有产出遵循 `_shared/anti-fabrication.md`——检索必须真实调用 API，失败输出 `EVIDENCE_MISSING` 而非编造；数字只来自 run 产物/数字账本；未决结论显式标注，禁止写成确定。
-   实证：同主题对照实验中，图锚定生成 18/18=100% 可回接，无图自由写作基线仅 11/17=64.7%，4 条坏论断全部命中 LLM 综述典型幻觉形态（多源泛化/来源混淆/弱证据强化/编造结论）——见 `research-instance/workspace/survey/graph-ab-1/`。
-2. **全程可复现（HARNESS v2）**：P1-P5 公理（模型可见⟺已记录/归档不可变/…）+ trace 事件化 + 两阶段归档 + artifacts sha256 清单。三轮真实归档在 `research-instance/archives/`，每轮含 trace.jsonl（逐事件）/ manifest / 全产物哈希 / memory-diff，可独立核验。
-3. **会进化（Evolver）**：每轮运行后 rsi-evolver 走 reflect → evaluate → distill → evolve，把踩过的坑蒸馏成经验（`research-instance/memory/experiences/`），经验库与进化日志（`evolution-log.md`）随实例公开——跑得越多越聪明，且每次进化有 memory-diff 审计。
+Python 3.10+；核心只依赖标准库。PDF 摄取另需 PyMuPDF；外部检索、SSH、Zotero、Lean 需要各自环境。宿主模型负责开放科研推理与写作，runtime 不内置模型账号。
 
-## 快速开始（三个场景）
+```text
+python skills/_shared/runtime/research.py --help
+python skills/_shared/examples/offline_research.py --output demo-run
+python skills/_shared/runtime/research.py --store demo-run/state serve
+```
 
-> **安装**：一行命令装进 Claude Code / 任意 Agent 运行时 → [INSTALL.md](INSTALL.md)（3 分钟试用路径也在里面）
+示例实际执行合成数据分析、负对照、数字绑定、人工分支、归档与 RSI 晋升/拒绝/回滚。它验证接口闭环，不证明真实科研能力提升。输出目录需为新目录。
 
-| 场景 | 入口 | 说明 |
-|---|---|---|
-| **论文精读**（最轻） | `skills/literature-scholar` | 丢 PDF/链接 → 结构化条目 + 论断图节点 + 《我的想法》笔记位 |
-| **全管线** | `skills/research-autopilot` | 编排器按 manifest 路由自动走完研究管线 |
-| **单点调用** | `skills/manifest.yaml` | 查路由表：intents 触发词 / provides-consumes 数据契约 |
+安装到指定宿主技能目录：
 
-> 运行环境：Claude Code / CodeArts 等支持 SKILL.md 的 Agent 运行时；零外部服务依赖（无向量库/无数据库/无 GraphRAG 运行时——外部引擎仅为可选加速层，见 HARNESS §9 降级声明）。
+```text
+python install.py --dest /your/runtime/skills
+```
 
-## Skill 一览（16 条管线）
+重复安装使用 `--force`，整包替换并保留备份，不产生嵌套 skill 目录。安装包含 HARNESS、registry、共享 runtime 和示例；具体见 [INSTALL.md](INSTALL.md)。
 
-| 管线 | Skill | 一句话 |
-|---|---|---|
-| intake | literature-miner | 5 源真实检索（arXiv/S2/Crossref/OpenAlex/PubMed），去重排序 |
-| reading | literature-scholar | 摄取建图：原子论断节点 + 四类原子关系 |
-| ideation | idea-forge | 进化计算式 IDEA 生成（变异/交叉/选择） |
-| design | experiment-designer | 可复现协议设计（env.lock/种子/run 号） |
-| replication | experiment-replicator | 复现执行（real 全量留痕 / protocol_only 显式标注） |
-| diagnosis | diagnosis-clinician | L1-L6 诊断定位 + 干预验证（唯一汇聚点） |
-| survey | survey-architect | G 路径图锚定综述（无锚不写） |
-| style | style-mimic | 任意样本 → 量化风格画像（HOW not WHAT） |
-| writing | paper-writer | 逐章迭代协调 + 跨章状态卡（数字账本） |
-| production | latex-adaptor | markdown → venue .tex → PDF，cite-map 三向对账 |
-| review | reviewer-panel | 动态评审人格压力测试，问题直通诊断 |
-| rebuttal | rebuttal-drafter | 逐条 triage（可反驳/需补实验/应让步），证据锚纪律 |
-| figures | figure-mimic | 视觉风格画像；数据图代码生成（生图模型不碰数据） |
-| presentation | slides-builder | 论点骨架投影式 slides + 讲稿 |
-| outreach | doc-composer | 小红书/博客/报告/周报四形态，传播力零升格红线 |
-| evolution | rsi-evolver | 受控 RSI 自进化 |
+## 已实现的机制
 
-架构全貌见 [SKILL-ARCHITECTURE.md](SKILL-ARCHITECTURE.md)；运行规范见 [HARNESS.md](HARNESS.md)；每个 skill 附 1-5 分 rubric 硬验收（0 分即作废）。
+| 环节 | 能力 |
+|---|---|
+| 检索与阅读 | 五源有界检索、缓存/退避、原始响应、逐页 PDF、文献库互操作、Zotero 元数据/批注、Markdown 笔记、BM25 与可选现成向量混合检索 |
+| 证据与写作 | 原子数量、条件/单位/run 绑定、源文件与引文核验、data→code→result→claim 图、失效传播、正文/表格数字审计 |
+| 设计与统计 | 协议、对照、独立单位、配对 bootstrap、效应量、Holm/BH、受限 meta-analysis、条件式序贯证据 |
+| 执行与控制 | 显式 DAG、本地进程、SSH 适配、资源队列、预算、原始日志、暂停/取消/单步、人工批注、checkpoint fork、里程碑对齐 |
+| RSI | 冻结评分器与数据分区、候选/现任实跑、回归/成本/覆盖门槛、复用预算、固定 final 基线、完整策略导出与回滚 |
+| 其他研究流程 | 系统筛选/裁决/PRISMA 账目、RoB/GRADE 记录、Lean 证明回执、基金目标/风险/预算、文献增量摘要、修订—补实验—复审/改投 |
 
-## research-instance/（真实研究实例）
+运行手册：[runtime-guide.md](skills/_shared/runtime-guide.md)。科学保证与恢复边界：[HARNESS.md](HARNESS.md)。架构：[SKILL-ARCHITECTURE.md](SKILL-ARCHITECTURE.md)。
 
-以「LLM 幻觉研究」为首个跑通案例的全部运行数据——**不是 demo，是真实轨迹**：
+## 证据与验证
 
-- `archives/` 三轮归档（补归档实证 / 图对照实验实时归档 / 风格画像提取轮）
-- `memory/experiences/` 经验库 + `memory/evolution-log.md` 进化日志
-- `workspace/literature/` 30 节点论断图 + 6 篇全文 + 6 份精读笔记 + 检索原始层
-- `workspace/survey/graph-ab-1/` 图锚定 vs 无图基线对照实验五件套
-- `workspace/paper/style-profiles/` 首次风格画像实证（4401 词样本可复现统计）
+- [22 篇论文精读笔记](docs/evidence/reading-notes.md)：方法、实验、局限与实现选择，附 PDF 页码及原文件哈希。
+- [论文—需求—实现映射](docs/evidence/implementation-map.md)：哪些方法借鉴了、哪些依赖未实现，避免把提示词称为论文算法复现。
+- [升级与验证报告](docs/UPGRADE-REPORT.md)：测试、独立使用检查和外部未验证项。
+- [历史勘误](docs/historical-errata.md)：旧归档/论断图/A-B 案例的限制；`research-instance/` 原样保留。
 
-导读见 [research-instance/README.md](research-instance/README.md)。
+开发检查：`python -m unittest discover -s tests -v`。技能元数据通过 skill-creator validator 检查；该检查不评价科学质量。
 
-## 组内使用与贡献
-
-- **用法反馈**：跑完一轮把 trace/产物发出来，按 HARNESS §5 归档格式即可入档
-- **经验贡献**：踩坑后按 `memory/experiences/` 现有格式写一条（skill / failure_mode / 为什么 / 如何应用四段式），rsi-evolver 会在下轮 reflect 时收编
-- **新 skill**：SKILL.md（遵守 HARNESS）+ rubric + manifest 注册一条，编排器零改动自动路由
-
-## 仓库关系
-
-本仓库为**完整版**（组内试用）；参赛提交版为 30 文件压缩包（华为小红书 skill 创新赛，仓库 [Huawei-Redbook_Skills](https://github.com/AGM54C/Huawei-Redbook_Skills)）。
+本地文件哈希与事件链是完整性机制，不是安全密封。候选和评分器具有相同系统权限；对抗 RSI 需独立可信执行服务。人类裁决、模型共识、引用存在或编译通过都不自动证明科学真值。本项目尚未完成同模型、同任务、同预算的外部能力基准，不能宣称“最强”“零幻觉”或全局首创。

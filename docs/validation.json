@@ -1,0 +1,402 @@
+{
+  "version": 2,
+  "scope": "Software validation using synthetic data; not a scientific capability benchmark",
+  "retention": "Development plans, temporary source copies, extracted text caches and raw test-run directories were removed at the maintainer request. This summary preserves measured outcomes; it is not a complete replay archive of the independent agent session.",
+  "unit_tests": {
+    "started_utc": "2026-10-19T10:52:00.296212+00:00",
+    "elapsed_seconds": 20.63926349999383,
+    "python": "3.13.3 (tags/v3.13.3:6280bb5, Apr  8 2025, 14:47:33) [MSC v.1943 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.22631-SP0",
+    "tests_run": 46,
+    "passed": true,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "tests": [
+      {
+        "test": "test_runtime.EvolutionTests.test_degraded_candidate_rejected",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.EvolutionTests.test_exact_partition_leakage_and_interrupted_trial_recovery",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.EvolutionTests.test_executed_promotion_tie_rejection_and_whole_bundle_rollback",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.EvolutionTests.test_final_not_used_for_promotion_or_reused",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.EvolutionTests.test_frozen_evaluator_integrity_and_audit_budget",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.InterfaceTests.test_console_auth_and_real_state_controls",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.InterfaceTests.test_install_twice_no_nested_skills_and_harness_included",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.InterfaceTests.test_resource_queue_executes_and_preserves_limits",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.RetrievalAndRegressionTests.test_citation_absent_retraction_is_unknown",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.RetrievalAndRegressionTests.test_empty_graph_and_unbound_ledger_rejected",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.RetrievalAndRegressionTests.test_failed_acceptance_output_not_marked_completed",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.RetrievalAndRegressionTests.test_intervention_changed_estimand_is_not_improvement",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.RetrievalAndRegressionTests.test_local_retrieval_fusion_and_source_mutation",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.RetrievalAndRegressionTests.test_milestone_alignment_and_conflicting_explicit_ids",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.RetrievalAndRegressionTests.test_provider_fixtures_and_raw_cache",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.RetrievalAndRegressionTests.test_real_pdf_extraction_and_scanned_page_state",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.RetrievalAndRegressionTests.test_source_invalidation_and_notes_bridge",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.RetrievalAndRegressionTests.test_windows_deep_archive_and_optional_input_integrity",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.ScientificTests.test_atomic_graph_quote_scope_and_binding",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.ScientificTests.test_clustered_pairs_not_seed_pseudoreplication",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.ScientificTests.test_data_leakage_and_negative_result",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.ScientificTests.test_grant_arithmetic_and_proof_unverified",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.ScientificTests.test_intervention_noncompliance_and_quality_not_truth",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.ScientificTests.test_invalid_samples_and_nonfinite_rejected",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.ScientificTests.test_monitor_missing_is_not_retraction",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.ScientificTests.test_multiple_comparisons_and_meta_estimand",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.ScientificTests.test_nbib_endnote_xml_csl_and_bibtex",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.ScientificTests.test_reference_import_dedup_and_lossless_export",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.ScientificTests.test_review_conflict_requires_adjudication",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.ScientificTests.test_sequential_validity_not_inferred",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.ScientificTests.test_writing_numbers_in_prose_and_table",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.WorkflowTests.test_archive_noop_portability_and_tamper_detection",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.WorkflowTests.test_authorization_and_budget_fail_closed",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.WorkflowTests.test_breakpoint_step_fork_and_checkpoint_fidelity",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.WorkflowTests.test_cancel_managed_process",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.WorkflowTests.test_dependency_errors_and_independent_progress",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.WorkflowTests.test_events_and_cas_tampering",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.WorkflowTests.test_liveness_check_never_kills_current_worker",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.WorkflowTests.test_manifest_cycles_missing_edges_and_duplicate_outputs",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.WorkflowTests.test_manual_submission_rechecks_inputs",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.WorkflowTests.test_mutated_seed_input_rejected_before_command",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.WorkflowTests.test_path_escape_and_ssh_quoting",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.WorkflowTests.test_real_execution_and_raw_invocation",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.WorkflowTests.test_retry_cost_reserved_and_timeout",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.WorkflowTests.test_stage_cannot_mutate_required_input",
+        "status": "passed"
+      },
+      {
+        "test": "test_runtime.WorkflowTests.test_stale_outputs_cannot_satisfy_new_run",
+        "status": "passed"
+      }
+    ],
+    "source_sha256": {
+      "install.py": "0e41197e4c73f546bb4e57ecab892f34895cd7cfd5e4c48697a9396aac9d0c58",
+      "skills/_shared/runtime/gresearch/__init__.py": "e64eee43f7a6ddbf1c8b33aba135cb9f3e26635b21a03264b690dbbdaef0a96d",
+      "skills/_shared/runtime/gresearch/cli.py": "0f652b44999b23372b13ded2dafaa0d8314691725e1aa4763b6a5d3f2d487a54",
+      "skills/_shared/runtime/gresearch/console.py": "d008621751c2bdbbee9fdb7cc5afe004a89e74b4271fd2f2e1352ba0b9d544a5",
+      "skills/_shared/runtime/gresearch/core.py": "f67a3575d4e6dc96b5e234629aa32d279894233663f6253672f455c0cbad912f",
+      "skills/_shared/runtime/gresearch/evidence.py": "1288de22cca6b10e82c6b6524f9804c00360e896a30dcb65d6866e58af64f4b8",
+      "skills/_shared/runtime/gresearch/evolution.py": "c9cf56e3a3f1a14e39982c0f3952808dcc7d689a208c4af9cc13c4f0b493777a",
+      "skills/_shared/runtime/gresearch/execution.py": "2be55d9f928b16d2a1bd4376ec02a0e855d35e6b3156d7f13aec7fc5b9971af5",
+      "skills/_shared/runtime/gresearch/literature.py": "50ea7e2006aab1df5d809f177e12c9ea1b8f7f0400adc302cb45714752122def",
+      "skills/_shared/runtime/gresearch/projects.py": "d56d9dab936b2b69d3e2304d5ab2509c990d7717a9ac4a591cbf521963d1677c",
+      "skills/_shared/runtime/gresearch/retrieval.py": "c93b82bafebfdc8fca7387e85e5016c4a946d56e407780a991714baf13b59806",
+      "skills/_shared/runtime/gresearch/review.py": "8ad67c7efda273bcc1263b59e837bc58cd92452176cd8b678e303b190d666a5f",
+      "skills/_shared/runtime/gresearch/statistics.py": "1413acd235e06f5f143e3721a18e9a57f28b643ab6e030c2ed6317a77dbe3c24",
+      "skills/_shared/runtime/research.py": "8df23925016d140c1f81605a2028303f00c85bdd2088a0028f7c091cf4d65fca",
+      "tests/test_runtime.py": "ff772444d35f2b2eb49650a2015c30f1f8374e91da587177e29fca01376575be"
+    }
+  },
+  "skill_metadata": {
+    "validated": 25,
+    "passed": 25,
+    "scope": "Frontmatter, names and scaffold validation only"
+  },
+  "offline_example": {
+    "scope": "Synthetic software integration test; no measured research capability gain",
+    "estimate": {
+      "condition": "synthetic tasks; drop=",
+      "metric": "paired gain",
+      "run": "synthetic-base",
+      "unit": "points",
+      "value": 0.8500000000000001
+    },
+    "ci": [
+      0.5125000000000002,
+      1.1
+    ],
+    "negative_control": 0,
+    "writing_audit": {
+      "document_text_hash": "22935446bf302d935700c48a8bf51b3d94f56ca2a77fe55190edfbaf20988907",
+      "errors": [],
+      "exemptions": [],
+      "ledger_hash": "2e05b3f96b5205671134e262910a7ebde81b59d35aec35f7557e80762dce5f01",
+      "numeric_spans": 1,
+      "passed": true,
+      "provenance_errors": [],
+      "semantic_review_required": [
+        "scope",
+        "negation",
+        "hedging",
+        "causality",
+        "citation entailment"
+      ],
+      "text_hash_scope": "UTF-8 of supplied Unicode text; raw artifact bytes are separately recorded by workflow"
+    },
+    "graph_audit": {
+      "errors": [],
+      "scientific_truth_proven": false,
+      "scope": "hash/quote/type checks plus recorded semantic adjudications; adjudications may be wrong",
+      "structurally_valid": true,
+      "unadjudicated_edges": [
+        "r-q"
+      ]
+    },
+    "rsi_promoted": true,
+    "rsi_tie_promoted": false,
+    "rollback_files": [
+      "agent.py"
+    ],
+    "integrity": {
+      "errors": [],
+      "integrity_only": true,
+      "security_seal": false,
+      "valid": true
+    },
+    "independent_scientific_reviewer": "not performed; graph support remains unadjudicated"
+  },
+  "independent_forward_check": {
+    "synthetic_tasks": 12,
+    "repetitions_per_task": 5,
+    "primary_unchanged": true,
+    "controls_reproduced": true,
+    "independent_recomputation": {
+      "contaminated": {
+        "effect_recomputed_without_package_statistics": 1.3685437032725263,
+        "runtime_effect": 1.3685437032725265,
+        "absolute_discrepancy": 2.220446049250313e-16
+      },
+      "clean": {
+        "effect_recomputed_without_package_statistics": -0.034252333210107504,
+        "runtime_effect": -0.034252333210107504,
+        "absolute_discrepancy": 0.0
+      },
+      "identity": {
+        "effect_recomputed_without_package_statistics": 0.0,
+        "runtime_effect": 0.0,
+        "absolute_discrepancy": 0.0
+      }
+    },
+    "archives_verified": true,
+    "predictions_independently_rescored": 96,
+    "rescoring_errors": 0,
+    "whole_bundle_rollback_verified": true,
+    "observed_failures_and_fixes": {
+      "renamed_stage_milestone_not_aligned": {
+        "observed": true,
+        "fixed_and_rechecked": true
+      },
+      "changed_estimand_treated_as_improvement": {
+        "observed": true,
+        "fixed_and_rechecked": true
+      },
+      "final_compared_promoted_candidate_to_itself": {
+        "observed": true,
+        "fixed_and_rechecked": true
+      },
+      "stage_id_fallback_overrode_milestone_conflict": {
+        "observed": true,
+        "fixed_and_rechecked": true
+      }
+    },
+    "targeted_regression": {
+      "milestone_label_renaming_resolved": true,
+      "stable_milestone_id_with_changed_wording_resolved": true,
+      "ambiguous_milestones_remain_unmatched": true,
+      "equal_measurement_contract_positive_example_validated": true,
+      "all_changed_required_fields_block_validation": true,
+      "missing_contracts_block_validation": true,
+      "negative_equal_contract_refuted": true,
+      "original_changed_estimand_no_longer_validated": true,
+      "two_real_promotions_succeeded": true,
+      "audit_tracks_current_incumbent": true,
+      "final_uses_original_frozen_baseline": true,
+      "final_gain_is_two": true,
+      "final_does_not_promote_or_change_active": true,
+      "raw_final_scores_independently_match": true,
+      "forbidden_final_promotion_rejected_before_use": true,
+      "second_final_blocked": true
+    },
+    "final_conflict_check": {
+      "no_alignment": true,
+      "left_remains_unmatched": true,
+      "right_remains_unmatched": true,
+      "specific_conflict_reported": true
+    }
+  },
+  "network_check": {
+    "provider": "crossref",
+    "query": "scientific reproducibility",
+    "records_returned": 2,
+    "receipts": [
+      {
+        "page": 1,
+        "retrieved_at": 1792406446.3575172,
+        "served_from_cache": false,
+        "sha256": "249d9788cc0e4c3f9a360b1c0674985ee71aa77e89f77c50d7501a25e2288f50",
+        "url": "https://api.crossref.org/works?query=scientific+reproducibility&rows=2&cursor=%2A"
+      }
+    ],
+    "pagination_complete": false,
+    "scope": "Live request/response retention only; no relevance or recall evaluation",
+    "other_providers": "fixture tests only"
+  },
+  "pre_cleanup_package_check": {
+    "checked_utc": "2026-10-19T10:58:56.230200+00:00",
+    "passed": true,
+    "skills": 25,
+    "pipeline_templates": 27,
+    "pdf_files": 22,
+    "pdf_pages": 600,
+    "pdf_hashes_unchanged": true,
+    "historical_research_instance_unchanged": true,
+    "test_code_hashes_still_match": true,
+    "harness_sha256": "ba479dcec1339e08b3a2735347e06820cc737b069211772a74e97c01240e84cf"
+  },
+  "reproduce": {
+    "unit_tests": "python -m unittest discover -s tests -v",
+    "offline_example": "python skills/_shared/examples/offline_research.py --output /path/to/new-output-directory",
+    "independent_session": "Historical summary only; the temporary agent driver and raw session were removed during cleanup"
+  },
+  "not_live_validated": [
+    "SSH remote experiment and cancellation",
+    "Lean project",
+    "private Zotero library",
+    "OpenAlex/Semantic Scholar/Europe PMC/arXiv live responses",
+    "learned hidden-state models",
+    "cross-domain research capability",
+    "HCI user study"
+  ],
+  "release_check": {
+    "checked_utc": "2026-10-19T11:12:30.401736+00:00",
+    "passed": true,
+    "errors": [],
+    "skills": 25,
+    "pipeline_templates": 27,
+    "markdown_links_checked": 77,
+    "python_files_parsed": 16,
+    "tested_source_hashes_match": true,
+    "original_pdf_hashes_match": true,
+    "temporary_release_artifacts_removed": true,
+    "scope": "Post-cleanup package integrity; no new research benchmark"
+  }
+}
