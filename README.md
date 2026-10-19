@@ -6,6 +6,8 @@ v2.1 在可执行的状态与证据检查上增加了隔离、真实模型适配
 
 ## 上手
 
+[下载最新 Release](https://github.com/AGM54C/GResearchEvolver_Skill/releases/latest)，解压后可按下方命令运行和安装；发布页提供 ZIP 与 SHA-256 校验文件。
+
 Python 3.10+；核心只依赖标准库。PDF 另需 PyMuPDF，签名需 cryptography，SSH 需 Paramiko；容器、Lean 与模型均按需接入。可使用 Responses/Chat/Ollama 或现有 Codex API-key 配置，保存真实用量与失败回执，账号密钥不写入技能包。
 
 ```text
