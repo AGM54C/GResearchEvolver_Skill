@@ -1,28 +1,6 @@
 ---
 name: figure-mimic
 description: 论文图表风格模仿。从样本论文的图中提取视觉风格画像（配色板/线型/布局/标注习惯），按画像生成图表——数据图（折线/柱状/热图）走代码生成（matplotlib/pgfplots，数据点从数字账本取，坐标精确）；概念图（teaser/框架图）走生图模型 prompt 工程 + 强制人工确认。与 style-mimic 对称：文本画像 ↔ 视觉画像。触发条件：要求"模仿这篇论文的图风格""按XX风格画图""生成论文图表"。
-parameters:
-  samples:
-    type: string
-    required: true
-    description: "样本来源：论文 PDF/图目录/已有 figures/ 目录"
-  figure_type:
-    type: string
-    required: true
-    enum: [data, concept]
-    description: "data=数据图（代码生成，坐标精确）；concept=概念图（生图模型+人工确认）"
-  data_source:
-    type: string
-    required: false
-    description: "数据图必填：runs/<run-id> 或 paper-state.json 数字账本路径——数据点只从这里取"
-  gen_endpoint:
-    type: string
-    required: false
-    description: "生图模型端点/工具名（concept 图必填，用户接入；未提供则只产 prompt 包不生成）"
-  out_dir:
-    type: string
-    required: false
-    description: "产物目录，默认 .codeartsdoer/.research/workspace/paper/figures"
 ---
 
 # figure-mimic Skill
@@ -125,3 +103,32 @@ out_dir/
 - **人的介入**：H2 强制——概念图每张生成后确认（内容准确性 + 风格相似度双指标）。
 - **Agent Memory**：M2 产物存 `workspace/paper/figures/`；画像入 HARNESS 归档。
 - **轨迹与归档**：生成调用与确认记录入 trace；figure-map 入 artifacts。
+
+
+## 调用参数（原版，未扩展）
+
+```yaml
+parameters:
+  samples:
+    type: string
+    required: true
+    description: "样本来源：论文 PDF/图目录/已有 figures/ 目录"
+  figure_type:
+    type: string
+    required: true
+    enum: [data, concept]
+    description: "data=数据图（代码生成，坐标精确）；concept=概念图（生图模型+人工确认）"
+  data_source:
+    type: string
+    required: false
+    description: "数据图必填：runs/<run-id> 或 paper-state.json 数字账本路径——数据点只从这里取"
+  gen_endpoint:
+    type: string
+    required: false
+    description: "生图模型端点/工具名（concept 图必填，用户接入；未提供则只产 prompt 包不生成）"
+  out_dir:
+    type: string
+    required: false
+    description: "产物目录，默认 .codeartsdoer/.research/workspace/paper/figures"
+
+```

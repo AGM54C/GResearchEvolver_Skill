@@ -1,0 +1,1 @@
+{"checks":["uses arithmetic means","numeric value matches source data","causal claim removed","universal generalization removed","actual rerun/hash recorded","original branch and intervention rationale preserved"],"mean_difference":-1.4660133683456706,"study_faults_intentionally_seeded":true}

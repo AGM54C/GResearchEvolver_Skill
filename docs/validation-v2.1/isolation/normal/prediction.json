@@ -1,0 +1,1 @@
+{"nonroot": true, "host_secret_absent": true, "docker_socket_absent": true, "host_env_absent": true, "input_readonly": true, "code_readonly": true, "root_readonly": true, "supervisor_private": true, "network_denied": true, "candidate_capabilities_zero": true}

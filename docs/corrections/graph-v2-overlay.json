@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "parent_graph_sha256": "c99b628da84b9097029f7599e695480cc06dbfb993ab72a649acb2d0701e75ac",
+  "original_unchanged": true,
+  "atomic_replacements": [
+    {
+      "id": "C-hallulens-5-a",
+      "replaces": "C-hallulens-5",
+      "source_role": "paper_report",
+      "value": 96.67,
+      "unit": "%",
+      "metric": "abstention judgment accuracy",
+      "condition": "Llama-3.1-70B-Instruct evaluator; original paper evaluation setting",
+      "status": "source_text_checked_not_independently_reproduced",
+      "evidence": {
+        "path": "research-instance/workspace/literature/inbox/fulltext/hallulens.txt",
+        "sha256": "aca523159fa43772f057f4369826e29d9ff4b85edb4cf573dd9503a6feaee010",
+        "line": 541,
+        "quote": "Evaluation First, the model’s refusal is evaluated; if it does not refuse, the answer is then evaluated for correctness. Both evaluations are conducted automatically using LLMs with prompts. Refusal is judged by asking the evaluator LLM if the model’s generated answer abstains from answering due to lack of knowledge, lack of access to information, or uncertainty. A model attempting to correct the user prompt is not considered a refusal, as the tested prompts are all valid and contain available information. Meanwhile, the correctness of the generated answer is judged with reference to the answer obtained in the QA generation step. We ask the LLM to classify non-abstained answers as ‘correct’, ‘incorrect’, or ‘unverifiable’. We consider both incorrect and unverifiable answers to be hallucinations, given that the question should have an answer. In our experiment, We used LLaMa-3.1-70B-Instruct as a judge. Our analysis shows that the model evaluator LLM achieves 96.67% accuracy for abstention and 95.56% accuracy for correctness judgment."
+      }
+    },
+    {
+      "id": "C-hallulens-5-b",
+      "replaces": "C-hallulens-5",
+      "source_role": "paper_report",
+      "value": 95.56,
+      "unit": "%",
+      "metric": "correctness judgment accuracy",
+      "condition": "Llama-3.1-70B-Instruct evaluator; original paper evaluation setting",
+      "status": "source_text_checked_not_independently_reproduced",
+      "evidence": {
+        "path": "research-instance/workspace/literature/inbox/fulltext/hallulens.txt",
+        "sha256": "aca523159fa43772f057f4369826e29d9ff4b85edb4cf573dd9503a6feaee010",
+        "line": 541,
+        "quote": "Evaluation First, the model’s refusal is evaluated; if it does not refuse, the answer is then evaluated for correctness. Both evaluations are conducted automatically using LLMs with prompts. Refusal is judged by asking the evaluator LLM if the model’s generated answer abstains from answering due to lack of knowledge, lack of access to information, or uncertainty. A model attempting to correct the user prompt is not considered a refusal, as the tested prompts are all valid and contain available information. Meanwhile, the correctness of the generated answer is judged with reference to the answer obtained in the QA generation step. We ask the LLM to classify non-abstained answers as ‘correct’, ‘incorrect’, or ‘unverifiable’. We consider both incorrect and unverifiable answers to be hallucinations, given that the question should have an answer. In our experiment, We used LLaMa-3.1-70B-Instruct as a judge. Our analysis shows that the model evaluator LLM achieves 96.67% accuracy for abstention and 95.56% accuracy for correctness judgment."
+      }
+    },
+    {
+      "id": "C-hallulens-5-c",
+      "replaces": "C-hallulens-5",
+      "source_role": "paper_report",
+      "value": 94.77,
+      "unit": "%",
+      "metric": "NonExistent evaluator-human agreement",
+      "condition": "Llama-3.1-70B-Instruct evaluator; original paper evaluation setting",
+      "status": "source_text_checked_not_independently_reproduced",
+      "evidence": {
+        "path": "research-instance/workspace/literature/inbox/fulltext/hallulens.txt",
+        "sha256": "aca523159fa43772f057f4369826e29d9ff4b85edb4cf573dd9503a6feaee010",
+        "line": 2295,
+        "quote": "To validate the accuracy of the automatic abstention judgment, we conducted a human evaluation. We sampled 440 generated responses from 11 models, achieving a 94.77% agreement with human assessments."
+      }
+    }
+  ],
+  "edge_adjudications": [
+    {
+      "id": "E-10",
+      "status": "suspended",
+      "reason": "不同概念维度/定义不直接构成逻辑反驳；需明确命题及适用范围。",
+      "suggested_relation": "conceptual_difference_pending_review"
+    },
+    {
+      "id": "E-15",
+      "status": "suspended",
+      "reason": "意图性与来源一致性可为正交维度，不能据此推出分类以无意错误为必要前提。"
+    },
+    {
+      "id": "E-16",
+      "status": "needs_review",
+      "reason": "一个任务的 judge 一致率不能直接验证另一基准管线，最多为有限工程动机。"
+    }
+  ]
+}

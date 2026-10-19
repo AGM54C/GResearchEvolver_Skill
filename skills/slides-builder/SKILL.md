@@ -1,25 +1,6 @@
 ---
 name: slides-builder
 description: 学术演示文稿制作。把成稿/复现结果转为答辩 PPT、组会 slides 或课程汇报——每页一个论点 + 证据 + 讲稿（speaker notes），数字全部从数字账本取，不逐段粘贴正文。触发条件：要求"做PPT""答辩幻灯片""组会汇报 slides""汇报演示"。
-parameters:
-  source:
-    type: string
-    required: false
-    description: "内容源：paper.md（默认）/ repl 报告 / survey；可叠加 paper-state.json 数字账本"
-  mode:
-    type: string
-    default: defense
-    enum: [defense, group_meeting, course]
-    description: "defense=答辩（12-15 页）；group_meeting=组会（进度+问题+计划）；course=课程汇报（教学性，多背景铺垫）"
-  format:
-    type: string
-    default: pptx
-    enum: [pptx, marp]
-    description: "pptx=python-pptx 结构化产出；marp=markdown 源（可版本控制）"
-  out_dir:
-    type: string
-    required: false
-    description: "产物目录，默认 .codeartsdoer/.research/workspace/slides"
 ---
 
 # slides-builder Skill
@@ -113,3 +94,29 @@ out_dir/
 - **人的介入**：H1（mode/format 歧义给选项）；H2 无不可逆操作。
 - **Agent Memory**：M2 产物存 `workspace/slides/`；sidecar 刷新。
 - **轨迹与归档**：对账结果入 trace；产物入 artifacts。
+
+
+## 调用参数（原版，未扩展）
+
+```yaml
+parameters:
+  source:
+    type: string
+    required: false
+    description: "内容源：paper.md（默认）/ repl 报告 / survey；可叠加 paper-state.json 数字账本"
+  mode:
+    type: string
+    default: defense
+    enum: [defense, group_meeting, course]
+    description: "defense=答辩（12-15 页）；group_meeting=组会（进度+问题+计划）；course=课程汇报（教学性，多背景铺垫）"
+  format:
+    type: string
+    default: pptx
+    enum: [pptx, marp]
+    description: "pptx=python-pptx 结构化产出；marp=markdown 源（可版本控制）"
+  out_dir:
+    type: string
+    required: false
+    description: "产物目录，默认 .codeartsdoer/.research/workspace/slides"
+
+```

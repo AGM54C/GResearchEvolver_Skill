@@ -1,49 +1,21 @@
-# 安装 GResearchEvolver
+# 安装与运行
 
-> 本质很简单：**把 `skills/` 目录放进你 Agent 运行时的 skill 目录**。以下任选其一。
+在完整源码目录运行 Python 3.10+。不需要先启动云服务；大部分辅助工具只用标准库。PDF 摄取需要项目环境中的 PyMuPDF。
 
-## 方式一：一行命令（Claude Code，推荐先试这个）
-
-```bash
-git clone ssh://git@ssh.github.com:443/AGM54C/GResearchEvolver_Skill.git
-cd GResearchEvolver_Skill && sh install.sh          # 装到全局 ~/.claude/skills/
-# 或: sh install.sh --project                       # 只装到当前项目 .claude/skills/
+```text
+python install.py --dest /absolute/path/to/host/skills
+python install.py --project
+python install.py --dest /absolute/path/to/host/skills --force
 ```
 
-装完在 Claude Code 里说一句验证：
+`--project` 使用当前目录的 `.claude/skills`。未给参数时默认 `~/.claude/skills`；Codex 等其他宿主请明确 `--dest`。本次开发只在临时隔离目录检验安装，没有修改用户全局技能目录。
 
-```
-读一下 skills 清单，然后用 literature-scholar 精读这篇论文：<拖入 PDF>
-```
+`--force` 在目标目录先完整 staging，再逐项替换；原条目移动到 `.gresearch-backup-*`。失败会回滚本次替换；不同进程不要同时运行安装器。默认遇已有 bundle 条目会停止，避免新旧共享协议混装。保留其他无关技能。不会递归把同名目录套进去，也不自动删除备份。
 
-## 方式二：下载 zip（不想装 git 的话）
+安装内容为 25 个技能、`_shared/`（含 runtime、协议与示例）、manifest.yaml 和 HARNESS.md，另写 `.gresearch-install.json` 原字节清单。Unix `sh install.sh` 是 Python 安装器的兼容入口。
 
-1. 打开 [Releases](https://github.com/AGM54C/GResearchEvolver_Skill/releases)，下载最新 `GResearchEvolver-vX.Y.Z.zip` 并解压
-2. 把解压出的 `skills/` 下所有内容复制到 `~/.claude/skills/`（Windows: `%USERPROFILE%\.claude\skills\`）
+在宿主中使用 research-autopilot 处理跨阶段任务，或单独使用具体技能。runtime CLI 的相对前缀取决于实际安装位置：源码为 `skills/_shared/runtime/research.py`，安装后为 `<skills-dir>/_shared/runtime/research.py`。先 `--help`，再按 [运行手册](skills/_shared/runtime-guide.md) 建立具体 manifest。
 
-## 方式三：其他 Agent 运行时（CodeArts / 任何支持 SKILL.md 的运行时）
+验证可运行示例：`python skills/_shared/examples/offline_research.py --output demo-run`。查看控制台：`python skills/_shared/runtime/research.py --store demo-run/state serve`。控制台仅绑定 127.0.0.1，不自动打开浏览器。示例明确是合成数据。
 
-```bash
-sh install.sh --dest <你运行时的 skill 目录>
-```
-
-或手动：`skills/` 下每个 `<skill-name>/SKILL.md` 就是完整定义，按你运行时的规范放置即可（16 个 skill 目录 + `manifest.yaml` 一个文件，别拆散 manifest——编排器靠它路由）。
-
-## 三分钟试用路径（装完后）
-
-| 你说 | 它做 |
-|---|---|
-| 「精读这篇论文」+ PDF | literature-scholar：结构化条目 + 论断图节点 + 每个观点标注原文出处 |
-| 「找一下 XX 方向最新文献」 | literature-miner：5 个真实学术源检索，失败明说，绝不编造 |
-| 「对比这几篇的综述」 | survey-architect：图锚定综述——每个论断可回接，无证据不写 |
-| 「帮我组会 slides」 | slides-builder：论点式幻灯片 + 讲稿 |
-
-## 卸载
-
-删除 skill 目录即可（`rm -rf ~/.claude/skills/<skill-name>`）；项目级同理删 `.claude/skills/` 下对应目录。
-
-## 常见问题
-
-- **装了没反应？** 确认运行时支持 SKILL.md 规范（Claude Code / CodeArts 均可）；重启会话让 skill 目录重新扫描。
-- **research-instance/ 需要装吗？** 不需要——那是真实研究运行数据（归档/经验库/对照实验），留着阅读用：[导读](research-instance/README.md)。
-- **Windows 能用吗？** install.sh 在 git-bash / WSL 下可跑；或直接用方式二手动复制。
+外部适配依赖：检索需要网络（部分 API 需 key）；Zotero 需要可读库和可选 ZOTERO_API_KEY；SSH 需要 OpenSSH、host key、认证与专用工作目录；Lean 需要实际 lake 项目。工具不可用时报告未验证，不自动将协议标为完成。绘图/PPT 模块功能保持原版。

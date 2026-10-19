@@ -1,0 +1,17 @@
+{
+  "cases": 43,
+  "contract_failures": [
+    "receipt-null-pins",
+    "semantic-uncertain-contradiction",
+    "semantic-metrics-unknown-labels",
+    "semantic-metrics-abstain-gold",
+    "semantic-metrics-duplicate-ids",
+    "critic-truncated-model",
+    "critic-nonfinite-model",
+    "critic-unknown-target-classes",
+    "isolation-cleanup-after-log-failure"
+  ],
+  "no_real_model_inference": true,
+  "no_network_calls": true,
+  "all_vectors_and_source_text_synthetic": true
+}

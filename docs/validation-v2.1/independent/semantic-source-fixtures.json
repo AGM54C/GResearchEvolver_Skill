@@ -1,0 +1,54 @@
+{
+  "raw_items": [
+    {
+      "id": "claim-a",
+      "claim": "The trial did not demonstrate fewer admissions among treated adults.",
+      "sources": [
+        {
+          "id": "source-a",
+          "text": "μ-study: Adults receiving the treatment did not have fewer hospital admissions. Children were not studied.",
+          "locator": "synthetic-source:sentence-1"
+        }
+      ]
+    }
+  ],
+  "prepared": [
+    {
+      "id": "claim-a",
+      "claim": "The trial did not demonstrate fewer admissions among treated adults.",
+      "claim_sha256": "fa2625543486be1c1cf976c93ac52b6ddfb11b1b4c568bbf576983b3aefa4552",
+      "sources": [
+        {
+          "id": "source-a",
+          "text": "μ-study: Adults receiving the treatment did not have fewer hospital admissions. Children were not studied.",
+          "sha256": "69bd17a03f6542eac46df340f355132ec880362b86395d5108b86271974aee7b",
+          "locator": "synthetic-source:sentence-1"
+        }
+      ]
+    }
+  ],
+  "synthetic_response": {
+    "judgments": [
+      {
+        "id": "claim-a",
+        "label": "supports",
+        "confidence": 0.97,
+        "aspects": {
+          "polarity": "consistent",
+          "quantifiers": "consistent",
+          "population": "consistent",
+          "causality": "consistent",
+          "hedging": "consistent",
+          "numeric_context": "consistent"
+        },
+        "evidence": [
+          {
+            "source_id": "source-a",
+            "quote": "Adults receiving the treatment did not have fewer hospital admissions."
+          }
+        ],
+        "rationale": "The statement preserves the source's negative finding and adult population."
+      }
+    ]
+  }
+}

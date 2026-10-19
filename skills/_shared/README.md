@@ -1,21 +1,13 @@
-# `_shared/` — 共享定义层（非 skill）
+# 共享运行与证据规则
 
-本目录**不是 skill**：没有 `SKILL.md`，不会被 skill 加载器注册。它存放被 ≥2 个 skill 引用的**定义层**内容，避免复制漂移。
+各技能按需使用确定性 runtime，科学判断由宿主研究者/模型提出并由证据检验。安装需包含整个 `_shared`、manifest.yaml 和 skills 根目录的 HARNESS.md。
 
-## 治理规则
+- 执行/恢复/授权：[HARNESS.md](../HARNESS.md)；源码仓库对应根目录 HARNESS.md，安装时复制到此位置。
+- CLI、manifest、各工具请求：[runtime-guide.md](runtime-guide.md)。
+- 来源/原子论断/结果账本：[evidence-contracts.md](evidence-contracts.md)。
+- RSI 实跑与晋升：[rsi-protocol.md](rsi-protocol.md)。
+- 人工干预：[intervention-protocol.md](intervention-protocol.md)。
+- 外部模型/白盒方法：[adapter-contracts.md](adapter-contracts.md)。
+- 归档：[session-archive.md](session-archive.md)。
 
-1. **提升条件**：仅当 ≥2 个 skill 需要同一内容时才放到这里。
-2. **放定义层，不放动作层**：多个 skill 共享同一套词汇/分类/模板，但各自在其上应用**不同的动作**。
-   - 例：`diagnosis-template.md`（诊断报告格式）被 diagnosis-clinician / survey-architect / idea-forge / literature-miner 共享，但每个 skill 的判定逻辑各不相同。
-3. 引用方式：`../_shared/<file>`（相对路径）。
-
-## 文件清单
-
-| 文件 | 内容 | 被谁引用 |
-|---|---|---|
-| `atomic-relations.md` | 原子论断节点 schema + 四类原子关系 | literature-scholar / literature-miner / diagnosis-clinician / survey-architect |
-| `diagnosis-template.md` | 诊断报告五列表格 + 分级支持标签 | 所有 L2 产出 skill |
-| `intervention-protocol.md` | 干预三级类型学（I1–I3）+ 判定四类 + Progress Made + 蒸馏接口 | diagnosis-clinician / research-autopilot / rsi-evolver |
-| `anti-fabrication.md` | 反捏造红线 + 占位符约定 + 分级支持 | 所有 skill |
-
-> **维护**：新增共享内容时先问「是否 ≥2 个 skill 需要」，否则留在各自 skill 目录内。
+按当前任务读取对应文件，不预加载所有技能和 rubric。原有 rubric 可辅助质量检查；若旧示例与 v2 的执行、证据、授权规则冲突，以实际 v2 接口和用户指令为准。
