@@ -49,7 +49,7 @@ for a in json.load(open('archives/archive-003/artifacts.json',encoding='utf-8'))
     p=a['path'].replace('workspace/','workspace/').replace('memory/','memory/')
     h=hashlib.sha256(open(p,'rb').read()).hexdigest()
     ok+=h==a['sha256']; bad+=h!=a['sha256']
-print(f'哈希一致 {ok} / 不符 {bad} / 预期跳过 {skip}（应 80 项中 71 一致 + 0 不符 + 9 跳过）')"
+print(f'哈希一致 {ok} / 不符 {bad} / 预期跳过 {skip}（应 70 一致 + 0 不符 + 10 跳过 = 80 项）')"
 
 # 3. 对照实验回查：traceback.json 里每条 broken 论断标注了原文位置，可人工核
 ```
