@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 import os
 from pathlib import Path
 import re
@@ -33,8 +35,14 @@ def get_bytes(url, headers=None):
             break
         except urllib.error.HTTPError as exc:
             if exc.code not in {429, 502, 503, 504} or attempt == 2: raise
-            try: delay = min(3, max(.5, float(exc.headers.get('Retry-After', 2 ** attempt))))
-            except ValueError: delay = 2 ** attempt
+            retry_after = exc.headers.get('Retry-After')
+            try: delay = max(.5, float(retry_after)) if retry_after else 2 ** attempt
+            except ValueError:
+                try: delay = max(.5, (parsedate_to_datetime(retry_after) - datetime.now(timezone.utc)).total_seconds())
+                except (ValueError, TypeError): delay = 2 ** attempt
+            # Respect provider delays. If too long for this bounded operation,
+            # surface throttling instead of retrying earlier than requested.
+            if delay > 20: raise
             time.sleep(delay)
     if len(data) > 20_000_000:
         raise ResearchError('Metadata response exceeds 20 MB bound')
@@ -133,6 +141,25 @@ def search(provider, query, destination, *, pages=1, page_size=25, cache_seconds
     result = {'provider': provider, 'query': query, 'records': records, 'receipts': receipts, 'pagination_complete': complete,
               'search_exhaustive': False, 'coverage': 'provider index and query scope only', 'limits': {'pages': pages, 'page_size': page_size}}
     write_json(destination / 'search.json', result)
+    return result
+
+
+def semantic_scholar_bulk(query, destination, max_records=100):
+    """Explicit documented bulk endpoint; not a silent relevance-search fallback."""
+    if not query.strip() or type(max_records) is not int or not 1 <= max_records <= 1000:
+        raise ResearchError('Bulk query needs 1..1000 maximum records')
+    destination = Path(destination); destination.mkdir(parents=True, exist_ok=False)
+    params = {'query':query,'fields':'title,year,authors,externalIds,url,abstract'}
+    url = 'https://api.semanticscholar.org/graph/v1/paper/search/bulk?' + urllib.parse.urlencode(params)
+    headers = {'x-api-key':os.environ['S2_API_KEY']} if os.getenv('S2_API_KEY') else {}
+    raw = get_bytes(url, headers); body = json.loads(raw); h=digest(raw)
+    (destination/'response.json').write_bytes(raw)
+    records = [normalize(x,'semantic-scholar') for x in body.get('data',[])[:max_records]]
+    result = {'provider':'semantic-scholar','mode':'bulk','query':query,'records':records,
+              'receipt':{'url':url,'sha256':h,'retrieved_at':time.time()},'total':body.get('total'),
+              'truncated':len(body.get('data',[]))>max_records,'next_token':body.get('token'),
+              'search_exhaustive':False,'scope':'bounded first bulk page, not relevance ranking; raw page retained'}
+    write_json(destination/'search.json',result)
     return result
 
 

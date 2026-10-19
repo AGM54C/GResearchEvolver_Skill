@@ -355,7 +355,7 @@ json.dump({'metric':metric,'checks':{'finite':isinstance(v,(int,float)) and math
         self.source('candidate/self_test.txt', 'complete strategy includes tests')
         tasks = [{'id': split + str(i), 'split': split, 'domain': 'toy', 'input': {'x': i + 100 * si}, 'expected': i + 100 * si + 1}
                  for si, split in enumerate(('development', 'selection', 'audit', 'final')) for i in range(3)]
-        protocol = {'tasks': tasks, 'seeds': [0], 'max_trials': max_trials, 'protected_checks': ['finite'], 'resamples': 300,
+        protocol = {'tasks': tasks, 'seeds': [0], 'max_trials': max_trials, 'audit_policy': 'reuse-corrected', 'protected_checks': ['finite'], 'resamples': 300,
                     'scorer_command': ['{python}', 'score.py'], 'timeout': 10, 'trial_seconds': 30, 'required_domains': ['toy']}
         evolution.freeze(self.store, name, protocol, evaluator, incumbent, ['{python}', 'agent.py'])
         return candidate, incumbent

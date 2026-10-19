@@ -1,7 +1,7 @@
 """Executed candidate/incumbent evaluation with frozen scorer and whole-bundle rollback.
 
-This is an integrity-audited local executor, NOT a sealed evaluator. Use an external
-permission boundary for adversarial or untrusted candidates.
+The default local executor is for trusted development. Explicit Docker mode puts
+candidate code behind a permission boundary; the evaluator/signing host is trusted.
 """
 from __future__ import annotations
 
@@ -22,6 +22,8 @@ def check_command(command):
 
 
 def freeze(store, name, protocol, evaluator_dir, incumbent_dir, incumbent_command):
+    protocol = dict(protocol)
+    protocol.setdefault('audit_policy', 'fresh-batches')
     if store.get_value('rsi:' + name):
         raise ResearchError('Epoch already exists; create a distinct epoch for changed evaluation')
     from .core import valid_id
@@ -34,11 +36,29 @@ def freeze(store, name, protocol, evaluator_dir, incumbent_dir, incumbent_comman
     if len([t for t in tasks if t['split'] == 'audit']) < 3:
         raise ResearchError('At least three audit tasks required')
     partitions = {}
+    audit_groups = set()
     for t in tasks:
         identity = t.get('group_id') or fingerprint(t['input'])
         if identity in partitions and partitions[identity] != t['split']:
             raise ResearchError('Identical input/group crosses evaluation partitions')
         partitions[identity] = t['split']
+        if t['split'] == 'audit':
+            if identity in audit_groups: raise ResearchError('Audit tasks must use distinct independent groups, including across batches')
+            audit_groups.add(identity)
+    if protocol['audit_policy'] not in {'fresh-batches', 'reuse-corrected'}:
+        raise ResearchError('Unknown audit policy')
+    if protocol['audit_policy'] == 'fresh-batches':
+        batches = {}
+        for t in tasks:
+            if t['split'] == 'audit': batches.setdefault(str(t.get('batch', '0')), []).append(t)
+        if any(len(v) < 3 for v in batches.values()): raise ResearchError('Each fresh audit batch needs at least three independent groups')
+    isolation = protocol.get('isolation')
+    if isolation:
+        from .isolation import validate
+        from .attestation import signer
+        validate(isolation)
+        if not protocol.get('attestation'): raise ResearchError('Isolated promotion epochs need a pinned evaluator signing key')
+        signer(protocol['attestation'])
     if not protocol.get('seeds') or len(set(protocol['seeds'])) != len(protocol['seeds']):
         raise ResearchError('Unique nonempty seed list required')
     if protocol.get('direction', 'higher') not in {'higher', 'lower'}:
@@ -61,7 +81,7 @@ def freeze(store, name, protocol, evaluator_dir, incumbent_dir, incumbent_comman
     record = {'name': name, 'protocol': protocol, 'protocol_hash': fingerprint(protocol),
               'evaluator': evaluator, 'evaluator_hash': fingerprint(evaluator), 'active': incumbent,
               'reporting_baseline': incumbent, 'history': [incumbent], 'trials': [], 'final_used': False,
-              'isolation': 'same-permission local processes; not sealed', 'created': time.time()}
+              'isolation': 'docker' if isolation else 'same-permission local processes; not sealed', 'created': time.time()}
     with store.tx():
         store.set_value('rsi:' + name, record)
         store.event('rsi-' + name, 'epoch_frozen', {k: record[k] for k in ('protocol_hash', 'evaluator_hash', 'isolation')})
@@ -113,6 +133,13 @@ def evaluate(store, name, candidate_dir, candidate_command, *, split='audit', pr
         if split == 'audit' and sum(t['split'] == 'audit' for t in record['trials']) >= record['protocol']['max_trials']:
             raise ResearchError('Audit reuse budget exhausted; new independent audit required')
         tasks = [t for t in record['protocol']['tasks'] if t['split'] == split]
+        audit_batch = None
+        if split == 'audit' and record['protocol'].get('audit_policy') == 'fresh-batches':
+            used = {t.get('audit_batch') for t in record['trials'] if t['split'] == 'audit'}
+            available = sorted({str(t.get('batch', '0')) for t in tasks} - used)
+            if not available: raise ResearchError('Fresh audit batches exhausted; provision independent tasks in a new epoch')
+            audit_batch = available[0]
+            tasks = [t for t in tasks if str(t.get('batch', '0')) == audit_batch]
         if len(tasks) < 3:
             raise ResearchError('This split needs >=3 independent tasks')
         candidate = {'files': store.files(candidate_dir), 'command': candidate_command}
@@ -120,6 +147,7 @@ def evaluate(store, name, candidate_dir, candidate_command, *, split='audit', pr
             raise ResearchError('Candidate has no source')
         reference = record.get('reporting_baseline', record['history'][0]) if split == 'final' else record['active']
         trial = {'id': 'trial-' + uuid.uuid4().hex[:12], 'split': split, 'status': 'running',
+                 'audit_batch': audit_batch, 'audit_policy': record['protocol'].get('audit_policy', 'reuse-corrected'),
                  'candidate': candidate, 'incumbent': reference, 'started': time.time(),
                  'comparison_role': 'frozen_reporting_baseline' if split == 'final' else 'current_incumbent'}
         record['trials'].append(trial)
@@ -152,9 +180,16 @@ def evaluate(store, name, candidate_dir, candidate_command, *, split='audit', pr
                     # Only task.input goes to strategy. Expected answers belong to the scorer.
                     write_json(taskpath, {'id': task['id'], 'input': task['input']})
                     write_json(privatepath, task)
-                    run = invoke(trial[label]['command'], code,
-                                 ['--task', str(taskpath), '--seed', str(seed), '--output', str(prediction)],
-                                 min(protocol.get('timeout', 60), remaining), folder / 'strategy')
+                    if protocol.get('isolation'):
+                        from .isolation import run as isolated_run
+                        run = isolated_run(protocol['isolation'], code, taskpath, trial[label]['command'], folder / 'isolated',
+                                           seed=seed, timeout=min(protocol.get('timeout', 60), remaining))
+                        if run['status'] != 'completed': raise ResearchError(run.get('error', 'Isolated strategy failed'))
+                        prediction.write_bytes((folder / 'isolated' / 'prediction.json').read_bytes())
+                    else:
+                        run = invoke(trial[label]['command'], code,
+                                     ['--task', str(taskpath), '--seed', str(seed), '--output', str(prediction)],
+                                     min(protocol.get('timeout', 60), remaining), folder / 'strategy')
                     if not prediction.is_file(): raise ResearchError('Strategy produced no prediction')
                     prediction_hash = store.put(prediction.read_bytes())
                     before = fingerprint(store.files(scorer))
@@ -187,7 +222,7 @@ def evaluate(store, name, candidate_dir, candidate_command, *, split='audit', pr
             reasons.append('runtime ratio limit exceeded')
         trial.update(status='evaluated', rows=rows, observations=observations, analysis=analysis, reasons=reasons,
                      passed=not reasons, seconds=seconds, promoted=False,
-                     uncertainty='bootstrap gate is approximate; reused adaptive audits are not fresh generalization evidence')
+                     uncertainty='bootstrap gate is approximate; fresh groups reduce reuse overfit but do not eliminate selection or pretraining contamination')
     except Exception as exc:
         trial.update(status='failed', reasons=[str(exc)], passed=False, promoted=False, observations=observations)
     with store.tx():
@@ -196,9 +231,20 @@ def evaluate(store, name, candidate_dir, candidate_command, *, split='audit', pr
         if latest['protocol_hash'] != record['protocol_hash'] or latest['active'] != record['active']:
             trial.update(passed=False, reasons=trial['reasons'] + ['epoch or active strategy changed during trial'])
         if promote and trial['passed']:
+            trial['promoted'] = True
+        if protocol.get('attestation'):
+            from .attestation import sign
+            payload = {'epoch': name, 'trial': trial['id'], 'protocol_hash': record['protocol_hash'],
+                       'evaluator_hash': record['evaluator_hash'], 'candidate_hash': fingerprint(candidate),
+                       'split': split, 'passed': trial['passed'], 'promoted': trial['promoted'],
+                       'isolation': record['isolation'], 'audit_batch': audit_batch,
+                       'result_hash': fingerprint(trial)}
+            try: trial['attestation'] = sign(protocol['attestation'], payload)
+            except Exception as exc:
+                trial.update(passed=False, promoted=False, reasons=trial['reasons'] + ['attestation failed: ' + str(exc)])
+        if trial['promoted']:
             latest['active'] = candidate
             latest['history'].append(candidate)
-            trial['promoted'] = True
         latest['trials'][-1] = trial
         latest['running'] = None
         latest['worker_pid'] = None

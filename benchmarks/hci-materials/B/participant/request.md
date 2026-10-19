@@ -1,0 +1,1 @@
+检查三条科研论断与所附原始摘要的支持关系。区分 supports / contradicts / insufficient，给出准确的原文句子与定位；修正 decisions.json 后，保留原运行和干预理由，重新执行并提交 report.md。摘要的存在或引用真实不能单独证明论断。

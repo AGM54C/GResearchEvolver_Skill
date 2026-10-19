@@ -121,7 +121,7 @@ def execute(destination):
             (directory / ('score.py' if label == 'evaluator' else 'agent.py')).write_text(text, encoding='utf-8')
         (sources / 'candidate' / 'self-tests.txt').write_text('Part of the whole strategy bundle, not independent acceptance.', encoding='utf-8')
         protocol = {'tasks': [{'id': 'audit-' + str(i), 'split': 'audit', 'domain': 'synthetic-arithmetic', 'input': {'x': i}, 'expected': i + 1} for i in range(4)],
-                    'seeds': [0], 'max_trials': 2, 'scorer_command': ['{python}', 'score.py'], 'protected_checks': ['finite'],
+                    'seeds': [0], 'max_trials': 2, 'audit_policy': 'reuse-corrected', 'scorer_command': ['{python}', 'score.py'], 'protected_checks': ['finite'],
                     'required_domains': ['synthetic-arithmetic'], 'resamples': 1000, 'timeout': 10, 'trial_seconds': 60}
         evolution.freeze(store, 'synthetic', protocol, sources / 'evaluator', sources / 'incumbent', ['{python}', 'agent.py'])
         promoted = evolution.evaluate(store, 'synthetic', sources / 'candidate', ['{python}', 'agent.py'], promote=True)

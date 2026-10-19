@@ -1,0 +1,1 @@
+{"scifact_source":{"members":["data/corpus.jsonl","data/claims_train.jsonl","data/claims_dev.jsonl"],"sha256":"11c621288d41ac144d29b13b0f8503b3820b7d6e8b1f6ff24dff335c196d76be","url":"https://scifact.s3-us-west-2.amazonaws.com/release/latest/data.tar.gz"},"scoring_key_for_reviewer_only":true,"status":"prepared_not_conducted","wine_source":"sklearn.datasets.load_wine; UCI Wine"}

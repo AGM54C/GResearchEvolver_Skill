@@ -11,7 +11,9 @@ description: 在冻结评估和预算下实跑策略候选与基线，按独立�
 
 active 是原子更新的整包快照；`rsi-rollback` 恢复整包，历史失败不删除。评估器改变需新 epoch，旧分数失效但产物保留；跨 epoch 要在固定外部 anchor 上实际校准，不以两边分数直接宣称改进。
 
-本地评分进程与策略具有相同系统权限，**不是密封验收**；bootstrap 是近似门槛，重复自适应使用固定任务仍会过拟合。对不可信候选，需独立可信执行服务/权限隔离。不能把此软件测试称为开放 RSI、能力边界扩展或单调科研进步。
+默认 trusted-local 模式用于可信开发。对不可信候选，在 protocol 显式选择 Docker 隔离并固定 image digest：候选非 root、无网络、只读代码/当前公开输入，评分器、隐藏答案和签名密钥留在可信控制域。配置不可用直接失败；不能回退到本地执行。签名回执绑定 epoch、评分器、协议、候选、trial，发布端钉住公钥和请求上下文并拒绝重放。
+
+默认 `audit_policy:fresh-batches`，每个 audit batch 至少 3 个不重叠 group；失败也消费该批次。`reuse-corrected` 仅为显式兼容选项，仍有适应性过拟合风险。容器依赖可信宿主内核/daemon，bootstrap 是近似门槛，不能据此声称开放 RSI、能力边界扩展或单调科研进步。
 
 接口及示例见 [RSI 协议](../_shared/rsi-protocol.md)。
 

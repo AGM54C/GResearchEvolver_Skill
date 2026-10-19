@@ -14,11 +14,37 @@ OPERATIONS = (
     'search', 'import', 'dedup', 'export', 'citation', 'zotero', 'monitor', 'notes', 'local-index', 'local-search', 'invalidate',
     'review-freeze', 'screen', 'adjudicate', 'review-report', 'quality', 'intervention',
     'rsi-freeze', 'rsi-evaluate', 'rsi-rollback', 'rsi-recover', 'rsi-export', 'rsi-compare', 'rsi-status',
-    'enqueue', 'queue-next', 'queue-cancel', 'queue-status', 'proof', 'grant')
+    'enqueue', 'queue-next', 'queue-cancel', 'queue-status', 'proof', 'grant',
+    'model', 'embeddings', 'semantic-review', 'semantic-graph', 'semantic-metrics', 's2-bulk', 'isolated-run',
+    'signing-keygen', 'receipt-accept', 'representations', 'critic-fit', 'critic-predict', 'study-plan', 'study-analyze')
 
 
 def operation(store, name, data):
     from . import statistics as st, evidence as ev, literature as lit, review as rv, evolution as rs, projects as pr, retrieval as rt
+    if name in {'study-plan','study-analyze'}:
+        from . import study
+        return study.initialize(data['destination'],data.get('participants',12),data.get('seed',20261019)) if name=='study-plan' else study.analyze(data['protocol'],data['observations'])
+    if name in {'model','embeddings'}:
+        from . import models
+        return models.generate(data['config'],data['messages'],data['destination']) if name=='model' else models.embeddings(data['config'],data['texts'],data['destination'])
+    if name in {'semantic-review','semantic-metrics'}:
+        from . import semantic
+        return semantic.review(data['config'],data['items'],data['destination'],threshold=data.get('threshold',.9)) if name=='semantic-review' else semantic.metrics(data['rows'])
+    if name=='semantic-graph':
+        from .semantic import review_graph
+        return review_graph(data['config'],data['graph'],data['root'],data['destination'],threshold=data.get('threshold',.9))
+    if name=='s2-bulk':return lit.semantic_scholar_bulk(data['query'],data['destination'],data.get('max_records',100))
+    if name=='isolated-run':
+        from .isolation import run
+        return run(data['isolation'],data['code'],data['task'],data['command'],data['destination'],seed=data.get('seed',0),timeout=data.get('timeout',60))
+    if name in {'signing-keygen','receipt-accept'}:
+        from . import attestation
+        return attestation.keygen(data['destination']) if name=='signing-keygen' else attestation.accept(store,data['receipt'],data['public_key'],data['expected'])
+    if name in {'representations','critic-fit','critic-predict'}:
+        from . import representations as rep
+        if name=='representations':return rep.encode(data['config'],data['texts'])
+        if name=='critic-fit':return rep.train_critic(data)
+        return rep.predict_critic(data['model'],data['vectors'],data['encoder_hash'])
     if name == 'paired': return st.paired_analysis(data['rows'], **data.get('options', {}))
     if name == 'adjust': return st.adjust_pvalues(data['pvalues'], data.get('method', 'holm'))
     if name == 'meta': return st.meta_analysis(data)
@@ -62,7 +88,7 @@ def operation(store, name, data):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description='Evidence-based research runtime v2. Trusted commands; no OS security sandbox.')
+    parser = argparse.ArgumentParser(description='Evidence-based research runtime. Trusted local commands; optional explicit Docker candidate isolation.')
     parser.add_argument('--store', default='.research-v2', help='durable research state directory')
     parser.add_argument('--output', help='also write JSON result to a file')
     commands = parser.add_subparsers(dest='command', required=True)

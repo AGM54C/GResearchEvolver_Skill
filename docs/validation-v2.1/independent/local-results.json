@@ -1,0 +1,1883 @@
+[
+  {
+    "name": "signature-valid",
+    "expectation": "Valid pinned signed audit receipt verifies",
+    "outcome": "returned",
+    "result": {
+      "version": 1,
+      "nonce": "d5b42abfccd14d61ae094157ea7d7456",
+      "issued_at": 1792412226.2417386,
+      "epoch": "synthetic-epoch",
+      "protocol_hash": "2ea88c7a30351b12a4dcfc06cdce2af6eab18416176466c2500cb6ef74f745bf",
+      "evaluator_hash": "c528cab03ad47ed5fceb01fd4f4557f12d8f2bcb2aa9f6e78087380aab8fde5f",
+      "candidate_hash": "dda18a0e21ae47c53b4309434cbc02ae8bf764fa83a6defbb719431242722aa7",
+      "trial": "synthetic-trial",
+      "split": "audit",
+      "passed": true,
+      "promoted": true,
+      "isolation": "docker"
+    },
+    "contract_satisfied": true
+  },
+  {
+    "name": "signature-tampered",
+    "expectation": "Changing the signed candidate must fail",
+    "outcome": "raised",
+    "error_type": "ResearchError",
+    "error": "Invalid evaluator signature",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\attestation.py\", line 52, in verify\n    Ed25519PublicKey.from_public_bytes(base64.b64decode(public_key, validate=True)).verify(\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        base64.b64decode(envelope['signature'], validate=True), canonical(body).encode('utf-8'))\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ncryptography.exceptions.InvalidSignature\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 55, in case\n    value = fn()\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 79, in <lambda>\n    case(\"signature-tampered\", \"Changing the signed candidate must fail\", lambda: attestation.verify(changed, config[\"public_key\"], expected), expect_error=True)\n                                                                                  ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\attestation.py\", line 55, in verify\n    raise ResearchError('Invalid evaluator signature') from exc\ngresearch.core.ResearchError: Invalid evaluator signature\n",
+    "contract_satisfied": true
+  },
+  {
+    "name": "signature-wrong-context",
+    "expectation": "Caller-pinned candidate mismatch must fail",
+    "outcome": "raised",
+    "error_type": "ResearchError",
+    "error": "Receipt context mismatch",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 55, in case\n    value = fn()\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 80, in <lambda>\n    case(\"signature-wrong-context\", \"Caller-pinned candidate mismatch must fail\", lambda: attestation.verify(envelope, config[\"public_key\"], {**expected, \"candidate_hash\": digest(b\"wrong\")}), expect_error=True)\n                                                                                          ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\attestation.py\", line 56, in verify\n    if any(body.get(k) != v for k, v in expected.items()): raise ResearchError('Receipt context mismatch')\n                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ngresearch.core.ResearchError: Receipt context mismatch\n",
+    "contract_satisfied": true
+  },
+  {
+    "name": "signature-missing-context",
+    "expectation": "Missing expected context must fail",
+    "outcome": "raised",
+    "error_type": "ResearchError",
+    "error": "Pin epoch, protocol, evaluator, candidate and trial",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 55, in case\n    value = fn()\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 81, in <lambda>\n    case(\"signature-missing-context\", \"Missing expected context must fail\", lambda: attestation.verify(envelope, config[\"public_key\"], {}), expect_error=True)\n                                                                                    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\attestation.py\", line 49, in verify\n    if not required.issubset(expected): raise ResearchError('Pin epoch, protocol, evaluator, candidate and trial')\n                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ngresearch.core.ResearchError: Pin epoch, protocol, evaluator, candidate and trial\n",
+    "contract_satisfied": true
+  },
+  {
+    "name": "signature-invalid-split",
+    "expectation": "Signed non-authorizing receipt must fail",
+    "outcome": "raised",
+    "error_type": "ResearchError",
+    "error": "Receipt does not authorize an audit promotion",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 55, in case\n    value = fn()\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 84, in <lambda>\n    case(\"signature-invalid-\" + field, \"Signed non-authorizing receipt must fail\", lambda e=invalid: attestation.verify(e, config[\"public_key\"], expected), expect_error=True)\n                                                                                                     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\attestation.py\", line 58, in verify\n    raise ResearchError('Receipt does not authorize an audit promotion')\ngresearch.core.ResearchError: Receipt does not authorize an audit promotion\n",
+    "contract_satisfied": true
+  },
+  {
+    "name": "signature-invalid-passed",
+    "expectation": "Signed non-authorizing receipt must fail",
+    "outcome": "raised",
+    "error_type": "ResearchError",
+    "error": "Receipt does not authorize an audit promotion",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 55, in case\n    value = fn()\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 84, in <lambda>\n    case(\"signature-invalid-\" + field, \"Signed non-authorizing receipt must fail\", lambda e=invalid: attestation.verify(e, config[\"public_key\"], expected), expect_error=True)\n                                                                                                     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\attestation.py\", line 58, in verify\n    raise ResearchError('Receipt does not authorize an audit promotion')\ngresearch.core.ResearchError: Receipt does not authorize an audit promotion\n",
+    "contract_satisfied": true
+  },
+  {
+    "name": "signature-invalid-promoted",
+    "expectation": "Signed non-authorizing receipt must fail",
+    "outcome": "raised",
+    "error_type": "ResearchError",
+    "error": "Receipt does not authorize an audit promotion",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 55, in case\n    value = fn()\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 84, in <lambda>\n    case(\"signature-invalid-\" + field, \"Signed non-authorizing receipt must fail\", lambda e=invalid: attestation.verify(e, config[\"public_key\"], expected), expect_error=True)\n                                                                                                     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\attestation.py\", line 58, in verify\n    raise ResearchError('Receipt does not authorize an audit promotion')\ngresearch.core.ResearchError: Receipt does not authorize an audit promotion\n",
+    "contract_satisfied": true
+  },
+  {
+    "name": "signature-invalid-isolation",
+    "expectation": "Signed non-authorizing receipt must fail",
+    "outcome": "raised",
+    "error_type": "ResearchError",
+    "error": "Missing isolation/nonce",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 55, in case\n    value = fn()\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 84, in <lambda>\n    case(\"signature-invalid-\" + field, \"Signed non-authorizing receipt must fail\", lambda e=invalid: attestation.verify(e, config[\"public_key\"], expected), expect_error=True)\n                                                                                                     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\attestation.py\", line 59, in verify\n    if body.get('isolation') != 'docker' or not body.get('nonce'): raise ResearchError('Missing isolation/nonce')\n                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ngresearch.core.ResearchError: Missing isolation/nonce\n",
+    "contract_satisfied": true
+  },
+  {
+    "name": "receipt-first-accept",
+    "expectation": "First valid receipt is accepted",
+    "outcome": "returned",
+    "result": {
+      "accepted": true,
+      "candidate_hash": "dda18a0e21ae47c53b4309434cbc02ae8bf764fa83a6defbb719431242722aa7",
+      "nonce": "d5b42abfccd14d61ae094157ea7d7456"
+    },
+    "contract_satisfied": true
+  },
+  {
+    "name": "receipt-replay",
+    "expectation": "Second acceptance in the same Store must fail",
+    "outcome": "raised",
+    "error_type": "ResearchError",
+    "error": "Receipt replay rejected",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 55, in case\n    value = fn()\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 88, in <lambda>\n    case(\"receipt-replay\", \"Second acceptance in the same Store must fail\", lambda: attestation.accept(with_store, envelope, config[\"public_key\"], expected), expect_error=True)\n                                                                                    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\attestation.py\", line 67, in accept\n    if store.get_value(key): raise ResearchError('Receipt replay rejected')\n                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ngresearch.core.ResearchError: Receipt replay rejected\n",
+    "contract_satisfied": true
+  },
+  {
+    "name": "receipt-null-pins",
+    "expectation": "Null epoch/protocol/evaluator/candidate/trial pins must be rejected",
+    "outcome": "returned",
+    "result": {
+      "accepted": true,
+      "candidate_hash": null,
+      "nonce": "d9f554106f634f3d938d87cfedfb98ad"
+    },
+    "contract_satisfied": false
+  },
+  {
+    "name": "semantic-bound-support",
+    "expectation": "Exact evidence spans yield source-bound non-adjudicated triage",
+    "outcome": "returned",
+    "result": [
+      {
+        "id": "claim-a",
+        "claim_sha256": "fa2625543486be1c1cf976c93ac52b6ddfb11b1b4c568bbf576983b3aefa4552",
+        "source_hashes": {
+          "source-a": "69bd17a03f6542eac46df340f355132ec880362b86395d5108b86271974aee7b"
+        },
+        "model_label": "supports",
+        "label": "supports",
+        "confidence": 0.97,
+        "confidence_kind": "uncalibrated_model_self_report",
+        "aspects": {
+          "polarity": "consistent",
+          "quantifiers": "consistent",
+          "population": "consistent",
+          "causality": "consistent",
+          "hedging": "consistent",
+          "numeric_context": "consistent"
+        },
+        "evidence": [
+          {
+            "source_id": "source-a",
+            "source_sha256": "69bd17a03f6542eac46df340f355132ec880362b86395d5108b86271974aee7b",
+            "quote": "Adults receiving the treatment did not have fewer hospital admissions.",
+            "start": 9,
+            "end": 79,
+            "offset_unit": "Unicode code points"
+          }
+        ],
+        "rationale": "The statement preserves the source's negative finding and adult population.",
+        "problems": [],
+        "human_adjudicated": false
+      }
+    ],
+    "contract_satisfied": true
+  },
+  {
+    "name": "semantic-source-hash-mismatch",
+    "expectation": "Source hash mismatch must reject before review",
+    "outcome": "raised",
+    "error_type": "ResearchError",
+    "error": "Semantic source hash mismatch",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 55, in case\n    value = fn()\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 110, in <lambda>\n    case(\"semantic-source-hash-mismatch\", \"Source hash mismatch must reject before review\", lambda: semantic.prepare(bad), expect_error=True)\n                                                                                                    ~~~~~~~~~~~~~~~~^^^^^\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\semantic.py\", line 57, in prepare\n    if source.get('sha256') and source['sha256'] != h: raise ResearchError('Semantic source hash mismatch')\n                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ngresearch.core.ResearchError: Semantic source hash mismatch\n",
+    "contract_satisfied": true
+  },
+  {
+    "name": "semantic-unbound-quote",
+    "expectation": "Insufficiently grounded or uncertain support must abstain",
+    "outcome": "returned",
+    "result": [
+      {
+        "id": "claim-a",
+        "claim_sha256": "fa2625543486be1c1cf976c93ac52b6ddfb11b1b4c568bbf576983b3aefa4552",
+        "source_hashes": {
+          "source-a": "69bd17a03f6542eac46df340f355132ec880362b86395d5108b86271974aee7b"
+        },
+        "model_label": "supports",
+        "label": "abstain",
+        "confidence": 0.97,
+        "confidence_kind": "uncalibrated_model_self_report",
+        "aspects": {
+          "polarity": "consistent",
+          "quantifiers": "consistent",
+          "population": "consistent",
+          "causality": "consistent",
+          "hedging": "consistent",
+          "numeric_context": "consistent"
+        },
+        "evidence": [],
+        "rationale": "The statement preserves the source's negative finding and adult population.",
+        "problems": [
+          "unbound evidence quote",
+          "decision has no bound evidence"
+        ],
+        "human_adjudicated": false
+      }
+    ],
+    "contract_satisfied": true
+  },
+  {
+    "name": "semantic-low-confidence",
+    "expectation": "Insufficiently grounded or uncertain support must abstain",
+    "outcome": "returned",
+    "result": [
+      {
+        "id": "claim-a",
+        "claim_sha256": "fa2625543486be1c1cf976c93ac52b6ddfb11b1b4c568bbf576983b3aefa4552",
+        "source_hashes": {
+          "source-a": "69bd17a03f6542eac46df340f355132ec880362b86395d5108b86271974aee7b"
+        },
+        "model_label": "supports",
+        "label": "abstain",
+        "confidence": 0.2,
+        "confidence_kind": "uncalibrated_model_self_report",
+        "aspects": {
+          "polarity": "consistent",
+          "quantifiers": "consistent",
+          "population": "consistent",
+          "causality": "consistent",
+          "hedging": "consistent",
+          "numeric_context": "consistent"
+        },
+        "evidence": [
+          {
+            "source_id": "source-a",
+            "source_sha256": "69bd17a03f6542eac46df340f355132ec880362b86395d5108b86271974aee7b",
+            "quote": "Adults receiving the treatment did not have fewer hospital admissions.",
+            "start": 9,
+            "end": 79,
+            "offset_unit": "Unicode code points"
+          }
+        ],
+        "rationale": "The statement preserves the source's negative finding and adult population.",
+        "problems": [],
+        "human_adjudicated": false
+      }
+    ],
+    "contract_satisfied": true
+  },
+  {
+    "name": "semantic-missing-aspects",
+    "expectation": "Insufficiently grounded or uncertain support must abstain",
+    "outcome": "returned",
+    "result": [
+      {
+        "id": "claim-a",
+        "claim_sha256": "fa2625543486be1c1cf976c93ac52b6ddfb11b1b4c568bbf576983b3aefa4552",
+        "source_hashes": {
+          "source-a": "69bd17a03f6542eac46df340f355132ec880362b86395d5108b86271974aee7b"
+        },
+        "model_label": "supports",
+        "label": "abstain",
+        "confidence": 0.97,
+        "confidence_kind": "uncalibrated_model_self_report",
+        "aspects": {},
+        "evidence": [
+          {
+            "source_id": "source-a",
+            "source_sha256": "69bd17a03f6542eac46df340f355132ec880362b86395d5108b86271974aee7b",
+            "quote": "Adults receiving the treatment did not have fewer hospital admissions.",
+            "start": 9,
+            "end": 79,
+            "offset_unit": "Unicode code points"
+          }
+        ],
+        "rationale": "The statement preserves the source's negative finding and adult population.",
+        "problems": [
+          "missing or invalid semantic aspect review"
+        ],
+        "human_adjudicated": false
+      }
+    ],
+    "contract_satisfied": true
+  },
+  {
+    "name": "semantic-inconsistent-support",
+    "expectation": "Insufficiently grounded or uncertain support must abstain",
+    "outcome": "returned",
+    "result": [
+      {
+        "id": "claim-a",
+        "claim_sha256": "fa2625543486be1c1cf976c93ac52b6ddfb11b1b4c568bbf576983b3aefa4552",
+        "source_hashes": {
+          "source-a": "69bd17a03f6542eac46df340f355132ec880362b86395d5108b86271974aee7b"
+        },
+        "model_label": "supports",
+        "label": "abstain",
+        "confidence": 0.97,
+        "confidence_kind": "uncalibrated_model_self_report",
+        "aspects": {
+          "polarity": "inconsistent",
+          "quantifiers": "consistent",
+          "population": "consistent",
+          "causality": "consistent",
+          "hedging": "consistent",
+          "numeric_context": "consistent"
+        },
+        "evidence": [
+          {
+            "source_id": "source-a",
+            "source_sha256": "69bd17a03f6542eac46df340f355132ec880362b86395d5108b86271974aee7b",
+            "quote": "Adults receiving the treatment did not have fewer hospital admissions.",
+            "start": 9,
+            "end": 79,
+            "offset_unit": "Unicode code points"
+          }
+        ],
+        "rationale": "The statement preserves the source's negative finding and adult population.",
+        "problems": [
+          "support conflicts with aspect assessment"
+        ],
+        "human_adjudicated": false
+      }
+    ],
+    "contract_satisfied": true
+  },
+  {
+    "name": "semantic-uncertain-contradiction",
+    "expectation": "A contradiction whose every reviewed aspect is uncertain should abstain",
+    "outcome": "returned",
+    "result": [
+      {
+        "id": "claim-a",
+        "claim_sha256": "fa2625543486be1c1cf976c93ac52b6ddfb11b1b4c568bbf576983b3aefa4552",
+        "source_hashes": {
+          "source-a": "69bd17a03f6542eac46df340f355132ec880362b86395d5108b86271974aee7b"
+        },
+        "model_label": "contradicts",
+        "label": "contradicts",
+        "confidence": 0.97,
+        "confidence_kind": "uncalibrated_model_self_report",
+        "aspects": {
+          "polarity": "uncertain",
+          "quantifiers": "uncertain",
+          "population": "uncertain",
+          "causality": "uncertain",
+          "hedging": "uncertain",
+          "numeric_context": "uncertain"
+        },
+        "evidence": [
+          {
+            "source_id": "source-a",
+            "source_sha256": "69bd17a03f6542eac46df340f355132ec880362b86395d5108b86271974aee7b",
+            "quote": "Adults receiving the treatment did not have fewer hospital admissions.",
+            "start": 9,
+            "end": 79,
+            "offset_unit": "Unicode code points"
+          }
+        ],
+        "rationale": "The statement preserves the source's negative finding and adult population.",
+        "problems": [],
+        "human_adjudicated": false
+      }
+    ],
+    "contract_satisfied": false
+  },
+  {
+    "name": "semantic-duplicate-response",
+    "expectation": "Duplicate response claim IDs must reject",
+    "outcome": "raised",
+    "error_type": "ResearchError",
+    "error": "Duplicate semantic response IDs",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 55, in case\n    value = fn()\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 122, in <lambda>\n    case(\"semantic-duplicate-response\", \"Duplicate response claim IDs must reject\", lambda:semantic.validate_judgments(public, duplicate), expect_error=True)\n                                                                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\semantic.py\", line 67, in validate_judgments\n    if len({r.get('id') for r in rows}) != len(rows): raise ResearchError('Duplicate semantic response IDs')\n                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ngresearch.core.ResearchError: Duplicate semantic response IDs\n",
+    "contract_satisfied": true
+  },
+  {
+    "name": "semantic-deliberately-wrong-model-opinion",
+    "expectation": "Even a high-confidence exact quote is not automatic truth verification",
+    "outcome": "returned",
+    "result": [
+      {
+        "id": "claim-a",
+        "claim_sha256": "aa21f61be33ef7395c3c65babea762c1031105cdb3bc1e8d25487f65f6abbd21",
+        "source_hashes": {
+          "source-a": "69bd17a03f6542eac46df340f355132ec880362b86395d5108b86271974aee7b"
+        },
+        "model_label": "supports",
+        "label": "supports",
+        "confidence": 0.97,
+        "confidence_kind": "uncalibrated_model_self_report",
+        "aspects": {
+          "polarity": "consistent",
+          "quantifiers": "consistent",
+          "population": "consistent",
+          "causality": "consistent",
+          "hedging": "consistent",
+          "numeric_context": "consistent"
+        },
+        "evidence": [
+          {
+            "source_id": "source-a",
+            "source_sha256": "69bd17a03f6542eac46df340f355132ec880362b86395d5108b86271974aee7b",
+            "quote": "Adults receiving the treatment did not have fewer hospital admissions.",
+            "start": 9,
+            "end": 79,
+            "offset_unit": "Unicode code points"
+          }
+        ],
+        "rationale": "The statement preserves the source's negative finding and adult population.",
+        "problems": [],
+        "human_adjudicated": false
+      }
+    ],
+    "contract_satisfied": true
+  },
+  {
+    "name": "semantic-incomplete-response",
+    "expectation": "Incomplete responses must abstain without model/network calls",
+    "outcome": "returned",
+    "result": {
+      "judgments": [
+        {
+          "id": "claim-a",
+          "claim_sha256": "fa2625543486be1c1cf976c93ac52b6ddfb11b1b4c568bbf576983b3aefa4552",
+          "source_hashes": {
+            "source-a": "69bd17a03f6542eac46df340f355132ec880362b86395d5108b86271974aee7b"
+          },
+          "model_label": "supports",
+          "label": "abstain",
+          "confidence": 0.97,
+          "confidence_kind": "uncalibrated_model_self_report",
+          "aspects": {
+            "polarity": "consistent",
+            "quantifiers": "consistent",
+            "population": "consistent",
+            "causality": "consistent",
+            "hedging": "consistent",
+            "numeric_context": "consistent"
+          },
+          "evidence": [
+            {
+              "source_id": "source-a",
+              "source_sha256": "69bd17a03f6542eac46df340f355132ec880362b86395d5108b86271974aee7b",
+              "quote": "Adults receiving the treatment did not have fewer hospital admissions.",
+              "start": 9,
+              "end": 79,
+              "offset_unit": "Unicode code points"
+            }
+          ],
+          "rationale": "The statement preserves the source's negative finding and adult population.",
+          "problems": [
+            "incomplete model response"
+          ],
+          "human_adjudicated": false
+        }
+      ],
+      "input_hash": "73e751bb14b13887f8e724e574fde559fba602df845bd6f1fce52d538c0f4da4",
+      "request_hash": "2fe784b0d2911744e76efa456fb28b13ee979cbf0e84cb44272c3cbcc1e8a823",
+      "model": "offline-response-fixture",
+      "model_incomplete": true,
+      "threshold": 0.9,
+      "automatic_truth_verification": false,
+      "scope": "source-bound model triage; qualified human review may override with reasons"
+    },
+    "contract_satisfied": true
+  },
+  {
+    "name": "semantic-metrics-valid",
+    "expectation": "Known labels and abstentions produce consistent counts",
+    "outcome": "returned",
+    "result": {
+      "n": 2,
+      "accuracy_counting_abstentions_wrong": 0.5,
+      "coverage": 0.5,
+      "selective_accuracy": 1.0,
+      "confusion": {
+        "supports": {
+          "supports": 1,
+          "contradicts": 0,
+          "insufficient": 0,
+          "abstain": 0
+        },
+        "contradicts": {
+          "supports": 0,
+          "contradicts": 0,
+          "insufficient": 0,
+          "abstain": 1
+        },
+        "insufficient": {
+          "supports": 0,
+          "contradicts": 0,
+          "insufficient": 0,
+          "abstain": 0
+        }
+      },
+      "errors": [],
+      "calibration_claim": "thresholded self-reported confidence is not a calibrated probability"
+    },
+    "contract_satisfied": true
+  },
+  {
+    "name": "semantic-metrics-unknown-labels",
+    "expectation": "Unknown labels must reject rather than silently disappear from the confusion matrix",
+    "outcome": "returned",
+    "result": {
+      "n": 1,
+      "accuracy_counting_abstentions_wrong": 1.0,
+      "coverage": 1.0,
+      "selective_accuracy": 1.0,
+      "confusion": {
+        "supports": {
+          "supports": 0,
+          "contradicts": 0,
+          "insufficient": 0,
+          "abstain": 0
+        },
+        "contradicts": {
+          "supports": 0,
+          "contradicts": 0,
+          "insufficient": 0,
+          "abstain": 0
+        },
+        "insufficient": {
+          "supports": 0,
+          "contradicts": 0,
+          "insufficient": 0,
+          "abstain": 0
+        }
+      },
+      "errors": [],
+      "calibration_claim": "thresholded self-reported confidence is not a calibrated probability"
+    },
+    "contract_satisfied": false
+  },
+  {
+    "name": "semantic-metrics-abstain-gold",
+    "expectation": "Gold abstain is not one of the externally labelled target classes",
+    "outcome": "returned",
+    "result": {
+      "n": 1,
+      "accuracy_counting_abstentions_wrong": 1.0,
+      "coverage": 0.0,
+      "selective_accuracy": null,
+      "confusion": {
+        "supports": {
+          "supports": 0,
+          "contradicts": 0,
+          "insufficient": 0,
+          "abstain": 0
+        },
+        "contradicts": {
+          "supports": 0,
+          "contradicts": 0,
+          "insufficient": 0,
+          "abstain": 0
+        },
+        "insufficient": {
+          "supports": 0,
+          "contradicts": 0,
+          "insufficient": 0,
+          "abstain": 0
+        }
+      },
+      "errors": [],
+      "calibration_claim": "thresholded self-reported confidence is not a calibrated probability"
+    },
+    "contract_satisfied": false
+  },
+  {
+    "name": "semantic-metrics-duplicate-ids",
+    "expectation": "Repeated evaluation example IDs must not inflate evaluation counts",
+    "outcome": "returned",
+    "result": {
+      "n": 2,
+      "accuracy_counting_abstentions_wrong": 1.0,
+      "coverage": 1.0,
+      "selective_accuracy": 1.0,
+      "confusion": {
+        "supports": {
+          "supports": 2,
+          "contradicts": 0,
+          "insufficient": 0,
+          "abstain": 0
+        },
+        "contradicts": {
+          "supports": 0,
+          "contradicts": 0,
+          "insufficient": 0,
+          "abstain": 0
+        },
+        "insufficient": {
+          "supports": 0,
+          "contradicts": 0,
+          "insufficient": 0,
+          "abstain": 0
+        }
+      },
+      "errors": [],
+      "calibration_claim": "thresholded self-reported confidence is not a calibrated probability"
+    },
+    "contract_satisfied": false
+  },
+  {
+    "name": "critic-valid-synthetic-fit",
+    "expectation": "Separate labelled splits support a small explicit synthetic diagnostic",
+    "outcome": "returned",
+    "result": {
+      "model": {
+        "classes": [
+          "contradicts",
+          "insufficient",
+          "supports"
+        ],
+        "coefficients": [
+          [
+            -0.619371908089564,
+            -0.40100069259457805
+          ],
+          [
+            3.788788252163033e-05,
+            0.8020306805656356
+          ],
+          [
+            0.6193340202070411,
+            -0.4010299879710558
+          ]
+        ],
+        "intercept": [
+          0.4187862994607372,
+          -0.7443437251133177,
+          0.3255574256525813
+        ],
+        "encoder_hash": "b061c79dc7ce64e2e9696a4aa1617770704044ab591d17c2104a9bdc4083eed9",
+        "training_hash": "c6fe6057efbd558a98ddb3510eecddaf095372667fac08aec20bd4b7add42555",
+        "method": "frozen encoder hidden states + multinomial logistic regression; C=1, no hyperparameter search",
+        "threshold": 0.5
+      },
+      "calibration_curve": [
+        {
+          "threshold": 0.5,
+          "coverage": 1.0,
+          "accuracy": 1.0
+        },
+        {
+          "threshold": 0.6,
+          "coverage": 1.0,
+          "accuracy": 1.0
+        },
+        {
+          "threshold": 0.75,
+          "coverage": 1.0,
+          "accuracy": 1.0
+        },
+        {
+          "threshold": 0.9,
+          "coverage": 1.0,
+          "accuracy": 1.0
+        },
+        {
+          "threshold": 0.99,
+          "coverage": 0.0,
+          "accuracy": null
+        }
+      ],
+      "evaluation": {
+        "n": 6,
+        "accuracy_counting_abstentions_wrong": 1.0,
+        "coverage": 1.0,
+        "selective_accuracy": 1.0,
+        "confusion": {
+          "supports": {
+            "supports": 2,
+            "contradicts": 0,
+            "insufficient": 0,
+            "abstain": 0
+          },
+          "contradicts": {
+            "supports": 0,
+            "contradicts": 2,
+            "insufficient": 0,
+            "abstain": 0
+          },
+          "insufficient": {
+            "supports": 0,
+            "contradicts": 0,
+            "insufficient": 2,
+            "abstain": 0
+          }
+        },
+        "errors": [],
+        "calibration_claim": "thresholded self-reported confidence is not a calibrated probability"
+      },
+      "raw_evaluation": {
+        "n": 6,
+        "accuracy_counting_abstentions_wrong": 1.0,
+        "coverage": 1.0,
+        "selective_accuracy": 1.0,
+        "confusion": {
+          "supports": {
+            "supports": 2,
+            "contradicts": 0,
+            "insufficient": 0,
+            "abstain": 0
+          },
+          "contradicts": {
+            "supports": 0,
+            "contradicts": 2,
+            "insufficient": 0,
+            "abstain": 0
+          },
+          "insufficient": {
+            "supports": 0,
+            "contradicts": 0,
+            "insufficient": 2,
+            "abstain": 0
+          }
+        },
+        "errors": [],
+        "calibration_claim": "thresholded self-reported confidence is not a calibrated probability"
+      },
+      "counts": {
+        "evaluation": 6,
+        "calibration": 6,
+        "train": 12
+      },
+      "experimental": true,
+      "use": "Diagnostic triage only; out-of-domain use needs new labels and validation"
+    },
+    "contract_satisfied": true
+  },
+  {
+    "name": "critic-cross-split-group",
+    "expectation": "Repeated document/group across splits must reject",
+    "outcome": "raised",
+    "error_type": "ResearchError",
+    "error": "Critic document/group leakage across splits",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 55, in case\n    value = fn()\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 156, in <lambda>\n    case(\"critic-cross-split-group\", \"Repeated document/group across splits must reject\", lambda:representations.train_critic(leak), expect_error=True)\n                                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\representations.py\", line 60, in train_critic\n    if g in used and used[g]!=row['split']:raise ResearchError('Critic document/group leakage across splits')\n                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ngresearch.core.ResearchError: Critic document/group leakage across splits\n",
+    "contract_satisfied": true
+  },
+  {
+    "name": "critic-encoder-mismatch",
+    "expectation": "Prediction with another encoder identity must reject",
+    "outcome": "raised",
+    "error_type": "ResearchError",
+    "error": "Critic encoder/layer identity mismatch",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 55, in case\n    value = fn()\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 157, in <lambda>\n    case(\"critic-encoder-mismatch\", \"Prediction with another encoder identity must reject\", lambda:representations.predict_critic(trained[\"model\"],[[1.,2.]],\"different\"), expect_error=True)\n                                                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\representations.py\", line 90, in predict_critic\n    if model['encoder_hash']!=encoder_hash:raise ResearchError('Critic encoder/layer identity mismatch')\n                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ngresearch.core.ResearchError: Critic encoder/layer identity mismatch\n",
+    "contract_satisfied": true
+  },
+  {
+    "name": "critic-dimension-mismatch",
+    "expectation": "Prediction with another vector dimension must reject",
+    "outcome": "raised",
+    "error_type": "ResearchError",
+    "error": "Critic representation dimension mismatch",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 55, in case\n    value = fn()\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 158, in <lambda>\n    case(\"critic-dimension-mismatch\", \"Prediction with another vector dimension must reject\", lambda:representations.predict_critic(trained[\"model\"],[[1.]],data[\"encoder_hash\"]), expect_error=True)\n                                                                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\representations.py\", line 93, in predict_critic\n    if any(len(c)!=len(v) for c in model['coefficients']):raise ResearchError('Critic representation dimension mismatch')\n                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ngresearch.core.ResearchError: Critic representation dimension mismatch\n",
+    "contract_satisfied": true
+  },
+  {
+    "name": "critic-truncated-model",
+    "expectation": "Mismatched coefficient/intercept/class arrays must reject",
+    "outcome": "returned",
+    "result": [
+      {
+        "label": "contradicts",
+        "confidence": 1.0,
+        "probabilities": {
+          "contradicts": 1.0
+        }
+      }
+    ],
+    "contract_satisfied": false
+  },
+  {
+    "name": "critic-nonfinite-model",
+    "expectation": "Non-finite stored model coefficients must reject",
+    "outcome": "returned",
+    "result": [
+      {
+        "label": "contradicts",
+        "confidence": {
+          "nonfinite": "nan"
+        },
+        "probabilities": {
+          "contradicts": {
+            "nonfinite": "nan"
+          },
+          "insufficient": {
+            "nonfinite": "nan"
+          },
+          "supports": {
+            "nonfinite": "nan"
+          }
+        }
+      }
+    ],
+    "contract_satisfied": false
+  },
+  {
+    "name": "critic-unknown-target-classes",
+    "expectation": "A semantic critic must reject labels outside the metrics target schema",
+    "outcome": "returned",
+    "result": {
+      "model": {
+        "classes": [
+          "A",
+          "B",
+          "C"
+        ],
+        "coefficients": [
+          [
+            0.6193340202070445,
+            -0.4010299879710573
+          ],
+          [
+            -0.619371908089561,
+            -0.40100069259457877
+          ],
+          [
+            3.788788252068545e-05,
+            0.8020306805656371
+          ]
+        ],
+        "intercept": [
+          0.3255574256525775,
+          0.41878629946073864,
+          -0.7443437251133158
+        ],
+        "encoder_hash": "b061c79dc7ce64e2e9696a4aa1617770704044ab591d17c2104a9bdc4083eed9",
+        "training_hash": "934e0c6fd8acbd5d7e9a3cbfd2e9da466b7b1fda7599b9e2f47ee884bbe36151",
+        "method": "frozen encoder hidden states + multinomial logistic regression; C=1, no hyperparameter search",
+        "threshold": 0.5
+      },
+      "calibration_curve": [
+        {
+          "threshold": 0.5,
+          "coverage": 1.0,
+          "accuracy": 1.0
+        },
+        {
+          "threshold": 0.6,
+          "coverage": 1.0,
+          "accuracy": 1.0
+        },
+        {
+          "threshold": 0.75,
+          "coverage": 1.0,
+          "accuracy": 1.0
+        },
+        {
+          "threshold": 0.9,
+          "coverage": 1.0,
+          "accuracy": 1.0
+        },
+        {
+          "threshold": 0.99,
+          "coverage": 0.0,
+          "accuracy": null
+        }
+      ],
+      "evaluation": {
+        "n": 6,
+        "accuracy_counting_abstentions_wrong": 1.0,
+        "coverage": 1.0,
+        "selective_accuracy": 1.0,
+        "confusion": {
+          "supports": {
+            "supports": 0,
+            "contradicts": 0,
+            "insufficient": 0,
+            "abstain": 0
+          },
+          "contradicts": {
+            "supports": 0,
+            "contradicts": 0,
+            "insufficient": 0,
+            "abstain": 0
+          },
+          "insufficient": {
+            "supports": 0,
+            "contradicts": 0,
+            "insufficient": 0,
+            "abstain": 0
+          }
+        },
+        "errors": [],
+        "calibration_claim": "thresholded self-reported confidence is not a calibrated probability"
+      },
+      "raw_evaluation": {
+        "n": 6,
+        "accuracy_counting_abstentions_wrong": 1.0,
+        "coverage": 1.0,
+        "selective_accuracy": 1.0,
+        "confusion": {
+          "supports": {
+            "supports": 0,
+            "contradicts": 0,
+            "insufficient": 0,
+            "abstain": 0
+          },
+          "contradicts": {
+            "supports": 0,
+            "contradicts": 0,
+            "insufficient": 0,
+            "abstain": 0
+          },
+          "insufficient": {
+            "supports": 0,
+            "contradicts": 0,
+            "insufficient": 0,
+            "abstain": 0
+          }
+        },
+        "errors": [],
+        "calibration_claim": "thresholded self-reported confidence is not a calibrated probability"
+      },
+      "counts": {
+        "evaluation": 6,
+        "calibration": 6,
+        "train": 12
+      },
+      "experimental": true,
+      "use": "Diagnostic triage only; out-of-domain use needs new labels and validation"
+    },
+    "contract_satisfied": false
+  },
+  {
+    "name": "isolation-pinned-config",
+    "expectation": "Pinned immutable image and bounded resource defaults validate",
+    "outcome": "returned",
+    "result": {
+      "kind": "docker",
+      "image": "sha256:e91c87665910d2f7979f01464eb9fc8205550b1e4e64cebdca96ef5a746e65fb"
+    },
+    "contract_satisfied": true
+  },
+  {
+    "name": "isolation-mutable-image",
+    "expectation": "Invalid isolation configuration must reject",
+    "outcome": "raised",
+    "error_type": "ResearchError",
+    "error": "Pin the container image by immutable sha256 digest, not a tag",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 55, in case\n    value = fn()\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 173, in <lambda>\n    case(\"isolation-\"+name,\"Invalid isolation configuration must reject\",lambda c=changed:isolation.validate(c),expect_error=True)\n                                                                                          ~~~~~~~~~~~~~~~~~~^^^\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\isolation.py\", line 32, in validate\n    raise ResearchError('Pin the container image by immutable sha256 digest, not a tag')\ngresearch.core.ResearchError: Pin the container image by immutable sha256 digest, not a tag\n",
+    "contract_satisfied": true
+  },
+  {
+    "name": "isolation-bool-memory",
+    "expectation": "Invalid isolation configuration must reject",
+    "outcome": "raised",
+    "error_type": "ResearchError",
+    "error": "Invalid isolation memory_mb",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 55, in case\n    value = fn()\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 173, in <lambda>\n    case(\"isolation-\"+name,\"Invalid isolation configuration must reject\",lambda c=changed:isolation.validate(c),expect_error=True)\n                                                                                          ~~~~~~~~~~~~~~~~~~^^^\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\isolation.py\", line 35, in validate\n    if type(value) is not int or not lo <= value <= hi: raise ResearchError('Invalid isolation ' + key)\n                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ngresearch.core.ResearchError: Invalid isolation memory_mb\n",
+    "contract_satisfied": true
+  },
+  {
+    "name": "isolation-nan-cpus",
+    "expectation": "Invalid isolation configuration must reject",
+    "outcome": "raised",
+    "error_type": "ResearchError",
+    "error": "Invalid isolation cpus",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 55, in case\n    value = fn()\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 173, in <lambda>\n    case(\"isolation-\"+name,\"Invalid isolation configuration must reject\",lambda c=changed:isolation.validate(c),expect_error=True)\n                                                                                          ~~~~~~~~~~~~~~~~~~^^^\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\isolation.py\", line 38, in validate\n    raise ResearchError('Invalid isolation cpus')\ngresearch.core.ResearchError: Invalid isolation cpus\n",
+    "contract_satisfied": true
+  },
+  {
+    "name": "isolation-unsupported-backend",
+    "expectation": "Invalid isolation configuration must reject",
+    "outcome": "raised",
+    "error_type": "ResearchError",
+    "error": "Only the explicit docker isolation backend is supported",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 55, in case\n    value = fn()\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 173, in <lambda>\n    case(\"isolation-\"+name,\"Invalid isolation configuration must reject\",lambda c=changed:isolation.validate(c),expect_error=True)\n                                                                                          ~~~~~~~~~~~~~~~~~~^^^\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\isolation.py\", line 30, in validate\n    if config.get('kind') != 'docker': raise ResearchError('Only the explicit docker isolation backend is supported')\n                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ngresearch.core.ResearchError: Only the explicit docker isolation backend is supported\n",
+    "contract_satisfied": true
+  },
+  {
+    "name": "isolation-cleanup-after-log-failure",
+    "expectation": "Log transport failure must not skip cleanup attempt and durable failure receipt",
+    "outcome": "returned",
+    "result": {
+      "transport_is_simulated": true,
+      "calls": [
+        [
+          "create",
+          "--name",
+          "gresearch-6e416f458556424baa81b8bd7251fe8c",
+          "--network",
+          "none",
+          "--read-only",
+          "--user",
+          "0:0",
+          "--cap-drop",
+          "ALL",
+          "--cap-add",
+          "SETUID",
+          "--cap-add",
+          "SETGID",
+          "--cap-add",
+          "KILL",
+          "--security-opt",
+          "no-new-privileges:true",
+          "--pids-limit",
+          "32",
+          "--memory",
+          "256m",
+          "--memory-swap",
+          "256m",
+          "--cpus",
+          "1",
+          "--ulimit",
+          "nofile=128:128",
+          "--log-driver",
+          "local",
+          "--log-opt",
+          "max-size=1m",
+          "--log-opt",
+          "max-file=1",
+          "--log-opt",
+          "compress=false",
+          "--tmpfs",
+          "/tmp:rw,noexec,nosuid,size=32m,mode=1777",
+          "--tmpfs",
+          "/state:rw,noexec,nosuid,size=1m,mode=700",
+          "--tmpfs",
+          "/out:rw,noexec,nosuid,size=16m,mode=1777",
+          "--mount",
+          "type=bind,source=C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\mock-transport-code,target=/strategy,readonly",
+          "--mount",
+          "type=bind,source=C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\mock-task.json,target=/input/task.json,readonly",
+          "--mount",
+          "type=bind,source=C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\container_worker.py,target=/supervisor.py,readonly",
+          "--workdir",
+          "/strategy",
+          "--env",
+          "PYTHONDONTWRITEBYTECODE=1",
+          "--entrypoint",
+          "python3",
+          "sha256:e91c87665910d2f7979f01464eb9fc8205550b1e4e64cebdca96ef5a746e65fb",
+          "/supervisor.py",
+          "1",
+          "[\"python3\", \"agent.py\", \"--task\", \"/input/task.json\", \"--seed\", \"0\", \"--output\", \"/out/prediction.json\"]"
+        ],
+        [
+          "start",
+          "gresearch-6e416f458556424baa81b8bd7251fe8c"
+        ],
+        [
+          "inspect",
+          "--format",
+          "{{json .State}}",
+          "gresearch-6e416f458556424baa81b8bd7251fe8c"
+        ],
+        [
+          "exec",
+          "--user",
+          "0",
+          "gresearch-6e416f458556424baa81b8bd7251fe8c",
+          "cat",
+          "/state/result.json"
+        ],
+        [
+          "logs",
+          "--tail",
+          "100",
+          "gresearch-6e416f458556424baa81b8bd7251fe8c"
+        ],
+        [
+          "logs",
+          "--tail",
+          "100",
+          "gresearch-6e416f458556424baa81b8bd7251fe8c"
+        ]
+      ],
+      "returned": null,
+      "escaped": {
+        "type": "ResearchError",
+        "message": "injected Docker log transport failure"
+      },
+      "cleanup_attempted": false,
+      "receipt_written": false
+    },
+    "contract_satisfied": false
+  },
+  {
+    "name": "evolution-failure-consumes-batch",
+    "expectation": "Execution failure consumes batch zero; next evaluation uses fresh batch one",
+    "outcome": "returned",
+    "result": {
+      "failed": {
+        "id": "trial-1423852a935b",
+        "split": "audit",
+        "status": "failed",
+        "audit_batch": "0",
+        "audit_policy": "fresh-batches",
+        "candidate": {
+          "files": {
+            "agent.py": "3896b655879f88beab4c840ad2a26add6b3a4cf26366a0beccec5730994f3a6f",
+            "config.json": "35e92d50d330bddd92dd619cd2f01ffad5a7b52a5ce29deae8540edb072a7afd"
+          },
+          "command": [
+            "{python}",
+            "-B",
+            "agent.py"
+          ]
+        },
+        "incumbent": {
+          "command": [
+            "{python}",
+            "-B",
+            "agent.py"
+          ],
+          "files": {
+            "agent.py": "3896b655879f88beab4c840ad2a26add6b3a4cf26366a0beccec5730994f3a6f",
+            "config.json": "21450f74783eca379b98499ed3d301fbefcdc9e43a6369752871654f9885818b"
+          }
+        },
+        "started": 1792412228.9356613,
+        "comparison_role": "current_incumbent",
+        "reasons": [
+          "Command failed (17); inspect \\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-1423852a935b\\0-0-candidate\\strategy"
+        ],
+        "passed": false,
+        "promoted": false,
+        "observations": []
+      },
+      "passed": {
+        "id": "trial-15d0ba8fb107",
+        "split": "audit",
+        "status": "evaluated",
+        "audit_batch": "1",
+        "audit_policy": "fresh-batches",
+        "candidate": {
+          "files": {
+            "agent.py": "3896b655879f88beab4c840ad2a26add6b3a4cf26366a0beccec5730994f3a6f",
+            "config.json": "4035bf173286baa1dc84d2083f8c88904a4c24c9cbff1b6ecac76621e6dce526"
+          },
+          "command": [
+            "{python}",
+            "-B",
+            "agent.py"
+          ]
+        },
+        "incumbent": {
+          "command": [
+            "{python}",
+            "-B",
+            "agent.py"
+          ],
+          "files": {
+            "agent.py": "3896b655879f88beab4c840ad2a26add6b3a4cf26366a0beccec5730994f3a6f",
+            "config.json": "21450f74783eca379b98499ed3d301fbefcdc9e43a6369752871654f9885818b"
+          }
+        },
+        "started": 1792412229.1792696,
+        "comparison_role": "current_incumbent",
+        "rows": [
+          {
+            "task": "batch-1-task-0",
+            "seed": 0,
+            "candidate": 0,
+            "incumbent": -11
+          },
+          {
+            "task": "batch-1-task-1",
+            "seed": 0,
+            "incumbent": -12,
+            "candidate": 0
+          },
+          {
+            "task": "batch-1-task-2",
+            "seed": 0,
+            "candidate": 0,
+            "incumbent": -13
+          }
+        ],
+        "observations": [
+          {
+            "task": "batch-1-task-0",
+            "domain": "synthetic-multiply",
+            "seed": 0,
+            "strategy": "candidate",
+            "run": {
+              "seconds": 0.1577345000114292,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "agent.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\0-0-candidate\\input.json",
+                "--seed",
+                "0",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\0-0-candidate\\prediction.json"
+              ],
+              "exit_code": 0
+            },
+            "scoring": {
+              "seconds": 0.15472140000201762,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "score.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\0-0-candidate\\private-task.json",
+                "--prediction",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\0-0-candidate\\prediction.json",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\0-0-candidate\\score.json"
+              ],
+              "exit_code": 0
+            },
+            "score": {
+              "metric": 0,
+              "checks": {
+                "finite": true
+              }
+            },
+            "prediction_hash": "db443e5bff045cb9625106a35480de49d5c980f53499e5babe86d2f3dfc9c340",
+            "score_hash": "4b814b70d4345b918e8dd6396c177b5898f3fe2e135279b47d0232cbaeb6b7b6"
+          },
+          {
+            "task": "batch-1-task-0",
+            "domain": "synthetic-multiply",
+            "seed": 0,
+            "strategy": "incumbent",
+            "run": {
+              "seconds": 0.17493850004393607,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "agent.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\0-0-incumbent\\input.json",
+                "--seed",
+                "0",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\0-0-incumbent\\prediction.json"
+              ],
+              "exit_code": 0
+            },
+            "scoring": {
+              "seconds": 0.1665130999754183,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "score.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\0-0-incumbent\\private-task.json",
+                "--prediction",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\0-0-incumbent\\prediction.json",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\0-0-incumbent\\score.json"
+              ],
+              "exit_code": 0
+            },
+            "score": {
+              "metric": -11,
+              "checks": {
+                "finite": true
+              }
+            },
+            "prediction_hash": "13748f965637ac9508fb2a9766f6eb99a070a6bae295e7d40e97e2bba91f2569",
+            "score_hash": "4f345aa013d580e6e9e24b558ca72635782d43c8064919391aa97042110c1b92"
+          },
+          {
+            "task": "batch-1-task-1",
+            "domain": "synthetic-multiply",
+            "seed": 0,
+            "strategy": "incumbent",
+            "run": {
+              "seconds": 0.1538598999613896,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "agent.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\1-0-incumbent\\input.json",
+                "--seed",
+                "0",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\1-0-incumbent\\prediction.json"
+              ],
+              "exit_code": 0
+            },
+            "scoring": {
+              "seconds": 0.14221710001584142,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "score.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\1-0-incumbent\\private-task.json",
+                "--prediction",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\1-0-incumbent\\prediction.json",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\1-0-incumbent\\score.json"
+              ],
+              "exit_code": 0
+            },
+            "score": {
+              "metric": -12,
+              "checks": {
+                "finite": true
+              }
+            },
+            "prediction_hash": "1c163ea009204970e14daffaa5104af0dbee45ebd67fb6a124b5588c1b9b8bc8",
+            "score_hash": "b6602c03bede226629848b4ef72cb985d5e67c0702c72099923158287c7e4e5c"
+          },
+          {
+            "task": "batch-1-task-1",
+            "domain": "synthetic-multiply",
+            "seed": 0,
+            "strategy": "candidate",
+            "run": {
+              "seconds": 0.13159859995357692,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "agent.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\1-0-candidate\\input.json",
+                "--seed",
+                "0",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\1-0-candidate\\prediction.json"
+              ],
+              "exit_code": 0
+            },
+            "scoring": {
+              "seconds": 0.13621600001351908,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "score.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\1-0-candidate\\private-task.json",
+                "--prediction",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\1-0-candidate\\prediction.json",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\1-0-candidate\\score.json"
+              ],
+              "exit_code": 0
+            },
+            "score": {
+              "metric": 0,
+              "checks": {
+                "finite": true
+              }
+            },
+            "prediction_hash": "38d453ec77c042b7b48391018d1cc66c9be0a1bdb442f01bb6da7d97be250dcd",
+            "score_hash": "4b814b70d4345b918e8dd6396c177b5898f3fe2e135279b47d0232cbaeb6b7b6"
+          },
+          {
+            "task": "batch-1-task-2",
+            "domain": "synthetic-multiply",
+            "seed": 0,
+            "strategy": "candidate",
+            "run": {
+              "seconds": 0.19705129996873438,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "agent.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\2-0-candidate\\input.json",
+                "--seed",
+                "0",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\2-0-candidate\\prediction.json"
+              ],
+              "exit_code": 0
+            },
+            "scoring": {
+              "seconds": 0.13580730004468933,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "score.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\2-0-candidate\\private-task.json",
+                "--prediction",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\2-0-candidate\\prediction.json",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\2-0-candidate\\score.json"
+              ],
+              "exit_code": 0
+            },
+            "score": {
+              "metric": 0,
+              "checks": {
+                "finite": true
+              }
+            },
+            "prediction_hash": "b574bb614db788c8904be1e72690e39d6b1d16634fa7090770391656d2640aff",
+            "score_hash": "4b814b70d4345b918e8dd6396c177b5898f3fe2e135279b47d0232cbaeb6b7b6"
+          },
+          {
+            "task": "batch-1-task-2",
+            "domain": "synthetic-multiply",
+            "seed": 0,
+            "strategy": "incumbent",
+            "run": {
+              "seconds": 0.14342129998840392,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "agent.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\2-0-incumbent\\input.json",
+                "--seed",
+                "0",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\2-0-incumbent\\prediction.json"
+              ],
+              "exit_code": 0
+            },
+            "scoring": {
+              "seconds": 0.13864059996558353,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "score.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\2-0-incumbent\\private-task.json",
+                "--prediction",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\2-0-incumbent\\prediction.json",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\fresh-batches\\trial-15d0ba8fb107\\2-0-incumbent\\score.json"
+              ],
+              "exit_code": 0
+            },
+            "score": {
+              "metric": -13,
+              "checks": {
+                "finite": true
+              }
+            },
+            "prediction_hash": "634ee10ecd74a9453ac91dcba206a9b2518dc8d9e71c51389fdb5f4ec09837e3",
+            "score_hash": "44a878de6d6785fe45b4b579701c7a65aab819a3382573c28f0c20389003d536"
+          }
+        ],
+        "analysis": {
+          "mean_gain": 12,
+          "ci": [
+            11.0,
+            13.0
+          ],
+          "alpha": 0.025,
+          "method": "paired percentile bootstrap of equal-weight task means",
+          "tasks": 3,
+          "pairs": 3,
+          "standardized_paired_effect": 12.0,
+          "task_gains": {
+            "batch-1-task-0": 11,
+            "batch-1-task-1": 12,
+            "batch-1-task-2": 13
+          },
+          "direction": "higher",
+          "resamples": 1000,
+          "seed": 0,
+          "input_hash": "1f319805187ea2128a3eb168ea36b45b02d94648b08be416dda4337a89a29ce5",
+          "assumptions": "tasks are independent sampling units; small samples and reused selection tasks weaken CI validity"
+        },
+        "reasons": [],
+        "passed": true,
+        "seconds": {
+          "candidate": 0.4863843999337405,
+          "incumbent": 0.4722196999937296
+        },
+        "promoted": true,
+        "uncertainty": "bootstrap gate is approximate; fresh groups reduce reuse overfit but do not eliminate selection or pretraining contamination"
+      }
+    },
+    "contract_satisfied": true
+  },
+  {
+    "name": "evolution-signing-failure-blocks-promotion",
+    "expectation": "Scoring success without required signing must leave active unchanged",
+    "outcome": "returned",
+    "result": {
+      "trial": {
+        "id": "trial-85e06a5d0c5c",
+        "split": "audit",
+        "status": "evaluated",
+        "audit_batch": "0",
+        "audit_policy": "fresh-batches",
+        "candidate": {
+          "files": {
+            "agent.py": "3896b655879f88beab4c840ad2a26add6b3a4cf26366a0beccec5730994f3a6f",
+            "config.json": "4035bf173286baa1dc84d2083f8c88904a4c24c9cbff1b6ecac76621e6dce526"
+          },
+          "command": [
+            "{python}",
+            "-B",
+            "agent.py"
+          ]
+        },
+        "incumbent": {
+          "command": [
+            "{python}",
+            "-B",
+            "agent.py"
+          ],
+          "files": {
+            "agent.py": "3896b655879f88beab4c840ad2a26add6b3a4cf26366a0beccec5730994f3a6f",
+            "config.json": "21450f74783eca379b98499ed3d301fbefcdc9e43a6369752871654f9885818b"
+          }
+        },
+        "started": 1792412231.230157,
+        "comparison_role": "current_incumbent",
+        "rows": [
+          {
+            "task": "batch-0-task-0",
+            "seed": 0,
+            "candidate": 0,
+            "incumbent": -1
+          },
+          {
+            "task": "batch-0-task-1",
+            "seed": 0,
+            "incumbent": -2,
+            "candidate": 0
+          },
+          {
+            "task": "batch-0-task-2",
+            "seed": 0,
+            "candidate": 0,
+            "incumbent": -3
+          }
+        ],
+        "observations": [
+          {
+            "task": "batch-0-task-0",
+            "domain": "synthetic-multiply",
+            "seed": 0,
+            "strategy": "candidate",
+            "run": {
+              "seconds": 0.13618119998136535,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "agent.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\0-0-candidate\\input.json",
+                "--seed",
+                "0",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\0-0-candidate\\prediction.json"
+              ],
+              "exit_code": 0
+            },
+            "scoring": {
+              "seconds": 0.1333899999735877,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "score.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\0-0-candidate\\private-task.json",
+                "--prediction",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\0-0-candidate\\prediction.json",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\0-0-candidate\\score.json"
+              ],
+              "exit_code": 0
+            },
+            "score": {
+              "metric": 0,
+              "checks": {
+                "finite": true
+              }
+            },
+            "prediction_hash": "5cbf71f412156624bbcdf2fec77bbb5feab077c9ce0c96607c5165ffb4b265c9",
+            "score_hash": "4b814b70d4345b918e8dd6396c177b5898f3fe2e135279b47d0232cbaeb6b7b6"
+          },
+          {
+            "task": "batch-0-task-0",
+            "domain": "synthetic-multiply",
+            "seed": 0,
+            "strategy": "incumbent",
+            "run": {
+              "seconds": 0.14997389999916777,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "agent.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\0-0-incumbent\\input.json",
+                "--seed",
+                "0",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\0-0-incumbent\\prediction.json"
+              ],
+              "exit_code": 0
+            },
+            "scoring": {
+              "seconds": 0.12695169996004552,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "score.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\0-0-incumbent\\private-task.json",
+                "--prediction",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\0-0-incumbent\\prediction.json",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\0-0-incumbent\\score.json"
+              ],
+              "exit_code": 0
+            },
+            "score": {
+              "metric": -1,
+              "checks": {
+                "finite": true
+              }
+            },
+            "prediction_hash": "b5d37f85de9a58f4441603657d1310a4c238865317369390d994143a14406740",
+            "score_hash": "764dad30ceb0c64b27efd326f548b01e696eb876a05535a674de45c7e1c2d401"
+          },
+          {
+            "task": "batch-0-task-1",
+            "domain": "synthetic-multiply",
+            "seed": 0,
+            "strategy": "incumbent",
+            "run": {
+              "seconds": 0.15968969999812543,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "agent.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\1-0-incumbent\\input.json",
+                "--seed",
+                "0",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\1-0-incumbent\\prediction.json"
+              ],
+              "exit_code": 0
+            },
+            "scoring": {
+              "seconds": 0.14211760001489893,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "score.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\1-0-incumbent\\private-task.json",
+                "--prediction",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\1-0-incumbent\\prediction.json",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\1-0-incumbent\\score.json"
+              ],
+              "exit_code": 0
+            },
+            "score": {
+              "metric": -2,
+              "checks": {
+                "finite": true
+              }
+            },
+            "prediction_hash": "5cbf71f412156624bbcdf2fec77bbb5feab077c9ce0c96607c5165ffb4b265c9",
+            "score_hash": "9404280b8ec770e9ecc94ff5f3f43b4727173df8b1e1c9deca018ed7257cad77"
+          },
+          {
+            "task": "batch-0-task-1",
+            "domain": "synthetic-multiply",
+            "seed": 0,
+            "strategy": "candidate",
+            "run": {
+              "seconds": 0.15077520004706457,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "agent.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\1-0-candidate\\input.json",
+                "--seed",
+                "0",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\1-0-candidate\\prediction.json"
+              ],
+              "exit_code": 0
+            },
+            "scoring": {
+              "seconds": 0.13005390000762418,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "score.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\1-0-candidate\\private-task.json",
+                "--prediction",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\1-0-candidate\\prediction.json",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\1-0-candidate\\score.json"
+              ],
+              "exit_code": 0
+            },
+            "score": {
+              "metric": 0,
+              "checks": {
+                "finite": true
+              }
+            },
+            "prediction_hash": "e6055d1ea87ddf270cf59acb4f70a19c7521d5f9a291c539fb3186a558973d6a",
+            "score_hash": "4b814b70d4345b918e8dd6396c177b5898f3fe2e135279b47d0232cbaeb6b7b6"
+          },
+          {
+            "task": "batch-0-task-2",
+            "domain": "synthetic-multiply",
+            "seed": 0,
+            "strategy": "candidate",
+            "run": {
+              "seconds": 0.16241220000665635,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "agent.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\2-0-candidate\\input.json",
+                "--seed",
+                "0",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\2-0-candidate\\prediction.json"
+              ],
+              "exit_code": 0
+            },
+            "scoring": {
+              "seconds": 0.19692550000036135,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "score.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\2-0-candidate\\private-task.json",
+                "--prediction",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\2-0-candidate\\prediction.json",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\2-0-candidate\\score.json"
+              ],
+              "exit_code": 0
+            },
+            "score": {
+              "metric": 0,
+              "checks": {
+                "finite": true
+              }
+            },
+            "prediction_hash": "351ae181fb7ecbf54d3b43747a295ec6e6149a9bfe9d70aebd47f0e6cc736c9e",
+            "score_hash": "4b814b70d4345b918e8dd6396c177b5898f3fe2e135279b47d0232cbaeb6b7b6"
+          },
+          {
+            "task": "batch-0-task-2",
+            "domain": "synthetic-multiply",
+            "seed": 0,
+            "strategy": "incumbent",
+            "run": {
+              "seconds": 0.13647639995906502,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "agent.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\2-0-incumbent\\input.json",
+                "--seed",
+                "0",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\2-0-incumbent\\prediction.json"
+              ],
+              "exit_code": 0
+            },
+            "scoring": {
+              "seconds": 0.14249060000292957,
+              "argv": [
+                "C:\\Python313\\python.exe",
+                "-B",
+                "score.py",
+                "--task",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\2-0-incumbent\\private-task.json",
+                "--prediction",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\2-0-incumbent\\prediction.json",
+                "--output",
+                "\\\\?\\C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\evolution-store\\rsi\\missing-signer\\trial-85e06a5d0c5c\\2-0-incumbent\\score.json"
+              ],
+              "exit_code": 0
+            },
+            "score": {
+              "metric": -3,
+              "checks": {
+                "finite": true
+              }
+            },
+            "prediction_hash": "e015b454288d8f3fcc3714a7f9c3c20f574a28a676018d8e793cd1ea5a574f3f",
+            "score_hash": "fdca7153b92ec9bfb848e23ff5878988e80f4f85012ba6e1b8cc6b46787a4255"
+          }
+        ],
+        "analysis": {
+          "mean_gain": 2,
+          "ci": [
+            1.0,
+            3.0
+          ],
+          "alpha": 0.025,
+          "method": "paired percentile bootstrap of equal-weight task means",
+          "tasks": 3,
+          "pairs": 3,
+          "standardized_paired_effect": 2.0,
+          "task_gains": {
+            "batch-0-task-0": 1,
+            "batch-0-task-1": 2,
+            "batch-0-task-2": 3
+          },
+          "direction": "higher",
+          "resamples": 1000,
+          "seed": 0,
+          "input_hash": "e55394b080db34a41ddb691a021cd83c6956a7187607827bca2539d5e0b5bad2",
+          "assumptions": "tasks are independent sampling units; small samples and reused selection tasks weaken CI validity"
+        },
+        "reasons": [
+          "attestation failed: Trusted evaluator signing-key path environment variable is unset"
+        ],
+        "passed": false,
+        "seconds": {
+          "candidate": 0.4493686000350863,
+          "incumbent": 0.4461399999563582
+        },
+        "promoted": false,
+        "uncertainty": "bootstrap gate is approximate; fresh groups reduce reuse overfit but do not eliminate selection or pretraining contamination"
+      },
+      "active_unchanged": true
+    },
+    "contract_satisfied": true
+  },
+  {
+    "name": "evolution-isolation-needs-signer",
+    "expectation": "Docker epoch without pinned evaluator signing configuration must reject",
+    "outcome": "raised",
+    "error_type": "ResearchError",
+    "error": "Isolated promotion epochs need a pinned evaluator signing key",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 55, in case\n    value = fn()\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\local_checks.py\", line 236, in <lambda>\n    case(\"evolution-isolation-needs-signer\", \"Docker epoch without pinned evaluator signing configuration must reject\",lambda:evolution.freeze(store,\"unsigned-docker\",{**protocol,\"isolation\":{\"kind\":\"docker\",\"image\":IMAGE}},scorer,sources/\"baseline\",[\"{python}\",\"agent.py\"]),expect_error=True)\n                                                                                                                              ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ROG\\Downloads\\LLM-hallucination\\.tmp-ai4research-v21\\forward-v21\\runtime-snapshot\\gresearch\\evolution.py\", line 60, in freeze\n    if not protocol.get('attestation'): raise ResearchError('Isolated promotion epochs need a pinned evaluator signing key')\n                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ngresearch.core.ResearchError: Isolated promotion epochs need a pinned evaluator signing key\n",
+    "contract_satisfied": true
+  },
+  {
+    "name": "human-analysis-comparable",
+    "expectation": "Declared comparable synthetic endpoint can be analyzed conditionally",
+    "outcome": "returned",
+    "result": {
+      "classification": "Validated",
+      "analysis": {
+        "mean_gain": 1,
+        "ci": [
+          1.0,
+          1.0
+        ],
+        "alpha": 0.05,
+        "method": "paired percentile bootstrap of equal-weight task means",
+        "tasks": 5,
+        "pairs": 5,
+        "standardized_paired_effect": null,
+        "task_gains": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 1,
+          "4": 1
+        },
+        "direction": "higher",
+        "resamples": 4000,
+        "seed": 0,
+        "input_hash": "07520f66e3b22c37eabaed79497f05ab5f735290f4c4db9f208c7cea5336a0a0",
+        "assumptions": "tasks are independent sampling units; small samples and reused selection tasks weaken CI validity"
+      },
+      "progress": 1.0,
+      "measurement_contract": {
+        "estimand": "mean synthetic task score",
+        "metric": "synthetic score",
+        "unit": "points",
+        "analysis_unit": "task",
+        "evaluation_data_hash": "ce12dd7eafdc5a7a9ad1492474a75a3d13fdd7c2f5513ceecf33a4028463e942"
+      },
+      "scope": "local intervention result conditional on accurate comparability declarations; not universal root-cause proof or independent validation of measurement semantics"
+    },
+    "contract_satisfied": true
+  },
+  {
+    "name": "human-analysis-estimand-change",
+    "expectation": "Changing the estimand prevents improvement validation",
+    "outcome": "returned",
+    "result": {
+      "classification": "Inconclusive",
+      "reason": "measurement target or evaluation population changed; numbers do not establish intervention improvement",
+      "changed_measurement_fields": [
+        "estimand"
+      ]
+    },
+    "contract_satisfied": true
+  }
+]

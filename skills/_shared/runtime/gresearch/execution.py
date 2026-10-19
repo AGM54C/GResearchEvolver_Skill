@@ -150,6 +150,9 @@ def run_workflow(store: Store, run):
 
 
 def execute_stage(store, run, spec):
+    if spec.get('ssh'):
+        from .ssh_runner import execute_stage as managed_ssh
+        return managed_ssh(store, run, spec)
     started = time.monotonic()
     m, state = store.get(run)
     limit = min(spec.get("timeout", 300), m.get("budget", {}).get("seconds", 3600) - state["seconds"])

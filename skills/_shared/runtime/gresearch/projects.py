@@ -85,19 +85,23 @@ def proof_check(data, destination):
     if not data.get('declarations') or any(not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_.]*', d) for d in data['declarations']):
         raise ResearchError('Specify concrete theorem declarations for axiom inspection')
     forbidden = bool(re.search(r'\b(sorry|admit|axiom)\b', text))
+    lake = data.get('lake') or shutil.which('lake')
     result = {'source_hash': digest(source.read_bytes()), 'project': str(project), 'source': data['source'],
               'passed': False, 'status': 'unverified', 'axiom_policy': data.get('allowed_axioms', ['propext', 'Classical.choice', 'Quot.sound'])}
     if forbidden:
         result.update(status='rejected', reason='sorry/admit/axiom token found; remove placeholders or explicitly review axiomatic assumptions')
-    elif not shutil.which('lake'):
+    elif not lake or not Path(lake).is_file():
         result['reason'] = 'Lean/lake not installed'
     else:
         suffix = '\n' + '\n'.join('#print axioms ' + d for d in data['declarations']) + '\n'
         probe = source.with_name('GResearchAudit_' + uuid.uuid4().hex[:8] + '.lean')
         probe.write_text(text + suffix, encoding='utf-8')
         try:
-            version = subprocess.run(['lake', 'env', 'lean', '--version'], cwd=project, capture_output=True, text=True, timeout=30)
-            run = subprocess.run(['lake', 'env', 'lean', str(probe)], cwd=project, capture_output=True, text=True, timeout=data.get('timeout', 120))
+            version = subprocess.run([lake, 'env', 'lean', '--version'], cwd=project, capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=30)
+            # Lean 4 on Windows misparses the extended-length prefix used for
+            # local IO. Keep compiler arguments relative to its project cwd.
+            probe_argument = Path(data['source']).with_name(probe.name).as_posix()
+            run = subprocess.run([lake, 'env', 'lean', probe_argument], cwd=project, capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=data.get('timeout', 120))
             outputs = run.stdout + '\n' + run.stderr
             found = re.findall(r'depends on axioms:\s*\[([^\]]*)\]', outputs)
             axioms = sorted({x.strip() for group in found for x in group.split(',') if x.strip()})

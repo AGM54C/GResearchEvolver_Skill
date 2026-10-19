@@ -121,7 +121,25 @@ RSI 的请求格式见 [rsi-protocol.md](rsi-protocol.md)。最小可运行示�
 
 `enqueue:{run,resources:{cpu:2,gpu:0},priority:0}`；`queue-next:{capacity:{cpu:8,gpu:1}}` 执行一个能容纳的任务，外部调度器可循环调用；`queue-status:{}`；`queue-cancel:{job}`。运行目录、任务状态、日志可在控制台查看。CPU/GPU 声明是调度预算，不分配物理设备。
 
-SSH stage 加 `ssh:{host:"user@host",cwd:"/dedicated/research-run"}`，authorization.ssh_hosts 包含同一 host。上传 requires/存在的 optional，执行 POSIX argv，拉回 outputs。远程路径限制为字母/数字/点/下划线/横线/斜线。远程 output 在新执行前移除（只删除显式文件）；专用 cwd 不得与其他任务共享。需安装 OpenSSH，配置 host key 和非交互认证；环境/实际运行/远程取消需在目标机器验证。
+SSH stage 加 `ssh:{host:"user@host",port:22,cwd:"/dedicated/research-run",known_hosts:"/path/to/pinned_known_hosts"}`，authorization.ssh_hosts 包含同一 host。需 Paramiko 与远程 Linux/Python 3；身份认证使用 SSH agent/identity_file，或 password_env 指向内存环境变量，不能把密码放入 manifest。父 cwd 预先存在，每次运行创建唯一目录，上传 requires/存在的 optional，执行 argv，取回有界常规 outputs。远程路径限制为字母/数字/点/下划线/横线/斜线。
+
+客户端每 3 秒发送心跳；监督器在取消/超时/30 秒心跳失联后终止并回收后代，即使子进程调用 setsid。只有收到对应 job 的 result.json 才标记 remote_cleanup_verified；网络故障保留远程目录和未确认状态供核查。监督器管理可信实验，不是对抗代码沙箱；不会撤销外部业务写入，也不会自动删除远程研究产物。当前托管 SSH 不转发 env_from，需在远端独立配置所需环境。
+
+## 实际模型与语义核验
+
+`model:{config,messages,destination}` 支持 responses、chat-completions、ollama 和 codex-config；后者读取当前 Codex API-key 配置，不支持把 ChatGPT OAuth token 当作 API key。Python 3.10 另装 tomli。config 必须明确 model；可设 max_output_tokens、timeout、reasoning_effort、json_schema。请求、原始响应、实际 usage、模型返回身份、耗时与失败保存在新目录；没有返回模型身份时明确为 null。未知配置/明文密钥字段被拒绝，key_env 只记录变量名，不写入值。服务商别名内部的模型修订并不能独立认证。
+
+`semantic-review:{config,items,destination,threshold}` 的 item 为 `{id,claim,sources:[{id,text,sha256,locator}]}`。或使用 `semantic-graph:{config,graph,root,destination}`，先核对源文件与图再读取绑定原文。输出含 model_label、保守 label、六个语义维度、精确引文偏移、拒判原因；这些是模型辅助意见，human_adjudicated 始终 false，不会覆盖人工裁决。threshold 只是自报置信度筛选，需在独立文献组人工标签上校准并报告拒判率。`semantic-metrics:{rows:[{id,gold,prediction}]}` 统计 supports/contradicts/insufficient/abstain，gold 不能为 abstain，ID 不可重复。
+
+`embeddings:{config,texts,destination}` 调用真实向量 API；校验索引、数量、维度和有限值。离线 `representations:{config:{model_dir,layers:[-1,-2],max_length:256,expected_files},texts}` 需要 torch/transformers 与本地 safetensors 快照；逐文件哈希、实际隐藏层、池化方式和文本截断全部记录。`critic-fit` 的 rows 需 vector/gold/groups/split，encoder_hash 固定编码器与层；train/calibration/evaluation 的文献组必须隔离。`critic-predict` 只接受匹配 encoder_hash 的模型和向量。当前小样本线性诊断实测较弱，仅为实验性 triage，不能称为 Latent Critic/ReCast 复现。
+
+Semantic Scholar relevance 受限时仍报告真实 HTTP 429。`s2-bulk:{query,destination,max_records}` 可显式选择官方 bulk 模式；它与 relevance 排序不同，记录截断和原始页，不隐式替换或声称查全。
+
+## HCI pilot 与便携 Lean
+
+`study-plan:{destination,participants:12,seed:20261019}` 产生平衡分配、冻结协议和空观测 CSV。`study-analyze:{protocol,observations}` 按参与者配对真实数据并报告缺失，拒绝空结果、重复和错配。源码仓库的 `docs/HCI-STUDY.md`、`benchmarks/hci_materials.py` 与 `benchmarks/hci-materials/` 提供任务和盲评材料；研究准备不计作研究结果。
+
+`proof` 可用可选 lake 字段指定便携 lake 可执行文件；仍需完整 Lean 工具链与真实项目。检查实际编译、#print axioms、公理策略与依赖文件哈希，不能用证明编译成功代替科学命题的形式化对齐审查。
 
 ## 归档
 

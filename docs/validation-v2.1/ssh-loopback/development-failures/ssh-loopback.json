@@ -1,0 +1,1 @@
+{"all_passed":false,"cases":[],"container_removed":true,"error":"RuntimeError: SSH test server did not start","scope":"Real loopback SSH/SFTP to a Linux test server; supplied external host not tested here"}
