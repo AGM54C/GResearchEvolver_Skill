@@ -14,7 +14,7 @@ python install.py --dest /absolute/path/to/host/skills --force
 
 `--force` 在目标目录先完整 staging，再逐项替换；原条目移动到 `.gresearch-backup-*`。失败会回滚本次替换；不同进程不要同时运行安装器。默认遇已有 bundle 条目会停止，避免新旧共享协议混装。保留其他无关技能。不会递归把同名目录套进去，也不自动删除备份。
 
-安装内容为 25 个技能、`_shared/`（含 runtime、协议与示例）、manifest.yaml 和 HARNESS.md，另写 `.gresearch-install.json` 原字节清单。Unix `sh install.sh` 是 Python 安装器的兼容入口。
+安装内容为 26 个技能、`_shared/`（含 runtime、协议与示例）、manifest.yaml 和 HARNESS.md，另写 `.gresearch-install.json` 原字节清单。Unix `sh install.sh` 是 Python 安装器的兼容入口。
 
 在宿主中使用 research-autopilot 处理跨阶段任务，或单独使用具体技能。runtime CLI 的相对前缀取决于实际安装位置：源码为 `skills/_shared/runtime/research.py`，安装后为 `<skills-dir>/_shared/runtime/research.py`。先 `--help`，再按 [运行手册](skills/_shared/runtime-guide.md) 建立具体 manifest。
 

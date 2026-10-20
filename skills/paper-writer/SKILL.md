@@ -12,3 +12,5 @@ description: 从作者的证据和实际实验起草、修订论文，维护论�
 模拟评审生成问题表后，使用版本化 revise/retest/rereview，更新相关章节与 ledger；不能仅改摘要而让表格和正文保留旧数值。交付稿件、账本、引用库与未决问题。
 
 按需读取 [共享运行规则](../_shared/README.md) 与 [接口示例](../_shared/runtime-guide.md)。旧评分 rubric 是启发式质量清单，不能代替实际证据和独立验收。
+
+受管阶段遵循 [阶段报告、科研讲解与受控进化协议](../_shared/human-guided-research.md)：说明为什么这样做、具体方法与结果；由 runtime 保存版本化 report.md，按需调用 research-explainer，记录研究者的实际反馈并落实到暂停、修改分支或后续执行。改进本技能时使用 `capability-freeze/propose/evaluate/review/activate`，目标为 `skill:paper-writer`；未经冻结评估及研究者接受，不把候选标记为已采用或能力提升。

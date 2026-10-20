@@ -20,7 +20,7 @@ def check_command(command):
         raise ResearchError('Commands must be argv arrays')
 
 
-def freeze(store, name, protocol, evaluator_dir, incumbent_dir, incumbent_command):
+def freeze(store, name, protocol, evaluator_dir, incumbent_dir, incumbent_command, *, _register=None):
     protocol = dict(protocol)
     protocol.setdefault('audit_policy', 'fresh-batches')
     if store.get_value('rsi:' + name):
@@ -82,8 +82,12 @@ def freeze(store, name, protocol, evaluator_dir, incumbent_dir, incumbent_comman
               'reporting_baseline': incumbent, 'history': [incumbent], 'trials': [], 'final_used': False,
               'isolation': 'docker' if isolation else 'same-permission local processes; not sealed', 'created': time.time()}
     with store.tx():
+        if store.get_value('rsi:' + name):
+            raise ResearchError('Epoch already exists; create a distinct epoch')
         store.set_value('rsi:' + name, record)
         store.event('rsi-' + name, 'epoch_frozen', {k: record[k] for k in ('protocol_hash', 'evaluator_hash', 'isolation')})
+        if _register is not None:
+            _register(record)
     return record
 
 
@@ -123,6 +127,8 @@ def _evaluate(store, name, candidate_dir, candidate_command, *, split='audit', p
         record = store.get_value(key)
         if not record:
             raise ResearchError('Unknown RSI epoch')
+        if promote and record['protocol'].get('promotion_policy') == 'human-reviewed':
+            raise ResearchError('Capability epochs require proposal review and capability activation')
         verify_epoch(store, record)
         if record.get('running'):
             raise ResearchError('Epoch already evaluating; inspect interrupted trial before recovery')
@@ -300,6 +306,8 @@ def rollback(store, name, index, reason):
         record = store.get_value('rsi:' + name)
         if not record or record.get('running'):
             raise ResearchError('Unknown or busy epoch')
+        if record['protocol'].get('capability_target'):
+            raise ResearchError('Use capability rollback and a new evaluation epoch')
         if not 0 <= index < len(record['history']):
             raise ResearchError('Unknown strategy version')
         restored = record['history'][index]

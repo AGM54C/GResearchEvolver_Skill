@@ -11,3 +11,5 @@
 - 归档：[session-archive.md](session-archive.md)。
 
 按当前任务读取对应文件，不预加载所有技能和 rubric。原有 rubric 可辅助质量检查；若旧示例与 v2 的执行、证据、授权规则冲突，以实际 v2 接口和用户指令为准。
+
+阶段报告、分层科研讲解、实际反馈和能力版本采用见 [人机协作协议](human-guided-research.md)。

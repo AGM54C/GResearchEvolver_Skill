@@ -146,3 +146,5 @@ Semantic Scholar relevance 受限时仍报告真实 HTTP 429。`s2-bulk:{query,d
 `archive RUN`、`verify`、`verify-archive DIRECTORY`；`import-archive DIRECTORY --id NEW` 可在空 Store 恢复归档中的文件/状态/历史对象，再 fork。事件是源全局链的片段，导入记录保留来源，不伪造为新运行执行史。
 
 命令执行不是 OS 沙箱；输入代码应可信。日志原始保存，不自动清洗所有秘密。恢复、授权与科学保证的完整边界见 HARNESS.md。
+
+阶段报告、分层科研讲解、实际反馈和能力版本采用见 [人机协作协议](human-guided-research.md)。

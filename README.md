@@ -2,9 +2,11 @@
 
 面向科研全过程的技能包与轻量 Python runtime：将文献来源、实验执行、统计结果和论文论断连起来，允许研究者查看原始证据、暂停、修改、分支重跑与回滚策略。
 
-v2.1 在可执行的状态与证据检查上增加了隔离、真实模型适配和实测记录。包含 **25 个技能**：原 17 个中 15 个科研技能已升级，新增系统综述、文献库、统计、假设验证、人机控制、形式化证明、基金申请和文献监测。绘图与 PPT 不在本次功能升级范围；原模块保留，仅规范安装所需的元数据。
+当前源码包含 **26 个技能**，覆盖检索阅读、设计执行、统计验证、写作修订及科研讲解。v2.1 引入隔离、真实模型适配和实测记录；后续源码进一步完善执行可靠性与人机协作。绘图与 PPT 不在本轮功能升级范围。
 
 当前源码进一步加固了进程托管、崩溃/队列恢复、环境漂移检查与完整备份，并接入 OpenViking 科研图谱记忆，保留条目节点、关系边及证据历史。设计参考、真实服务验证和部署边界见 [Harness 验证说明](docs/HARNESS-RELIABILITY.md)。
+
+每个受管阶段保存版本化 `report.md`，说明选择理由、执行方法、结果与待决定问题。研究者可要求解释、接受、修改或停止；反馈进入实际执行状态。新增 `research-explainer` 提供直观解释、技术细节和原文依据。所有范围内技能、工具和 runtime 模块可登记改进提案，经过冻结评估、研究者接受，再供新运行显式采用。用法见 [人机协作与受控进化](skills/_shared/human-guided-research.md)。
 
 ## 上手
 
@@ -36,9 +38,11 @@ python install.py --dest /your/runtime/skills
 | 证据与写作 | 数量/条件/单位/run 绑定、来源与引文核验、证据图和失效传播；带原文偏移的语义核验、反证/范围/因果/否定检查与拒判 |
 | 设计与统计 | 协议、对照、独立单位、配对 bootstrap、效应量、Holm/BH、受限 meta-analysis、条件式序贯证据 |
 | 执行与控制 | 显式 DAG、本地进程、SSH 适配、资源队列、预算、原始日志、暂停/取消/单步、人工批注、checkpoint fork、里程碑对齐 |
+| 报告与讲解 | 每阶段版本化报告、直观/技术/证据分层解释、精确引用、绑定版本的反馈、审阅门控与修改分支 |
 | 可靠性与复现 | OS 所有权锁、独立监督器、崩溃后代清理、分类失败/有界重试、环境锁、SQLite/CAS 完整性、完整备份恢复 |
 | 科研记忆 | 版本化节点/边、邻域遍历、证据失效传播、本地检索、OpenViking 原文同步/向量检索与回执对账 |
 | RSI | 可选 Docker 权限隔离、固定评分器、全新审计批次、配对实跑、签名晋升/防重放、固定 final 基线、完整策略导出与回滚 |
+| 能力改进 | 技能/工具/模块目录、报告与反馈溯源、候选快照、冻结比较、独立研究者标签审阅、版本采用/回滚与运行固定版本 |
 | 其他研究流程 | 系统筛选/裁决/PRISMA 账目、RoB/GRADE 记录、Lean 证明回执、基金目标/风险/预算、文献增量摘要、修订—补实验—复审/改投 |
 
 运行手册：[runtime-guide.md](skills/_shared/runtime-guide.md)。科学保证与恢复边界：[HARNESS.md](HARNESS.md)。架构：[SKILL-ARCHITECTURE.md](SKILL-ARCHITECTURE.md)。
@@ -52,8 +56,9 @@ python install.py --dest /your/runtime/skills
 - [升级与验证报告](docs/UPGRADE-REPORT.md)：测试、独立使用检查和外部未验证项。
 - [v2.1 真实验证](docs/VALIDATION-V2.1.md)：同模型小基准、人工标签语义评估、真实隐藏状态诊断、隔离攻击与外部集成结果。
 - [HCI 研究方案](docs/HCI-STUDY.md)：导师/同学可参加的平衡交叉 pilot、盲评指标和观测分析；尚未实施用户研究。
+- [人机协作升级验证](docs/HUMAN-GUIDED-VALIDATION.md)：阶段报告/反馈、分层讲解、能力版本采用、Windows/Linux 回归与签名隔离实测。
 - [历史勘误](docs/historical-errata.md)：旧归档/论断图/A-B 案例的限制；`research-instance/` 原样保留。
 
-开发检查：`python -B tests/run_checks.py --report validation.json`。CI 覆盖 Windows/Linux、Python 3.10/3.13；真实 OpenViking 测试按需运行 `tests/live_openviking.py`。技能元数据检查不评价科学质量。
+开发检查：`python -B tests/run_checks.py --report validation.json`。GitHub CI 配置 Windows/Linux、Python 3.10/3.13，在 push/PR 后自动执行检查；具体通过状态应查看对应提交的 Actions 记录。真实 OpenViking 测试按需运行 `tests/live_openviking.py`。技能元数据检查不评价科学质量。
 
 默认本地模式用于可信开发；显式 Docker 模式将候选与评分/签名权限分开，宿主和 daemon 仍须可信。已完成 3 个领域、6 个真实数据微任务的同模型/任务/预算 pilot，两组均满分，未测出增益。语义核验在独立样本上仍有错误，简易隐藏状态诊断器表现较弱；因此保留拒判和人工复核，不据此宣称“最强”“零幻觉”或全球首创。

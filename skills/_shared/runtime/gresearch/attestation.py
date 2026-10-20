@@ -43,7 +43,7 @@ def sign(config, payload):
     return {'payload': body, 'signature': base64.b64encode(signature).decode(), 'algorithm': 'Ed25519'}
 
 
-def verify(envelope, public_key, expected):
+def verified_payload(envelope, public_key, expected):
     from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
     from cryptography.exceptions import InvalidSignature
     # Callers must pin context from their own release request, not copy it from receipt.
@@ -61,10 +61,23 @@ def verify(envelope, public_key, expected):
     except (InvalidSignature, ValueError, KeyError) as exc:
         raise ResearchError('Invalid evaluator signature') from exc
     if any(body.get(k) != v for k, v in expected.items()): raise ResearchError('Receipt context mismatch')
-    if body.get('split') != 'audit' or body.get('passed') is not True or body.get('promoted') is not True:
-        raise ResearchError('Receipt does not authorize an audit promotion')
     if body.get('isolation') != 'docker' or not isinstance(body.get('nonce'),str) or not re.fullmatch('[0-9a-f]{32}',body['nonce']) or body.get('version')!=1:
         raise ResearchError('Missing or invalid isolation/nonce/version')
+    return body
+
+
+def verify(envelope, public_key, expected):
+    body = verified_payload(envelope, public_key, expected)
+    if body.get('split') != 'audit' or body.get('passed') is not True or body.get('promoted') is not True:
+        raise ResearchError('Receipt does not authorize an audit promotion')
+    return body
+
+
+def verify_evaluation(envelope, public_key, expected):
+    """A passed comparison is not yet authorization to deploy the candidate."""
+    body = verified_payload(envelope, public_key, expected)
+    if body.get('split') != 'audit' or body.get('passed') is not True or body.get('promoted') is not False:
+        raise ResearchError('Receipt is not a passed, unpromoted audit')
     return body
 
 
