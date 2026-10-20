@@ -39,7 +39,7 @@ python -B tests/live_capability.py --image sha256:e91c87665910d2f7979f01464eb9fc
 
 离线回执记录 runtime/tests 的源文件哈希；安装回执记录实际安装字节。GitHub Actions 在 push/PR 后运行独立矩阵，配置存在不等于该提交已通过，应查看对应提交的检查记录。
 
-首次云端运行还发现测试依赖清单漏了诊断器边界检查导入的 scikit-learn；本机预装环境掩盖了这个缺口。现将兼容 Python 3.10/3.13 的 scikit-learn 1.7.2 加入 CI 清单，保留原测试要求，不跳过失败项。该修复只补充测试环境依赖，原 runtime 字节及其本地验证回执不变。
+首次云端运行发现测试依赖清单漏了诊断器边界检查导入的 scikit-learn；本机预装环境掩盖了这个缺口。现将兼容 Python 3.10/3.13 的 scikit-learn 1.7.2 加入 CI 清单，保留原测试要求，不跳过失败项。Windows/Python 3.10 又检出了旧 pathlib 对带扩展前缀路径的解析差异；safe_path 现先显式拒绝根路径及所有父目录段，再检查解析后的路径归属。本地回执已按此最终 runtime 更新。
 
 ## 结论范围
 

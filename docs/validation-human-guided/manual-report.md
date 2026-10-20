@@ -41,9 +41,9 @@ Compute the mean of the explicit fixture values [1, 2, 6].
   "exit_code": 0,
   "timeout": false,
   "cancelled": false,
-  "seconds": 0.5245697000063956,
+  "seconds": 0.5122693000012077,
   "cleanup_pending": false,
-  "logs": "logs/analysis/778ebfd987d4",
+  "logs": "logs/analysis/4d4061b0e6c6",
   "log_hashes": {
     "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -64,14 +64,14 @@ Compute the mean of the explicit fixture values [1, 2, 6].
         "stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "supervisor-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
-      "logs": "logs/analysis/778ebfd987d4",
+      "logs": "logs/analysis/4d4061b0e6c6",
       "mutated_inputs": [],
       "outputs": {
         "result.json": "b55dd0810d74ce926028ef16c7c500cc8f317027aa4e5adef8a7a2a21ada5c34"
       },
       "status": "completed",
       "supervisor": {
-        "attempt_id": "53125c8cbbaf4072b850d20c274092c0",
+        "attempt_id": "7d0e33b3c4924aebac20085a089b183e",
         "cleanup_verified": true,
         "containment": "windows_job_object",
         "exit_code": 0,
@@ -80,10 +80,10 @@ Compute the mean of the explicit fixture values [1, 2, 6].
           "stdout.txt": 0
         },
         "reason": null,
-        "seconds": 0.29462419997435063,
+        "seconds": 0.2853729000198655,
         "status": "completed",
         "supervisor_exit_code": 0,
-        "supervisor_pid": 58404
+        "supervisor_pid": 65332
       },
       "timeout": false
     }

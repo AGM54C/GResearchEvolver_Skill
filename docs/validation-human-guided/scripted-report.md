@@ -1,6 +1,6 @@
 # 阶段报告：analysis
 
-运行：run-315012fc42a8；第 1 次执行；状态：completed
+运行：run-881124811b27；第 1 次执行；状态：completed
 
 运行状态：completed
 
@@ -41,9 +41,9 @@ Report both fixture summaries.
   "exit_code": 0,
   "timeout": false,
   "cancelled": false,
-  "seconds": 0.5021149999811314,
+  "seconds": 0.5021044000168331,
   "cleanup_pending": false,
-  "logs": "logs/analysis/75d94b2a9d25",
+  "logs": "logs/analysis/1b33be57b9a5",
   "log_hashes": {
     "stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -64,14 +64,14 @@ Report both fixture summaries.
         "stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "supervisor-stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       },
-      "logs": "logs/analysis/75d94b2a9d25",
+      "logs": "logs/analysis/1b33be57b9a5",
       "mutated_inputs": [],
       "outputs": {
         "result.json": "835bd0f2fcc0e37c87fb3e187e580b21aa341f5d64608354591d52671523bcd1"
       },
       "status": "completed",
       "supervisor": {
-        "attempt_id": "b0db01a5f8e2425fb71a065f6d49158b",
+        "attempt_id": "d9cb1965f71b4b70b2b3a86b61b7d4cd",
         "cleanup_verified": true,
         "containment": "windows_job_object",
         "exit_code": 0,
@@ -80,10 +80,10 @@ Report both fixture summaries.
           "stdout.txt": 0
         },
         "reason": null,
-        "seconds": 0.2838482999941334,
+        "seconds": 0.28298569994512945,
         "status": "completed",
         "supervisor_exit_code": 0,
-        "supervisor_pid": 6752
+        "supervisor_pid": 1936
       },
       "timeout": false
     }
@@ -140,7 +140,7 @@ exact source bytes and Unicode offsets checked; entailment requires review
 ## 已收到的反馈及处理
 
 - scripted-researcher / approve：SCRIPTED FIXTURE: accept the integration example, not its scientific validity.
-  - 处理：已接受当前报告版本；允许继续符合既有授权的后续阶段；对应报告：report-d7b59e00613147af
+  - 处理：已接受当前报告版本；允许继续符合既有授权的后续阶段；对应报告：report-8abceefa41714be9
 
 ## 后续条件
 

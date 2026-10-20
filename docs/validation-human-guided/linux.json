@@ -1,12 +1,12 @@
 {
-  "time_utc": "2026-10-20T01:54:43.874236+00:00",
+  "time_utc": "2026-10-20T02:12:29.438563+00:00",
   "python": "3.11.10",
   "platform": "Linux-5.15.153.1-microsoft-standard-WSL2-x86_64-with-glibc2.36",
   "tests": 114,
   "passed": true,
   "skips": [],
   "failures": [],
-  "seconds": 105.33108954800264,
+  "seconds": 102.40353628899902,
   "packages": {
     "cryptography": "43.0.1",
     "numpy": "1.26.3",
@@ -19,7 +19,7 @@
     "skills/_shared/runtime/gresearch/cli.py": "4827ee1c6020aabd760836ef956bd74690af6545931537457925a39f8764516e",
     "skills/_shared/runtime/gresearch/console.py": "8404a922d07b6b6769e8e5d550edab25a731674288b667e0a3c2075472d62a8c",
     "skills/_shared/runtime/gresearch/container_worker.py": "8f4c4e1938d207b6a86db30b74ef4645a3f3c1cc807101e0e9189f24d787c5e3",
-    "skills/_shared/runtime/gresearch/core.py": "e3c8ba3500eab293e0825620c1f7b22beb7e75be8e1b705054140388e3074864",
+    "skills/_shared/runtime/gresearch/core.py": "f38a258ec47a868681df2074a577ec18511dfb34ff4014f98b212ff949d4f30b",
     "skills/_shared/runtime/gresearch/evidence.py": "1288de22cca6b10e82c6b6524f9804c00360e896a30dcb65d6866e58af64f4b8",
     "skills/_shared/runtime/gresearch/evolution.py": "b79dba83001ee6f5c7b6264a41261186735bd1add98ef37a743086ef44e1d8cc",
     "skills/_shared/runtime/gresearch/execution.py": "3a0b662b036e1ccd0927d3e27c0322fa29b311e3d216f1dde49cc9d15e0918e8",
@@ -51,7 +51,7 @@
     "tests/test_harness.py": "47741108074764c34dabf2fc590d9f5b9e1c05e6f749baa3c88602579f8d402b",
     "tests/test_hci.py": "5acfb8e252871d6eabc76960ac9b9718e0740e402f8385bf15c79ef796dec680",
     "tests/test_memory.py": "e7de3d2056c778365ef77d34a7e3a8d4ab6a19c7aa98187089ac33c7e089f211",
-    "tests/test_runtime.py": "bd7d5d24b5a18581082095960190d96632d69193e173f79f92f618e2fd94d865",
+    "tests/test_runtime.py": "8cf2168319e01b2770e3c01389f4aa6f74d0916eaead8309d2eab303b99f2a6c",
     "tests/test_v21.py": "fb42372eb1b53da921420a535cd315b6a5eeb1863eb2783e1965071829f47870"
   }
 }
