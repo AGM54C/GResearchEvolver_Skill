@@ -1,0 +1,44 @@
+{
+  "native_charts": [
+    {
+      "kind": "line",
+      "native_values": [
+        2.0,
+        3.0,
+        2.5,
+        4.0
+      ],
+      "chart_type": "LINE_MARKERS (65)",
+      "file_sha256": "1281e3eed40a28bc7fd2c49cb8bff527a1884fa4f3272a17de424ea220f95904",
+      "office_render": "not_run"
+    },
+    {
+      "kind": "scatter",
+      "native_values": [
+        2.0,
+        3.0,
+        2.5,
+        4.0
+      ],
+      "chart_type": "XY_SCATTER_LINES (74)",
+      "file_sha256": "98b1cf91a2a9f618d455ca115144d53e28154f7313d4841745271f048202fa66",
+      "office_render": "not_run"
+    }
+  ],
+  "template_edit": {
+    "unchanged_parts": 62,
+    "edited_parts": [
+      "ppt/slides/slide1.xml"
+    ],
+    "original_sha256": "43a624fe93986d43d68f1c7592d40f17724098814d2a8d2324c67c00848814da",
+    "revised_sha256": "71f9e46247a84924ceac505cdff1e1a214b5bc8c3b7f51bef55ffb049e67e3bb"
+  },
+  "installed_example": {
+    "run": "visual-demo",
+    "status": "awaiting_review",
+    "human_feedback_synthesized": false,
+    "scientific_gain_claimed": false,
+    "source_kind": "explicit synthetic fixture"
+  },
+  "scientific_gain_claimed": false
+}

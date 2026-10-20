@@ -24,9 +24,9 @@ def main():
     record = {'time_utc': datetime.now(timezone.utc).isoformat(), 'python': platform.python_version(), 'platform': platform.platform(),
               'tests': result.testsRun, 'passed': result.wasSuccessful(), 'skips': [(str(t), reason) for t, reason in result.skipped],
               'failures': [(str(t), detail) for t, detail in result.failures + result.errors], 'seconds': time.monotonic() - started,
-              'packages': {name: importlib.metadata.version(name) for name in ('cryptography', 'numpy', 'PyMuPDF') if importlib.util.find_spec({'PyMuPDF': 'fitz'}.get(name, name))},
+              'packages': {name: importlib.metadata.version(name) for name in ('cryptography', 'numpy', 'PyMuPDF', 'matplotlib', 'Pillow', 'python-pptx') if importlib.util.find_spec({'PyMuPDF': 'fitz', 'Pillow': 'PIL', 'python-pptx': 'pptx'}.get(name, name))},
               'source_hashes': {p.relative_to(repo).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
-                                for directory in (repo / 'skills/_shared/runtime', repo / 'tests') for p in sorted(directory.rglob('*.py'))}}
+                                for directory in (repo / 'skills', repo / 'tests') for p in sorted(directory.rglob('*.py'))}}
     if args.report:
         path = Path(args.report)
         path.parent.mkdir(parents=True, exist_ok=True)

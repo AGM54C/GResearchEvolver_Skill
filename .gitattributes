@@ -1,5 +1,6 @@
 * text=auto
 *.py text eol=lf
+*.ps1 text eol=lf
 *.md text eol=lf
 *.json text eol=lf
 *.jsonl text eol=lf
@@ -9,3 +10,4 @@ benchmarks/hci-materials/** -text -whitespace
 docs/validation-v2.1/** -text -whitespace
 docs/validation-harness/** -text -whitespace
 docs/validation-human-guided/** -text -whitespace
+docs/validation-visual/** -text -whitespace

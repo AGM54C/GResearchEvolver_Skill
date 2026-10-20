@@ -5,3 +5,7 @@ numpy==2.2.6
 PyMuPDF==1.26.5
 # train_critic's leakage checks import this optional runtime backend.
 scikit-learn==1.7.2
+# Visual artifacts are actually built and inspected in the offline suite.
+matplotlib==3.10.7
+Pillow==11.3.0
+python-pptx==1.0.2

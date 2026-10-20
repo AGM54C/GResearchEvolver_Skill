@@ -1,0 +1,61 @@
+{
+  "time_utc": "2026-10-20T03:19:11.760804+00:00",
+  "offline_tests": 127,
+  "offline_passed": true,
+  "visual_tests": 13,
+  "full_test_source_hashes_match_current_files": true,
+  "all_bundle_and_render_hashes_verified": true,
+  "renderers": [
+    {
+      "file": "powerpoint/render.json",
+      "engine": "Microsoft PowerPoint",
+      "version": "16.0",
+      "pages": 5
+    },
+    {
+      "file": "edited-render/render.json",
+      "engine": "Microsoft PowerPoint",
+      "version": "16.0",
+      "pages": 5
+    }
+  ],
+  "metadata_validation": {
+    "figure-mimic": "quick_validate passed",
+    "slides-builder": "quick_validate passed"
+  },
+  "visual_review": {
+    "reviewer": "development agent; not a human researcher",
+    "files": "5 original PowerPoint slide PNGs, figure PNG, diagram PNG; revised first slide separately",
+    "scope": "obvious rendering issues in labelled software examples; not scientific or aesthetic certification"
+  },
+  "human_review": "pending",
+  "scientific_gain_claimed": false,
+  "extra_source_hashes": {
+    "docs/validation-visual/reproduce.py": "81cb810eaef8514ddaa98bb593283eee18b17e7766b99e0e9b8f71dbd3d18290",
+    "skills/slides-builder/scripts/render_powerpoint.ps1": "958b64e407c936c1f4cb941a94bfbac8c24cb3cb8803e24824a2800f6c908fc5",
+    "skills/figure-mimic/SKILL.md": "9aaba619b193eead0c9360388cbd6e010ea5f6a8b4e23cabb56e463b6a167887",
+    "skills/slides-builder/SKILL.md": "0b380b35274794fc73dac0700cb0b63ccbc5a1d9199831cfc39fa3219fa17275",
+    "skills/_shared/visual-research.md": "86d15f1aff6fd6be8fb78404113d8df43fdf527616f1d2edde190f38a0ebc19d",
+    "skills/manifest.yaml": "5e22cef0234f77eb53edaa19a5abc5c423c6076bd8b8953b11376751c796be8d"
+  },
+  "publication_normalization": [
+    {
+      "path": "skills/figure-mimic/SKILL.md",
+      "before_sha256": "ac4214c3ba43d81fc40fb0052fd9e2addf4efd77707d440cc3e2668fdaa34be9",
+      "after_sha256": "9aaba619b193eead0c9360388cbd6e010ea5f6a8b4e23cabb56e463b6a167887",
+      "change": "CRLF to LF only; no content or executable logic change"
+    },
+    {
+      "path": "skills/slides-builder/SKILL.md",
+      "before_sha256": "993ecb1abee33499e47bf31a0c948a8f6705f43bcce8bd0e82cb08b1c53933aa",
+      "after_sha256": "0b380b35274794fc73dac0700cb0b63ccbc5a1d9199831cfc39fa3219fa17275",
+      "change": "CRLF to LF only; no content or executable logic change"
+    },
+    {
+      "path": "skills/manifest.yaml",
+      "before_sha256": "75162c82260a89c2faa376e2b92aba1c6b5f1fcf03ac6a7848f0489a189c84dd",
+      "after_sha256": "5e22cef0234f77eb53edaa19a5abc5c423c6076bd8b8953b11376751c796be8d",
+      "change": "CRLF to LF only; no content or executable logic change"
+    }
+  ]
+}

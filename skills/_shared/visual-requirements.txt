@@ -1,0 +1,5 @@
+# Optional local visual tools; core runtime does not import these packages.
+matplotlib==3.10.7
+Pillow==11.3.0
+python-pptx==1.0.2
+PyMuPDF==1.26.5

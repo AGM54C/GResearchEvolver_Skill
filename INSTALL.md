@@ -20,4 +20,4 @@ python install.py --dest /absolute/path/to/host/skills --force
 
 验证可运行示例：`python skills/_shared/examples/offline_research.py --output demo-run`。查看控制台：`python skills/_shared/runtime/research.py --store demo-run/state serve`。控制台仅绑定 127.0.0.1，不自动打开浏览器。示例明确是合成数据。
 
-外部适配依赖：检索需要网络（部分 API 需 key）；Zotero 需要可读库和可选 ZOTERO_API_KEY；托管 SSH 客户端需要 Paramiko、固定 host key、认证，以及远端 Linux/Python 3 和专用工作目录；Lean 需要实际 lake 项目。Docker 隔离需要本机 Docker 和固定镜像，签名需要 cryptography。工具不可用时报告未验证，不自动将协议标为完成。绘图/PPT 模块功能保持原版。
+外部适配依赖：检索需要网络（部分 API 需 key）；Zotero 需要可读库和可选 ZOTERO_API_KEY；托管 SSH 客户端需要 Paramiko、固定 host key、认证，以及远端 Linux/Python 3 和专用工作目录；Lean 需要实际 lake 项目。Docker 隔离需要本机 Docker 和固定镜像，签名需要 cryptography。工具不可用时报告未验证，不自动将协议标为完成。绘图/PPT 按需安装 skills/_shared/visual-requirements.txt；Office 渲染另需 PowerPoint 或 LibreOffice。详见 skills/_shared/visual-research.md。

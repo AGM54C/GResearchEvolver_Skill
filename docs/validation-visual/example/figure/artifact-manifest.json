@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "builder": "build_figure.py",
+  "builder_sha256": "d557657dfb80c789c8ca30a88e291b61702121a569d7aa65d50fdf2716cdce63",
+  "shared_sha256": "de25edcf9eae080500d354ed69c970873d4a0c6727acbded49c9329ced94b2c4",
+  "packages": {
+    "matplotlib": "3.10.7",
+    "python-pptx": "1.0.2",
+    "Pillow": "11.3.0",
+    "PyMuPDF": "1.26.5"
+  },
+  "python": "3.13.3",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "font": {
+    "family": "Microsoft YaHei",
+    "file": "msyh.ttc",
+    "sha256": "d79c55e68b1131eea0cc1c47be4f572d964f28c682e143db2ad09c1e4cb07a3f"
+  },
+  "evidence_status": "illustrative",
+  "purpose": "Explain a visual workflow using labelled synthetic values",
+  "sources": [
+    {
+      "id": "data",
+      "path": "inputs/input-000.csv",
+      "sha256": "f8b24b0e6ba7b387d44efbfc30fc2e248704b27f216fa8306a6547b4d863317d",
+      "label": "Synthetic interface fixture"
+    }
+  ],
+  "checks": {
+    "panels": [
+      {
+        "kind": "line",
+        "source": "data",
+        "rows": 4,
+        "missing_y_cells": 0,
+        "statistics": "values and intervals read as supplied; no tests or CI estimation performed"
+      },
+      {
+        "kind": "scatter",
+        "source": "data",
+        "rows": 4,
+        "missing_y_cells": 0,
+        "statistics": "values and intervals read as supplied; no tests or CI estimation performed"
+      }
+    ],
+    "font": "Microsoft YaHei",
+    "size_mm": [
+      180,
+      100
+    ],
+    "dpi": 160,
+    "bounds_screen": "passed",
+    "visual_review": "pending",
+    "warnings": []
+  },
+  "human_review": "pending",
+  "scientific_validity": "not_established_by_build",
+  "outputs": {
+    "caption.md": "5f6697ae61315fa69878f502bd3716f6dbf92db7286433aecb8c958498c4c2fd",
+    "figure.pdf": "8fdd727c28750743c99d77f82301bcca16f981ac44fe238d056e9fabf8aa4cb8",
+    "figure.png": "7ff19146978291568ab0feba0192336fd49ebfa111cdac68e11ae82ab677363d",
+    "figure.svg": "28d67a1e31bcaf139a4cb0a12598e62a4df7a0fd17ed0aa187ba13ccb05fa8a7",
+    "grayscale.png": "e07501f8aff89d07f1fd8e6a00a07048b0fc060b298509a2de9d1349fe33f6e2",
+    "report.md": "19de77d5e810007ae77f7e26fe370da26ff2e088897b892ccd5973dd5b1dca74",
+    "spec.json": "463748d42ddd4c806f3a518bc4ad0f43fad0b3aacd58afcf7a8c4c44f1304ee5",
+    "inputs/input-000.csv": "f8b24b0e6ba7b387d44efbfc30fc2e248704b27f216fa8306a6547b4d863317d"
+  }
+}

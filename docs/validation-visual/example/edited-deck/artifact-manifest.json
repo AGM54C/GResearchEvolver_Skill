@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "builder": "deck_tools.py",
+  "builder_sha256": "763f76bd152f582a85d90ecdce0b549d57d1b0bae18552a768c298854bd9bb7e",
+  "shared_sha256": "de25edcf9eae080500d354ed69c970873d4a0c6727acbded49c9329ced94b2c4",
+  "packages": {
+    "matplotlib": "3.10.7",
+    "python-pptx": "1.0.2",
+    "Pillow": "11.3.0",
+    "PyMuPDF": "1.26.5"
+  },
+  "python": "3.13.3",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "font": null,
+  "evidence_status": "illustrative",
+  "purpose": "Exact text replacement software fixture",
+  "sources": [
+    {
+      "id": "template",
+      "path": "inputs/input-000.pptx",
+      "sha256": "43a624fe93986d43d68f1c7592d40f17724098814d2a8d2324c67c00848814da"
+    }
+  ],
+  "checks": {
+    "edited_parts": [
+      "ppt/slides/slide1.xml"
+    ],
+    "edits": 1,
+    "unchanged_parts": "original uncompressed bytes retained",
+    "office_render": "not_run",
+    "visual_review": "pending; replacement text can change wrapping"
+  },
+  "human_review": "pending",
+  "scientific_validity": "not_established_by_build",
+  "outputs": {
+    "report.md": "2766952e102aedda7aa7891882da425d8cb6fa887a7587a8e67cd11a09003a30",
+    "slides.pptx": "71f9e46247a84924ceac505cdff1e1a214b5bc8c3b7f51bef55ffb049e67e3bb",
+    "spec.json": "c38008a33a22d86a18010d6cd507c36df3a529a92f336357c1fc46c48e847db7",
+    "inputs/input-000.pptx": "43a624fe93986d43d68f1c7592d40f17724098814d2a8d2324c67c00848814da"
+  }
+}

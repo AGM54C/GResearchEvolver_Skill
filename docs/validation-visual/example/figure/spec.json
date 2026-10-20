@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "purpose": "Explain a visual workflow using labelled synthetic values",
+  "audience": "Researcher reviewing software behavior",
+  "rationale": "Compare explicit values while preserving sources and researcher control.",
+  "evidence_status": "illustrative",
+  "sources": [
+    {
+      "id": "data",
+      "path": "inputs/input-000.csv",
+      "sha256": "f8b24b0e6ba7b387d44efbfc30fc2e248704b27f216fa8306a6547b4d863317d",
+      "label": "Synthetic interface fixture"
+    }
+  ],
+  "claims": [
+    {
+      "id": "demo",
+      "text": "These values illustrate the interface only.",
+      "status": "illustrative",
+      "evidence": [
+        {
+          "source": "data",
+          "locator": "rows 1-4"
+        }
+      ]
+    }
+  ],
+  "size_mm": [
+    180,
+    100
+  ],
+  "dpi": 160,
+  "caption": "合成软件测试数据；给定区间不是估计的置信区间，不支持科研结论。",
+  "panels": [
+    {
+      "kind": "line",
+      "source": "data",
+      "title": "保留给定区间",
+      "x": "step",
+      "xlabel": "步骤",
+      "ylabel": "示例值",
+      "claims": [
+        "demo"
+      ],
+      "series": [
+        {
+          "y": "value",
+          "label": "Fixture",
+          "interval": {
+            "low": "lower",
+            "high": "upper",
+            "definition": "Supplied illustrative bounds, not statistical inference",
+            "sampling_unit": "None: synthetic fixture"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "scatter",
+      "source": "data",
+      "title": "对照示例值",
+      "x": "value",
+      "xlabel": "示例值",
+      "ylabel": "对照值",
+      "claims": [
+        "demo"
+      ],
+      "series": [
+        {
+          "y": "comparison",
+          "label": "Fixture"
+        }
+      ]
+    }
+  ]
+}

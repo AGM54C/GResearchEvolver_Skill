@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "purpose": "Explain a visual workflow using labelled synthetic values",
+  "audience": "Researcher reviewing software behavior",
+  "rationale": "Compare explicit values while preserving sources and researcher control.",
+  "evidence_status": "illustrative",
+  "sources": [
+    {
+      "id": "data",
+      "path": "inputs/input-000.csv",
+      "sha256": "f8b24b0e6ba7b387d44efbfc30fc2e248704b27f216fa8306a6547b4d863317d",
+      "label": "Synthetic interface fixture"
+    }
+  ],
+  "claims": [
+    {
+      "id": "demo",
+      "text": "These values illustrate the interface only.",
+      "status": "illustrative",
+      "evidence": [
+        {
+          "source": "data",
+          "locator": "rows 1-4"
+        }
+      ]
+    }
+  ],
+  "size": [
+    1100,
+    400
+  ],
+  "alt_text": "A proposed workflow keeps researcher decisions before rendering and review.",
+  "nodes": [
+    {
+      "id": "brief",
+      "label": "研究者\n确定方向",
+      "box": [
+        40,
+        130,
+        260,
+        110
+      ]
+    },
+    {
+      "id": "build",
+      "label": "生成\n可追溯产物",
+      "box": [
+        420,
+        130,
+        260,
+        110
+      ]
+    },
+    {
+      "id": "review",
+      "label": "研究者\n审阅与修订",
+      "box": [
+        800,
+        130,
+        260,
+        110
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "brief",
+      "to": "build",
+      "kind": "flow",
+      "label": "已接受方案"
+    },
+    {
+      "from": "build",
+      "to": "review",
+      "kind": "flow",
+      "label": "预览与证据"
+    }
+  ],
+  "font": "Microsoft YaHei"
+}

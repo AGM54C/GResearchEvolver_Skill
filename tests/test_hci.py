@@ -275,14 +275,14 @@ class CapabilityTests(Workspace):
             '{python}', '{bundle}/agent.py', '--task', 'task.json', '--seed', '0', '--output', 'analysis.json'])
         return self.store.create(manifest([spec]), inputs={'task.json': task})
 
-    def test_catalog_covers_registered_skills_tools_and_exclusions(self):
+    def test_catalog_covers_registered_skills_tools_and_visual_targets(self):
         catalog = {r['id']: r for r in cap.catalog()}
         registry = read_json(REPO / 'skills/manifest.yaml')
         self.assertEqual(len(registry['skills']), 26)
         self.assertTrue(all('skill:' + s in catalog for s in registry['skills']))
         self.assertTrue(all('tool:' + op in catalog for op in OPERATIONS))
-        self.assertFalse(catalog['skill:figure-mimic']['in_scope'])
-        self.assertFalse(catalog['skill:slides-builder']['in_scope'])
+        self.assertTrue(catalog['skill:figure-mimic']['in_scope'])
+        self.assertTrue(catalog['skill:slides-builder']['in_scope'])
         self.assertEqual(operation(self.store, 'capability-list', {}), cap.catalog())
 
     def test_real_adoption_pins_new_runs_and_archive_preserves_old_bundle(self):

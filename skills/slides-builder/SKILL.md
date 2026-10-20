@@ -1,122 +1,43 @@
 ---
 name: slides-builder
-description: 学术演示文稿制作。把成稿/复现结果转为答辩 PPT、组会 slides 或课程汇报——每页一个论点 + 证据 + 讲稿（speaker notes），数字全部从数字账本取，不逐段粘贴正文。触发条件：要求"做PPT""答辩幻灯片""组会汇报 slides""汇报演示"。
+description: 从论文、研究结果或已有演示稿创建和修改学术 PPTX、Beamer 或 Marp，支持论证结构、模板编辑、讲稿、时间安排、证据绑定与逐页视觉检查。
 ---
 
-# slides-builder Skill
+# 科研演示与 PPT
 
-成稿的演示形态转换。**核心纪律：一页一论点——slides 是论点骨架的投影，不是正文的压缩粘贴；页内每个数字可回接数字账本，未决结论的页加显式「（初步）」标注。**
+根据受众、场景和讲述时间组织科学论证。支持论文报告、组会、答辩、会议 oral/spotlight、教学和项目讨论；不设通用页数上限，也不把“一页一论点”机械变成每页相同的要点列表。
 
-> **验收标准**：按 `references/slides-qa-rubric.md` 打分；S2（数字账本回接）= 0 → 作废。
->
-> **诚实边界**：本 skill 保证**结构正确与内容真实**，不承诺设计美观（模板/配色由用户提供或用极简默认）；设计感需求建议转专业模板工具。
+## 研究者掌握叙事方向
 
----
+读取原文、结果、图表和用户模板，提取核心问题、证据强度、限制与未决项。先给出简明 storyboard：每页要回答的问题、论点/疑问、证据、视觉布局、预计时间和需讨论的问题。已给定的大方向直接沿用；由研究者决定优先讲什么、哪些结论不能强化、哪些背景值得展开。讲解困难时调用 research-explainer，不能用视觉润色掩盖证据缺口。
 
-## 1. 工作流
+保留英文论文题目、公式变量和准确引用，中文正文使用实际可用字体。数字与论断绑定来源，区分原文报告、个人解释、假设和未知；推测性标题保留限定语。
 
-### Phase 0：论点骨架萃取
+已有 source/mode/format/out_dir 输入继续有效；mode 表达受众场景，不隐含固定页数。项目提供 paper-state.json 或 figure-map.json 时，保留原 claim_id/run/figure-id 并回接逐页证据表，不另编一套不相容的数字账本。独立文献报告可直接绑定原论文与材料。
 
-- 从 source + paper-state.json 提取：核心主张（1 句）、支撑证据链（每条带 claim_id/run 号/强度态）、关键图表（figure-id）；
-- **未决项清单**单独提取——slides 上出现时必须带「初步/待验证」标注。
+## 路线与可运行工具
 
-### Phase 1：结构映射（按 mode 选模板）
-
-| mode | 页序模板 |
+| 任务 | 路线 |
 |---|---|
-| defense | 标题页 → 问题（1-2 页，为什么重要） → 方法（2-3 页） → 实验（3-4 页，每页一个实验论点+图） → 局限（1 页，诚实） → 结论（1 页） → 致谢/QA |
-| group_meeting | 上周计划回顾 → 进展（数据为主） → 问题/卡点 → 下周计划 → 讨论项 |
-| course | 是什么 → 为什么 → 怎么做 → 证据 → 启发/延伸 |
+| 创建可编辑 PPTX | 使用 python-pptx/PptxGenJS 原生文字、形状和图表；scripts/build_deck.py 提供带讲稿、来源记录、时间检查的基础构建器 |
+| 用户现有 PPTX/模板 | 先 scripts/deck_tools.py inspect 建立页/对象清单并渲染。精确文本替换可用 edit，保留未变更 OOXML 部件；复制/重排/SmartArt/动画等复杂操作采用原生 Office 或经过验证的实现，不声称普通文本替换能完成 |
+| 数学密集的报告 | Beamer；保存 .tex、引用、图片与实际编译日志。原生可编辑公式与渲染公式图片要明确区分 |
+| 可版本管理的网页/Markdown 演示 | Marp；保留 Markdown、主题和依赖。PDF、HTML、PPTX 转换后的可编辑程度分别检查 |
+| 概念插画 | 可用实际配置的生图工具制作局部素材；定量图、公式、引文和主要文字保持确定性生成 |
 
-映射纪律：每页 = 论点标题（结论式，非「实验设置」式）+ 3-5 个要点 + 证据（图/表/数字）+ speaker notes（这页怎么讲，40-60 字/页）。
+基础构建器不是唯一布局引擎。需要复杂科研叙事时写专用构建脚本，复用相同来源、报告和审阅契约。模板、数学、图像、讲稿与 QA 细节见 [演示工作流](references/presentation-workflow.md)，CLI/spec 见 [工具接口](references/tools.md)。
 
-### Phase 2：产出
+## 制作与质量检查
 
-- `format: pptx` → python-pptx 脚本生成（结构化：每页 title/bullets/notes/图占位）；
-- `format: marp` → markdown 源（`---` 分页，frontmatter 定主题）；
-- 图从 `figures/` 按 figure-id 引用（figure-map 对账），**不在 slides 里重画数据**。
+1. 根据已确认方向制作少量有代表性的预览页，再完成整稿。常用布局包括图为主、问题—方法、证据对照、流程解释、局限和讨论；选择由内容决定。
+2. 图表从原数据重绘或原样嵌入，不让生图模型复写结果。保持纵横比；若图中文字在投影尺寸下太小，拆图或从原数据重绘，不能只放大低分辨率截图。
+3. 每页添加 speaker notes：讲述要点、来源、成立前提、转场和时长。备份页单独计时；准备可据证回答的 Q&A，未解决问题明确保留。
+4. 检查文字、引用、数字、图表、讲稿、页序和模板残留。PPTX 可打开、ZIP 有效或对象未越界，都不等于视觉合格。
+5. 用 PowerPoint 或 LibreOffice 实际渲染后检查每一页；检查字号、缺字、遮挡、裁切、公式、图例、对比和版式。修改后重新渲染修改过的文件，并记录源文件哈希。没有渲染器时明确标记“视觉检查未完成”，不以自行画的预览冒充 Office 渲染。
+6. 交付 PPTX/其他约定格式、可复现源文件、讲稿、逐页证据表、预览和 report.md。用户原稿不覆盖，生成新的修订版。
 
-### Phase 3：对账 + 交付检查
+## 人机协作与受控进化
 
-- **数字对账**：slides 中每个数字 ↔ 数字账本条目逐项比对（应零无源数字）；
-- 页数合规（defense ≤15 / 组会 ≤10）；未决标注完备；
-- 产出 slides-ledger.md：每页 ↔ 论点 ↔ 证据指针对账表。
+遵循 [阶段报告与人工反馈](../_shared/human-guided-research.md) 和 [视觉工作的人类监督协议](../_shared/visual-research.md)。在 storyboard、代表页/全稿预览和交付节点呈现理由、内容、方法、证据与待决定事项。反馈绑定具体页、对象、论断和报告版本；revise 建分支，stop 停止，comment 不冒充采用。
 
----
-
-## 2. 产物
-
-```
-out_dir/
-├── slides.pptx 或 slides.md    ← 演示稿（含 speaker notes）
-├── build_pptx.py               ← pptx 格式时的生成脚本（可复现）
-└── slides-ledger.md            ← 页↔论点↔证据对账
-```
-
----
-
-## 3. Gate Check
-
-- 一页一论点（无粘贴式大段文字页）
-- 数字 100% 回接数字账本（ledger 对账平衡）
-- 未决结论页有显式标注
-- 每页有 speaker notes
-- 图引用经 figure-map 对账（无幽灵图）
-
----
-
-## 4. 与其他 skill 的边界
-
-| 能力 | 本技能 | paper-writer | doc-composer |
-|---|:--:|:--:|:--:|
-| 论文成稿 | — | ✅ | — |
-| 演示形态（论点骨架投影） | ✅ | 内容源 | — |
-| 分享形态（小红书/博客） | — | — | ✅ |
-| 数字红线 | 账本回接（同源同纪律） | 账本生产者 | 账本回接 |
-
----
-
-## 5. 技术参考对照
-
-| 机制 | 参考 |
-|---|---|
-| 论点式标题（assertion-evidence slides） | 学术演示研究（Assertion-Evidence 范式） |
-| pptx 结构化生成 | python-pptx / pptx skill 生态 |
-| marp 可版本控制 slides | marp 生态（markdown → slides） |
-| 数字账本回接 | 本项目独有（paper-state.json 底座） |
-
----
-
-## 6. 运行机制（遵守 HARNESS.md）
-
-- **工具调用**：python-pptx 不可用 → 降级 marp markdown（E2，显式标注）。
-- **错误恢复**：E6 幂等（同 source + 同 mode → 同 slides 结构）。
-- **人的介入**：H1（mode/format 歧义给选项）；H2 无不可逆操作。
-- **Agent Memory**：M2 产物存 `workspace/slides/`；sidecar 刷新。
-- **轨迹与归档**：对账结果入 trace；产物入 artifacts。
-
-
-## 调用参数（原版，未扩展）
-
-```yaml
-parameters:
-  source:
-    type: string
-    required: false
-    description: "内容源：paper.md（默认）/ repl 报告 / survey；可叠加 paper-state.json 数字账本"
-  mode:
-    type: string
-    default: defense
-    enum: [defense, group_meeting, course]
-    description: "defense=答辩（12-15 页）；group_meeting=组会（进度+问题+计划）；course=课程汇报（教学性，多背景铺垫）"
-  format:
-    type: string
-    default: pptx
-    enum: [pptx, marp]
-    description: "pptx=python-pptx 结构化产出；marp=markdown 源（可版本控制）"
-  out_dir:
-    type: string
-    required: false
-    description: "产物目录，默认 .codeartsdoer/.research/workspace/slides"
-
-```
+改进目标为 `skill:slides-builder`。可提出布局、模板适配、图表处理、讲解、渲染恢复和叙事策略候选，但必须冻结任务/评分/成本、实际对照、研究者审阅采用。审美评分、点赞或语气自信不能替代科学内容检查；不把某位研究者的审美固化成全领域的科研 taste。使用 `capability-freeze/propose/evaluate/review/activate`，保留失败、版本与回滚。

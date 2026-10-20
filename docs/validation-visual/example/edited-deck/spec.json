@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "purpose": "Exact text replacement software fixture",
+  "audience": "Researcher reviewing tool behavior",
+  "rationale": "Check exact edits while preserving other presentation parts.",
+  "evidence_status": "illustrative",
+  "sources": [
+    {
+      "id": "template",
+      "path": "inputs/input-000.pptx",
+      "sha256": "43a624fe93986d43d68f1c7592d40f17724098814d2a8d2324c67c00848814da"
+    }
+  ],
+  "claims": [],
+  "deck_source": "template",
+  "edits": [
+    {
+      "part": "ppt/slides/slide1.xml",
+      "shape_id": 2,
+      "run": 0,
+      "before": "研究方向由研究者掌握",
+      "after": "Researcher review controls adoption"
+    }
+  ]
+}

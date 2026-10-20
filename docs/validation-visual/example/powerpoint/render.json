@@ -1,0 +1,26 @@
+﻿{
+    "width":  1600,
+    "input_sha256":  "43a624fe93986d43d68f1c7592d40f17724098814d2a8d2324c67c00848814da",
+    "output_sha256":  {
+                          "slide-005.png":  "6d7b047ac4d48323cf60c872f559c60832f71960bd99fe9ba991f4640cd9bac9",
+                          "slide-003.png":  "e7aaa94644544cc01125a0cfb81a6208bf9ac3b3285a19a77a74f1383b69b4b2",
+                          "slide-001.png":  "5032fcf4468b7894e6f6a85ad27b546f15262c0cadbefdae384631b52a0471b0",
+                          "slide-002.png":  "b82641f96c161f25ffef979c34c306b0b8a955243e7d0a8b07e2ca8c4418d26f",
+                          "slide-004.png":  "dd822e8eb1a824f3f57b4d393d438aad2f4c5cabe0c244f6169df812c4d5f25b",
+                          "slides.pdf":  "5c72a5b9e7ffb853fad3ca48682d5c6885a17ca3b078da49e609a4a6d21539ab"
+                      },
+    "version":  "16.0",
+    "script_sha256":  "958b64e407c936c1f4cb941a94bfbac8c24cb3cb8803e24824a2800f6c908fc5",
+    "engine":  "Microsoft PowerPoint",
+    "scientific_verification":  false,
+    "height":  900,
+    "visual_review":  "pending",
+    "status":  "rendered",
+    "pages":  [
+                  "slide-001.png",
+                  "slide-002.png",
+                  "slide-003.png",
+                  "slide-004.png",
+                  "slide-005.png"
+              ]
+}

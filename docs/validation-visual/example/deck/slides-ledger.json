@@ -1,0 +1,68 @@
+[
+  {
+    "slide": 1,
+    "title": "研究方向由研究者掌握",
+    "claims": [
+      "demo"
+    ],
+    "sources": [
+      "data"
+    ],
+    "seconds": 35,
+    "backup": false,
+    "layout": "title"
+  },
+  {
+    "slide": 2,
+    "title": "原生图表保留给定数据",
+    "claims": [
+      "demo"
+    ],
+    "sources": [
+      "data"
+    ],
+    "seconds": 60,
+    "backup": false,
+    "layout": "evidence"
+  },
+  {
+    "slide": 3,
+    "title": "保留区间与中文标注",
+    "claims": [
+      "demo"
+    ],
+    "sources": [
+      "figure",
+      "data"
+    ],
+    "seconds": 40,
+    "backup": false,
+    "layout": "figure"
+  },
+  {
+    "slide": 4,
+    "title": "区分机器检查与科研判断",
+    "claims": [
+      "demo"
+    ],
+    "sources": [
+      "data"
+    ],
+    "seconds": 55,
+    "backup": false,
+    "layout": "comparison"
+  },
+  {
+    "slide": 5,
+    "title": "采用前，哪些内容需要修改？",
+    "claims": [
+      "demo"
+    ],
+    "sources": [
+      "data"
+    ],
+    "seconds": 45,
+    "backup": false,
+    "layout": "discussion"
+  }
+]

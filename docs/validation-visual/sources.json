@@ -1,0 +1,177 @@
+{
+  "review_date": "2026-10-20",
+  "method": "GitHub REST repository/commit/tree APIs and pinned raw source files. No upstream execution or comparative performance benchmark.",
+  "copied_upstream_implementation": false,
+  "repositories": [
+    {
+      "repository": "Agents365-ai/drawio-skill",
+      "sha": "57270820d3cd71cbdf4fb6b2f7091d4fb37bb019",
+      "truncated": false,
+      "url": "https://github.com/Agents365-ai/drawio-skill/tree/57270820d3cd71cbdf4fb6b2f7091d4fb37bb019",
+      "license_metadata": "MIT",
+      "scope": "selected source text inspection only; upstream code not executed",
+      "files": [
+        {
+          "path": "skills/drawio-skill/SKILL.md",
+          "sha256": "922d7863a09e6521236bffb6989ebe4e9bce045ebd0f82866c94375fccfd1c6b",
+          "url": "https://github.com/Agents365-ai/drawio-skill/blob/57270820d3cd71cbdf4fb6b2f7091d4fb37bb019/skills/drawio-skill/SKILL.md"
+        }
+      ]
+    },
+    {
+      "repository": "anthropics/skills",
+      "sha": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+      "truncated": false,
+      "url": "https://github.com/anthropics/skills/tree/dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+      "license_metadata": null,
+      "scope": "selected source text inspection only; upstream code not executed",
+      "files": [
+        {
+          "path": "skills/pptx/LICENSE.txt",
+          "sha256": "79f6d8f5b427252fa3b1c11ecdbdb6bf610b944f7530b4de78f770f38741cfaa",
+          "url": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/pptx/LICENSE.txt"
+        },
+        {
+          "path": "skills/pptx/SKILL.md",
+          "sha256": "a7ff03e2c85b636f55232a6b1555f5dd90216b7a1a359ab289d8364e6acbc6a0",
+          "url": "https://github.com/anthropics/skills/blob/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/pptx/SKILL.md"
+        }
+      ],
+      "license_note": "pptx subdirectory has a restrictive LICENSE.txt; used only for feature comparison, no files redistributed or adapted."
+    },
+    {
+      "repository": "brycewang-stanford/Auto-Research-Skills",
+      "sha": "0c37426075ba4aabaad1026f69c8b4c6f72dbadc",
+      "truncated": false,
+      "url": "https://github.com/brycewang-stanford/Auto-Research-Skills/tree/0c37426075ba4aabaad1026f69c8b4c6f72dbadc",
+      "license_metadata": "CC0-1.0",
+      "scope": "selected source text inspection only; upstream code not executed",
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "18922163037f3f3b27f7e3c3cd7a7df2cdca105e117ff970c068beca0054dc59",
+          "url": "https://github.com/brycewang-stanford/Auto-Research-Skills/blob/0c37426075ba4aabaad1026f69c8b4c6f72dbadc/README.md"
+        }
+      ]
+    },
+    {
+      "repository": "chuspeeism/dashi-ppt-skill",
+      "sha": "21dc7e5fc8c3a0d7f6a94948153dd1ee954f4e64",
+      "truncated": false,
+      "url": "https://github.com/chuspeeism/dashi-ppt-skill/tree/21dc7e5fc8c3a0d7f6a94948153dd1ee954f4e64",
+      "license_metadata": "AGPL-3.0",
+      "scope": "selected source text inspection only; upstream code not executed",
+      "files": [
+        {
+          "path": "skills/dashi-ppt/SKILL.md",
+          "sha256": "d4a3e924b643abeab591c3b8875e3bb4c0289e7d2fb65ac8dd710b3c559e43d3",
+          "url": "https://github.com/chuspeeism/dashi-ppt-skill/blob/21dc7e5fc8c3a0d7f6a94948153dd1ee954f4e64/skills/dashi-ppt/SKILL.md"
+        }
+      ]
+    },
+    {
+      "repository": "Haojae/scipilot-figure-skill",
+      "sha": "43098ddb9e6a6d142218540c114f9ed38922fc42",
+      "truncated": false,
+      "url": "https://github.com/Haojae/scipilot-figure-skill/tree/43098ddb9e6a6d142218540c114f9ed38922fc42",
+      "license_metadata": "MIT",
+      "scope": "selected source text inspection only; upstream code not executed",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "79e7438109306d40638728ba8adaadf7312d486215189b320e157ab2e382adcc",
+          "url": "https://github.com/Haojae/scipilot-figure-skill/blob/43098ddb9e6a6d142218540c114f9ed38922fc42/SKILL.md"
+        }
+      ]
+    },
+    {
+      "repository": "K-Dense-AI/scientific-agent-skills",
+      "sha": "593377bb048752abb0152deab9fbb1083a6087df",
+      "truncated": false,
+      "url": "https://github.com/K-Dense-AI/scientific-agent-skills/tree/593377bb048752abb0152deab9fbb1083a6087df",
+      "license_metadata": "MIT",
+      "scope": "selected source text inspection only; upstream code not executed",
+      "files": [
+        {
+          "path": "skills/scientific-schematics/SKILL.md",
+          "sha256": "e15d761ef88013c98fd5b19cc144aba7336e20dbadf340db17bd1ba2227d1d69",
+          "url": "https://github.com/K-Dense-AI/scientific-agent-skills/blob/593377bb048752abb0152deab9fbb1083a6087df/skills/scientific-schematics/SKILL.md"
+        },
+        {
+          "path": "skills/scientific-slides/scripts/validate_presentation.py",
+          "sha256": "f4f8ebe14e2cc593edf60e5236bd31fcae1b686757c90cc4b18eb488cdf78646",
+          "url": "https://github.com/K-Dense-AI/scientific-agent-skills/blob/593377bb048752abb0152deab9fbb1083a6087df/skills/scientific-slides/scripts/validate_presentation.py"
+        },
+        {
+          "path": "skills/scientific-slides/SKILL.md",
+          "sha256": "b1d34b81d30789f561bd4ee3ddb373c9fb84bed25086794bebd842af46afbad6",
+          "url": "https://github.com/K-Dense-AI/scientific-agent-skills/blob/593377bb048752abb0152deab9fbb1083a6087df/skills/scientific-slides/SKILL.md"
+        },
+        {
+          "path": "skills/scientific-visualization/scripts/figure_export.py",
+          "sha256": "fe9c77878da61297ce55224b67282d128631deb628d930aa1929c9eb7330bf79",
+          "url": "https://github.com/K-Dense-AI/scientific-agent-skills/blob/593377bb048752abb0152deab9fbb1083a6087df/skills/scientific-visualization/scripts/figure_export.py"
+        },
+        {
+          "path": "skills/scientific-visualization/SKILL.md",
+          "sha256": "8cbde7cdc10d959cf72cfd08335cc8ce996247eee6ebdb900eb64a4cb0ff34a3",
+          "url": "https://github.com/K-Dense-AI/scientific-agent-skills/blob/593377bb048752abb0152deab9fbb1083a6087df/skills/scientific-visualization/SKILL.md"
+        }
+      ]
+    },
+    {
+      "repository": "openai/skills",
+      "sha": "49f948faa9258a0c61caceaf225e179651397431",
+      "truncated": false,
+      "url": "https://github.com/openai/skills/tree/49f948faa9258a0c61caceaf225e179651397431",
+      "license_metadata": null,
+      "scope": "repository tree only; no slides SKILL.md in this inspected tree",
+      "files": []
+    },
+    {
+      "repository": "Orchestra-Research/AI-Research-SKILLs",
+      "sha": "773a52944ba4747a18bd4ae9ade53fff041adcbc",
+      "truncated": false,
+      "url": "https://github.com/Orchestra-Research/AI-Research-SKILLs/tree/773a52944ba4747a18bd4ae9ade53fff041adcbc",
+      "license_metadata": "MIT",
+      "scope": "selected source text inspection only; upstream code not executed",
+      "files": [
+        {
+          "path": "20-ml-paper-writing/academic-plotting/SKILL.md",
+          "sha256": "6613653d8109dcae36596b37d7414d5ae394a18f81543365222286d04485fd83",
+          "url": "https://github.com/Orchestra-Research/AI-Research-SKILLs/blob/773a52944ba4747a18bd4ae9ade53fff041adcbc/20-ml-paper-writing/academic-plotting/SKILL.md"
+        }
+      ]
+    },
+    {
+      "repository": "VoltAgent/awesome-agent-skills",
+      "sha": "aad12458dd990f1af4f752b271f9c8c7cab01513",
+      "truncated": false,
+      "url": "https://github.com/VoltAgent/awesome-agent-skills/tree/aad12458dd990f1af4f752b271f9c8c7cab01513",
+      "license_metadata": "MIT",
+      "scope": "selected source text inspection only; upstream code not executed",
+      "files": [
+        {
+          "path": "README.md",
+          "sha256": "f349d05e17b66039aaf46f0b04ac62036624b6e76ba112e939243b82f5020ccb",
+          "url": "https://github.com/VoltAgent/awesome-agent-skills/blob/aad12458dd990f1af4f752b271f9c8c7cab01513/README.md"
+        }
+      ]
+    },
+    {
+      "repository": "zLanqing/codex-claude-academic-skills",
+      "sha": "7ed6377f0efb6a38951b48ef03b19d996e454b1f",
+      "truncated": false,
+      "url": "https://github.com/zLanqing/codex-claude-academic-skills/tree/7ed6377f0efb6a38951b48ef03b19d996e454b1f",
+      "license_metadata": "MIT",
+      "scope": "selected source text inspection only; upstream code not executed",
+      "files": [
+        {
+          "path": "office-academic-skill/SKILL.md",
+          "sha256": "81408a5882f102435b2cd1e7ed77d7a50098416fd99ae9de0aad51e47abc42e8",
+          "url": "https://github.com/zLanqing/codex-claude-academic-skills/blob/7ed6377f0efb6a38951b48ef03b19d996e454b1f/office-academic-skill/SKILL.md"
+        }
+      ]
+    }
+  ]
+}

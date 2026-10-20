@@ -1,0 +1,130 @@
+{
+  "version": 1,
+  "purpose": "Explain a visual workflow using labelled synthetic values",
+  "audience": "Researcher reviewing software behavior",
+  "rationale": "Compare explicit values while preserving sources and researcher control.",
+  "evidence_status": "illustrative",
+  "sources": [
+    {
+      "id": "data",
+      "path": "sample.csv",
+      "sha256": "f8b24b0e6ba7b387d44efbfc30fc2e248704b27f216fa8306a6547b4d863317d",
+      "label": "Synthetic interface fixture"
+    },
+    {
+      "id": "figure",
+      "path": "../figure/figure.png",
+      "sha256": "7ff19146978291568ab0feba0192336fd49ebfa111cdac68e11ae82ab677363d",
+      "label": "Synthetic interval figure"
+    }
+  ],
+  "claims": [
+    {
+      "id": "demo",
+      "text": "These values illustrate the interface only.",
+      "status": "illustrative",
+      "evidence": [
+        {
+          "source": "data",
+          "locator": "rows 1-4"
+        }
+      ]
+    }
+  ],
+  "duration_seconds": 240,
+  "slides": [
+    {
+      "title": "研究方向由研究者掌握",
+      "layout": "title",
+      "body": [
+        "有来源、有版本、可人工介入的视觉工作流",
+        "仅为合成软件示例，不是科研实验结果"
+      ],
+      "seconds": 35,
+      "notes": "Introduce the software demonstration. No scientific result or user-study outcome is claimed.",
+      "claims": [
+        "demo"
+      ]
+    },
+    {
+      "title": "原生图表保留给定数据",
+      "layout": "evidence",
+      "body": [
+        "图表可编辑。",
+        "数据绑定 CSV 哈希。"
+      ],
+      "chart": {
+        "kind": "bar",
+        "source": "data",
+        "x": "step",
+        "xlabel": "Step",
+        "ylabel": "Illustrative value",
+        "series": [
+          {
+            "y": "value",
+            "label": "Fixture"
+          }
+        ]
+      },
+      "seconds": 60,
+      "notes": "Show that the native chart workbook retains each CSV value. The earlier figure separately shows supplied bounds.",
+      "claims": [
+        "demo"
+      ]
+    },
+    {
+      "title": "保留区间与中文标注",
+      "layout": "figure",
+      "image": {
+        "source": "figure",
+        "alt_text": "Synthetic values with supplied bounds and comparison scatter."
+      },
+      "seconds": 40,
+      "notes": "Explain the supplied bounds. They are not estimated confidence intervals. This is a software fixture.",
+      "claims": [
+        "demo"
+      ]
+    },
+    {
+      "title": "区分机器检查与科研判断",
+      "layout": "comparison",
+      "columns": [
+        {
+          "title": "机器检查",
+          "body": [
+            "来源字节与文件结构",
+            "时长与对象边界",
+            "实际渲染结果"
+          ]
+        },
+        {
+          "title": "研究者判断",
+          "body": [
+            "科学问题与证据强度",
+            "适当的强调与叙事",
+            "是否采用当前版本"
+          ]
+        }
+      ],
+      "seconds": 55,
+      "notes": "Explain why technical success does not approve scientific meaning or visual taste.",
+      "claims": [
+        "demo"
+      ]
+    },
+    {
+      "title": "采用前，哪些内容需要修改？",
+      "layout": "discussion",
+      "body": [
+        "核对方向、论断和证据。",
+        "提出修订、解释或停止要求。",
+        "只审阅当前产物版本。"
+      ],
+      "seconds": 45,
+      "notes": "Ask for actual feedback. The example does not synthesize approval.",
+      "claims": [
+        "demo"
+      ]
+    }
+  ]
+}

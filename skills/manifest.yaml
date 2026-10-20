@@ -483,31 +483,47 @@
     },
     "figure-mimic": {
       "entry": "figure-mimic/SKILL.md",
-      "outside_v2_upgrade": true,
       "required": [
         "author_materials"
       ],
-      "optional": [],
+      "optional": [
+        "research_brief",
+        "source_data",
+        "reference_style"
+      ],
       "external": [
         "author_materials"
       ],
       "provides": [
         "figure-mimic_output"
-      ]
+      ],
+      "intents": [
+        "科研数据图、可编辑示意图、参考风格与视觉检查"
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:figure-mimic"
     },
     "slides-builder": {
       "entry": "slides-builder/SKILL.md",
-      "outside_v2_upgrade": true,
       "required": [
         "author_materials"
       ],
-      "optional": [],
+      "optional": [
+        "research_brief",
+        "source_data",
+        "reference_style"
+      ],
       "external": [
         "author_materials"
       ],
       "provides": [
         "slides-builder_output"
-      ]
+      ],
+      "intents": [
+        "科研演示叙事、可编辑 PPTX、讲稿、模板与逐页检查"
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:slides-builder"
     },
     "research-explainer": {
       "entry": "research-explainer/SKILL.md",

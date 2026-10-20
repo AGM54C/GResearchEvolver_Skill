@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "builder": "build_deck.py",
+  "builder_sha256": "2ba28823a64cd5fcfe5f80d2f78588349bf6b4bfd0c6782ac38084d21bfcfeb6",
+  "shared_sha256": "de25edcf9eae080500d354ed69c970873d4a0c6727acbded49c9329ced94b2c4",
+  "packages": {
+    "matplotlib": "3.10.7",
+    "python-pptx": "1.0.2",
+    "Pillow": "11.3.0",
+    "PyMuPDF": "1.26.5"
+  },
+  "python": "3.13.3",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "font": {
+    "family": "Microsoft YaHei",
+    "file": "msyh.ttc",
+    "sha256": "d79c55e68b1131eea0cc1c47be4f572d964f28c682e143db2ad09c1e4cb07a3f"
+  },
+  "evidence_status": "illustrative",
+  "purpose": "Explain a visual workflow using labelled synthetic values",
+  "sources": [
+    {
+      "id": "data",
+      "path": "inputs/input-000.csv",
+      "sha256": "f8b24b0e6ba7b387d44efbfc30fc2e248704b27f216fa8306a6547b4d863317d",
+      "label": "Synthetic interface fixture"
+    },
+    {
+      "id": "figure",
+      "path": "inputs/input-001.png",
+      "sha256": "7ff19146978291568ab0feba0192336fd49ebfa111cdac68e11ae82ab677363d",
+      "label": "Synthetic interval figure"
+    }
+  ],
+  "checks": {
+    "slides": 5,
+    "main_talk_seconds": 235,
+    "font": "Microsoft YaHei",
+    "editable_text": true,
+    "native_charts": 1,
+    "office_render": "not_run",
+    "visual_review": "pending",
+    "text_fit": "heuristic screen only"
+  },
+  "human_review": "pending",
+  "scientific_validity": "not_established_by_build",
+  "outputs": {
+    "report.md": "517851d12204be254d64892af0b0e9f700257d755d9dc79d173157c64a382cf8",
+    "slides-ledger.json": "e3970319d8de51c0382ee1a1f6f463c33d42b47930e88454e4d93f3cb92f8879",
+    "slides.pptx": "43a624fe93986d43d68f1c7592d40f17724098814d2a8d2324c67c00848814da",
+    "speaker-notes.md": "26e768f40c13981491d05ebcbc8079ada9bdec98a845e4f9cceceec4b5f06db7",
+    "spec.json": "8f07fae3c37a02e9426a01b192b5e1007f33290154cef7bf2897ae50870de166",
+    "inputs/input-000.csv": "f8b24b0e6ba7b387d44efbfc30fc2e248704b27f216fa8306a6547b4d863317d",
+    "inputs/input-001.png": "7ff19146978291568ab0feba0192336fd49ebfa111cdac68e11ae82ab677363d"
+  }
+}

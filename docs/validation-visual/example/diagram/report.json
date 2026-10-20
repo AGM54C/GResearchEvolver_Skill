@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "builder": "build_diagram.py",
+  "builder_sha256": "223a1136d00a3723f37907d465c08a7c0f8546b13177e6db86ffcf43482d1f17",
+  "shared_sha256": "de25edcf9eae080500d354ed69c970873d4a0c6727acbded49c9329ced94b2c4",
+  "packages": {
+    "matplotlib": "3.10.7",
+    "python-pptx": "1.0.2",
+    "Pillow": "11.3.0",
+    "PyMuPDF": "1.26.5"
+  },
+  "python": "3.13.3",
+  "platform": "Windows-11-10.0.22631-SP0",
+  "font": null,
+  "evidence_status": "illustrative",
+  "purpose": "Explain a visual workflow using labelled synthetic values",
+  "sources": [
+    {
+      "id": "data",
+      "path": "inputs/input-000.csv",
+      "sha256": "f8b24b0e6ba7b387d44efbfc30fc2e248704b27f216fa8306a6547b4d863317d",
+      "label": "Synthetic interface fixture"
+    }
+  ],
+  "checks": {
+    "nodes": 3,
+    "edges": 2,
+    "bounds": "passed",
+    "node_overlap": "none",
+    "edge_routing_and_labels": "require visual review",
+    "preview_renderer": "PyMuPDF SVG converter; fonts may be substituted",
+    "relation_semantics": "require researcher review; types are declarations"
+  },
+  "human_review": "pending",
+  "scientific_validity": "not_established_by_build",
+  "outputs": {
+    "diagram.drawio": "fea3df0488ac9fbe2908e451f24eafeb9a139da8539f3e728ccbd1675b1ed4aa",
+    "diagram.pdf": "763c72462096323c6cbde62f332a4a1d06d8dd58a9720665c8d4d560e2c7ecee",
+    "diagram.png": "e2bcbda511a73583f33cfce3723cfc15ffdbfe2264796251fbdb8d8ca2d9b741",
+    "diagram.svg": "886172e51931ba84c8ca8588c2c4724b40c5442d39e0e635f853b63997063764",
+    "report.md": "6624d024ab46eb37ed2923ad84cafd3fde4a67e4a29b64e6de24976b8daa8fd7",
+    "spec.json": "efe06c4f66cb3b756f3a41754139f1c8140deee238835ada1bc5c231210cda2a",
+    "inputs/input-000.csv": "f8b24b0e6ba7b387d44efbfc30fc2e248704b27f216fa8306a6547b4d863317d"
+  }
+}

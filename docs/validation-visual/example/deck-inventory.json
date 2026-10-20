@@ -1,0 +1,257 @@
+{
+  "slides": [
+    {
+      "slide": 1,
+      "part": "ppt/slides/slide1.xml",
+      "shapes": [
+        {
+          "id": 2,
+          "name": "TextBox 1",
+          "type": "TEXT_BOX (17)",
+          "text": "研究方向由研究者掌握",
+          "outside_canvas": false,
+          "text_runs": [
+            "研究方向由研究者掌握"
+          ],
+          "native_chart": false
+        },
+        {
+          "id": 3,
+          "name": "TextBox 2",
+          "type": "TEXT_BOX (17)",
+          "text": "有来源、有版本、可人工介入的视觉工作流\n\n仅为合成软件示例，不是科研实验结果",
+          "outside_canvas": false,
+          "text_runs": [
+            "有来源、有版本、可人工介入的视觉工作流",
+            "仅为合成软件示例，不是科研实验结果"
+          ],
+          "native_chart": false
+        },
+        {
+          "id": 4,
+          "name": "TextBox 3",
+          "type": "TEXT_BOX (17)",
+          "text": "1 | ILLUSTRATIVE | Synthetic interface fixture",
+          "outside_canvas": false,
+          "text_runs": [
+            "1 | ILLUSTRATIVE | Synthetic interface fixture"
+          ],
+          "native_chart": false
+        }
+      ],
+      "notes": "Timing: 35 seconds\nIntroduce the software demonstration. No scientific result or user-study outcome is claimed.\n\nClaims\n[demo] illustrative: These values illustrate the interface only.\n\nSources\ndata: Synthetic interface fixture; SHA256 f8b24b0e6ba7b387d44efbfc30fc2e248704b27f216fa8306a6547b4d863317d"
+    },
+    {
+      "slide": 2,
+      "part": "ppt/slides/slide2.xml",
+      "shapes": [
+        {
+          "id": 2,
+          "name": "TextBox 1",
+          "type": "TEXT_BOX (17)",
+          "text": "原生图表保留给定数据",
+          "outside_canvas": false,
+          "text_runs": [
+            "原生图表保留给定数据"
+          ],
+          "native_chart": false
+        },
+        {
+          "id": 3,
+          "name": "Chart 2",
+          "type": "CHART (3)",
+          "text": null,
+          "outside_canvas": false,
+          "text_runs": [],
+          "native_chart": true
+        },
+        {
+          "id": 4,
+          "name": "TextBox 3",
+          "type": "TEXT_BOX (17)",
+          "text": "图表可编辑。\n\n数据绑定 CSV 哈希。",
+          "outside_canvas": false,
+          "text_runs": [
+            "图表可编辑。",
+            "数据绑定 CSV 哈希。"
+          ],
+          "native_chart": false
+        },
+        {
+          "id": 5,
+          "name": "TextBox 4",
+          "type": "TEXT_BOX (17)",
+          "text": "2 | ILLUSTRATIVE | Synthetic interface fixture",
+          "outside_canvas": false,
+          "text_runs": [
+            "2 | ILLUSTRATIVE | Synthetic interface fixture"
+          ],
+          "native_chart": false
+        }
+      ],
+      "notes": "Timing: 60 seconds\nShow that the native chart workbook retains each CSV value. The earlier figure separately shows supplied bounds.\n\nClaims\n[demo] illustrative: These values illustrate the interface only.\n\nSources\ndata: Synthetic interface fixture; SHA256 f8b24b0e6ba7b387d44efbfc30fc2e248704b27f216fa8306a6547b4d863317d"
+    },
+    {
+      "slide": 3,
+      "part": "ppt/slides/slide3.xml",
+      "shapes": [
+        {
+          "id": 2,
+          "name": "TextBox 1",
+          "type": "TEXT_BOX (17)",
+          "text": "保留区间与中文标注",
+          "outside_canvas": false,
+          "text_runs": [
+            "保留区间与中文标注"
+          ],
+          "native_chart": false
+        },
+        {
+          "id": 3,
+          "name": "Picture 2",
+          "type": "PICTURE (13)",
+          "text": null,
+          "outside_canvas": false,
+          "text_runs": [],
+          "native_chart": false
+        },
+        {
+          "id": 4,
+          "name": "TextBox 3",
+          "type": "TEXT_BOX (17)",
+          "text": "3 | ILLUSTRATIVE | Synthetic interval figure; Synthetic interface fixture",
+          "outside_canvas": false,
+          "text_runs": [
+            "3 | ILLUSTRATIVE | Synthetic interval figure; Synthetic interface fixture"
+          ],
+          "native_chart": false
+        }
+      ],
+      "notes": "Timing: 40 seconds\nExplain the supplied bounds. They are not estimated confidence intervals. This is a software fixture.\n\nClaims\n[demo] illustrative: These values illustrate the interface only.\n\nSources\nfigure: Synthetic interval figure; SHA256 7ff19146978291568ab0feba0192336fd49ebfa111cdac68e11ae82ab677363d\ndata: Synthetic interface fixture; SHA256 f8b24b0e6ba7b387d44efbfc30fc2e248704b27f216fa8306a6547b4d863317d"
+    },
+    {
+      "slide": 4,
+      "part": "ppt/slides/slide4.xml",
+      "shapes": [
+        {
+          "id": 2,
+          "name": "TextBox 1",
+          "type": "TEXT_BOX (17)",
+          "text": "区分机器检查与科研判断",
+          "outside_canvas": false,
+          "text_runs": [
+            "区分机器检查与科研判断"
+          ],
+          "native_chart": false
+        },
+        {
+          "id": 3,
+          "name": "TextBox 2",
+          "type": "TEXT_BOX (17)",
+          "text": "机器检查",
+          "outside_canvas": false,
+          "text_runs": [
+            "机器检查"
+          ],
+          "native_chart": false
+        },
+        {
+          "id": 4,
+          "name": "TextBox 3",
+          "type": "TEXT_BOX (17)",
+          "text": "来源字节与文件结构\n\n时长与对象边界\n\n实际渲染结果",
+          "outside_canvas": false,
+          "text_runs": [
+            "来源字节与文件结构",
+            "时长与对象边界",
+            "实际渲染结果"
+          ],
+          "native_chart": false
+        },
+        {
+          "id": 5,
+          "name": "TextBox 4",
+          "type": "TEXT_BOX (17)",
+          "text": "研究者判断",
+          "outside_canvas": false,
+          "text_runs": [
+            "研究者判断"
+          ],
+          "native_chart": false
+        },
+        {
+          "id": 6,
+          "name": "TextBox 5",
+          "type": "TEXT_BOX (17)",
+          "text": "科学问题与证据强度\n\n适当的强调与叙事\n\n是否采用当前版本",
+          "outside_canvas": false,
+          "text_runs": [
+            "科学问题与证据强度",
+            "适当的强调与叙事",
+            "是否采用当前版本"
+          ],
+          "native_chart": false
+        },
+        {
+          "id": 7,
+          "name": "TextBox 6",
+          "type": "TEXT_BOX (17)",
+          "text": "4 | ILLUSTRATIVE | Synthetic interface fixture",
+          "outside_canvas": false,
+          "text_runs": [
+            "4 | ILLUSTRATIVE | Synthetic interface fixture"
+          ],
+          "native_chart": false
+        }
+      ],
+      "notes": "Timing: 55 seconds\nExplain why technical success does not approve scientific meaning or visual taste.\n\nClaims\n[demo] illustrative: These values illustrate the interface only.\n\nSources\ndata: Synthetic interface fixture; SHA256 f8b24b0e6ba7b387d44efbfc30fc2e248704b27f216fa8306a6547b4d863317d"
+    },
+    {
+      "slide": 5,
+      "part": "ppt/slides/slide5.xml",
+      "shapes": [
+        {
+          "id": 2,
+          "name": "TextBox 1",
+          "type": "TEXT_BOX (17)",
+          "text": "采用前，哪些内容需要修改？",
+          "outside_canvas": false,
+          "text_runs": [
+            "采用前，哪些内容需要修改？"
+          ],
+          "native_chart": false
+        },
+        {
+          "id": 3,
+          "name": "TextBox 2",
+          "type": "TEXT_BOX (17)",
+          "text": "核对方向、论断和证据。\n\n提出修订、解释或停止要求。\n\n只审阅当前产物版本。",
+          "outside_canvas": false,
+          "text_runs": [
+            "核对方向、论断和证据。",
+            "提出修订、解释或停止要求。",
+            "只审阅当前产物版本。"
+          ],
+          "native_chart": false
+        },
+        {
+          "id": 4,
+          "name": "TextBox 3",
+          "type": "TEXT_BOX (17)",
+          "text": "5 | ILLUSTRATIVE | Synthetic interface fixture",
+          "outside_canvas": false,
+          "text_runs": [
+            "5 | ILLUSTRATIVE | Synthetic interface fixture"
+          ],
+          "native_chart": false
+        }
+      ],
+      "notes": "Timing: 45 seconds\nAsk for actual feedback. The example does not synthesize approval.\n\nClaims\n[demo] illustrative: These values illustrate the interface only.\n\nSources\ndata: Synthetic interface fixture; SHA256 f8b24b0e6ba7b387d44efbfc30fc2e248704b27f216fa8306a6547b4d863317d"
+    }
+  ],
+  "size_emu": [
+    12191999,
+    6858000
+  ],
+  "scope": "Object inventory and bounds only; not font rendering, overlap or scientific verification"
+}
