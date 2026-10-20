@@ -1,5 +1,7 @@
-# Offline suite dependencies; exact versions used for this harness validation.
+# Pinned dependencies for the clean CI environment; local validation receipts describe local packages.
 # Production experiment environments supply their own lockfiles and environment-lock receipts.
 cryptography==46.0.3
 numpy==2.2.6
 PyMuPDF==1.26.5
+# train_critic's leakage checks import this optional runtime backend.
+scikit-learn==1.7.2
