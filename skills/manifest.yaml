@@ -1,7 +1,11 @@
 {
   "version": 2,
   "defaults": {
-    "research_root": ".research-v2"
+    "research_root": ".research-v2",
+    "hci": {
+      "mode": "every-stage",
+      "require_explanation": true
+    }
   },
   "contract_note": "Capability contracts are not an executable DAG. Instantiate explicit stage IDs, needs, required/optional paths and versioned outputs.",
   "skills": {
@@ -21,7 +25,9 @@
       ],
       "provides": [
         "run_report"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:research-autopilot"
     },
     "literature-miner": {
       "entry": "literature-miner/SKILL.md",
@@ -39,7 +45,9 @@
       ],
       "provides": [
         "search_records"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:literature-miner"
     },
     "literature-scholar": {
       "entry": "literature-scholar/SKILL.md",
@@ -58,7 +66,9 @@
       "provides": [
         "evidence_graph",
         "reading_notes"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:literature-scholar"
     },
     "survey-architect": {
       "entry": "survey-architect/SKILL.md",
@@ -74,7 +84,9 @@
       "external": [],
       "provides": [
         "survey"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:survey-architect"
     },
     "idea-forge": {
       "entry": "idea-forge/SKILL.md",
@@ -93,7 +105,9 @@
       ],
       "provides": [
         "hypotheses"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:idea-forge"
     },
     "experiment-designer": {
       "entry": "experiment-designer/SKILL.md",
@@ -112,7 +126,9 @@
       ],
       "provides": [
         "protocol"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:experiment-designer"
     },
     "experiment-replicator": {
       "entry": "experiment-replicator/SKILL.md",
@@ -129,7 +145,9 @@
       "external": [],
       "provides": [
         "experiment_results"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:experiment-replicator"
     },
     "diagnosis-clinician": {
       "entry": "diagnosis-clinician/SKILL.md",
@@ -149,7 +167,9 @@
       "provides": [
         "diagnosis",
         "intervention_plan"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:diagnosis-clinician"
     },
     "rsi-evolver": {
       "entry": "rsi-evolver/SKILL.md",
@@ -168,7 +188,9 @@
       ],
       "provides": [
         "evolution_receipt"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:rsi-evolver"
     },
     "paper-writer": {
       "entry": "paper-writer/SKILL.md",
@@ -190,7 +212,9 @@
       "provides": [
         "manuscript",
         "claim_ledger"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:paper-writer"
     },
     "style-mimic": {
       "entry": "style-mimic/SKILL.md",
@@ -209,7 +233,9 @@
       "provides": [
         "styled_manuscript",
         "style_profile"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:style-mimic"
     },
     "latex-adaptor": {
       "entry": "latex-adaptor/SKILL.md",
@@ -228,7 +254,9 @@
       ],
       "provides": [
         "submission_sources"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:latex-adaptor"
     },
     "reviewer-panel": {
       "entry": "reviewer-panel/SKILL.md",
@@ -245,7 +273,9 @@
       "external": [],
       "provides": [
         "review_issues"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:reviewer-panel"
     },
     "rebuttal-drafter": {
       "entry": "rebuttal-drafter/SKILL.md",
@@ -263,7 +293,9 @@
       "provides": [
         "response_matrix",
         "revised_manuscript"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:rebuttal-drafter"
     },
     "doc-composer": {
       "entry": "doc-composer/SKILL.md",
@@ -281,7 +313,9 @@
       ],
       "provides": [
         "communication_draft"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:doc-composer"
     },
     "systematic-review": {
       "entry": "systematic-review/SKILL.md",
@@ -300,7 +334,9 @@
       "provides": [
         "screening",
         "review_synthesis"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:systematic-review"
     },
     "reference-manager": {
       "entry": "reference-manager/SKILL.md",
@@ -320,7 +356,9 @@
       "provides": [
         "library",
         "bibliography"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:reference-manager"
     },
     "statistical-analyst": {
       "entry": "statistical-analyst/SKILL.md",
@@ -337,7 +375,9 @@
       "external": [],
       "provides": [
         "statistical_results"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:statistical-analyst"
     },
     "hypothesis-validator": {
       "entry": "hypothesis-validator/SKILL.md",
@@ -354,7 +394,9 @@
       "external": [],
       "provides": [
         "validation_record"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:hypothesis-validator"
     },
     "research-control": {
       "entry": "research-control/SKILL.md",
@@ -372,7 +414,9 @@
       ],
       "provides": [
         "intervention_record"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:research-control"
     },
     "theory-prover": {
       "entry": "theory-prover/SKILL.md",
@@ -391,7 +435,9 @@
       ],
       "provides": [
         "proof_receipt"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:theory-prover"
     },
     "grant-planner": {
       "entry": "grant-planner/SKILL.md",
@@ -411,7 +457,9 @@
       ],
       "provides": [
         "grant_draft"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:grant-planner"
     },
     "literature-monitor": {
       "entry": "literature-monitor/SKILL.md",
@@ -429,7 +477,9 @@
       ],
       "provides": [
         "literature_digest"
-      ]
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:literature-monitor"
     },
     "figure-mimic": {
       "entry": "figure-mimic/SKILL.md",
@@ -458,6 +508,27 @@
       "provides": [
         "slides-builder_output"
       ]
+    },
+    "research-explainer": {
+      "entry": "research-explainer/SKILL.md",
+      "intents": [
+        "用直观例子、技术细节和原文依据讲解知识点、论文、论断与实验结果，记录理解问题和反馈。"
+      ],
+      "required": [
+        "question"
+      ],
+      "optional": [
+        "source_materials",
+        "stage_report"
+      ],
+      "external": [
+        "question"
+      ],
+      "provides": [
+        "grounded_explanation"
+      ],
+      "stage_protocol": "_shared/human-guided-research.md",
+      "evolution_target": "skill:research-explainer"
     }
   },
   "pipelines": {
@@ -860,6 +931,15 @@
         ],
         "bindings_required": true
       }
+    ],
+    "explanation": [
+      {
+        "id": "1-research-explainer",
+        "skill": "research-explainer",
+        "needs": [],
+        "bindings_required": true
+      }
     ]
-  }
+  },
+  "shared_stage_protocol": "_shared/human-guided-research.md"
 }

@@ -184,6 +184,8 @@ def validate_manifest(m):
         raise ResearchError('reproducibility.mode must be record or strict')
     if policy.get('mode') == 'strict' and not policy.get('lock'):
         raise ResearchError('Strict reproducibility requires an environment lock')
+    from .hci import validate_policy
+    validate_policy(m)
     return m
 
 
@@ -263,7 +265,10 @@ class Store:
     def blob(self, key):
         if not re.fullmatch(r"[a-f0-9]{64}", key):
             raise ResearchError("Invalid object hash")
-        data = (self.objects / key).read_bytes()
+        try:
+            data = (self.objects / key).read_bytes()
+        except FileNotFoundError as exc:
+            raise ResearchError(f'Object missing: {key}') from exc
         if digest(data) != key:
             raise ResearchError(f"Object corrupted: {key}")
         return data
@@ -291,6 +296,9 @@ class Store:
         return json.loads(row["manifest"]), json.loads(row["state"])
 
     def save(self, run, state):
+        from .hci import refresh
+        manifest, _ = self.get(run)
+        refresh(self, run, manifest, state)
         self.db.execute("UPDATE runs SET state=? WHERE id=?", (canonical(state), run))
 
     def work(self, run):
@@ -318,7 +326,7 @@ class Store:
             p.parent.mkdir(parents=True, exist_ok=True)
             atomic_bytes(p, self.blob(key))
 
-    def create(self, manifest, run=None, inputs=None):
+    def create(self, manifest, run=None, inputs=None, *, _inherited_pins=None):
         manifest = validate_manifest(manifest)
         run = valid_id(run or "run-" + uuid.uuid4().hex[:12])
         if self.db.execute("SELECT 1 FROM runs WHERE id=?", (run,)).fetchone() or self.work(run).exists():
@@ -327,6 +335,12 @@ class Store:
         seeds = {name: Path(path).read_bytes() for name, path in (inputs or {}).items()}
         for name in seeds:
             safe_path(self.work(run), name)
+            from .hci import reserved
+            if reserved(name):
+                raise ResearchError('Reserved runtime input directory')
+        from .capabilities import pins
+        selected, bundled = pins(self, manifest, inherited=_inherited_pins)
+        seeds.update(bundled)
         self.work(run).mkdir(parents=True)
         for name, data in seeds.items():
             p = safe_path(self.work(run), name)
@@ -336,9 +350,11 @@ class Store:
                  "stages": {s["id"]: {"status": "pending", "attempts": 0} for s in manifest["stages"]},
                  "artifacts": {}, "inputs": self.files(self.work(run)), "annotations": [], "breakpoints": manifest.get("breakpoints", [])}
         state['artifacts'].update(state['inputs'])
+        for sid, selected_bundle in selected.items(): state['stages'][sid]['capability_pin'] = selected_bundle
         with self.tx():
             self.db.execute("INSERT INTO runs VALUES(?,?,?)", (run, canonical(manifest), canonical(state)))
             self.event(run, "created", {"manifest": manifest, "inputs": state["inputs"], "version": 2})
+            self.save(run, state)
         return run
 
     def control(self, run, action, reason="human control", stage=None):
@@ -349,6 +365,9 @@ class Store:
                     raise ResearchError("Terminal run cannot pause")
                 s["status"] = "pause_requested" if s.get("worker") else "paused"
             elif action in {"resume", "step"}:
+                from .hci import pending
+                if pending(s) or s.get('intervention_hold'):
+                    raise ResearchError('Resolve researcher feedback and review the current report before resuming')
                 if s["status"] in {"completed", "cancelled"}:
                     raise ResearchError("Fork a terminal run to continue")
                 if any(v["status"] == "running" for v in s["stages"].values()):
@@ -365,13 +384,17 @@ class Store:
                     raise ResearchError("Unknown stage")
                 s["breakpoints"] = sorted(set(s["breakpoints"]) | {stage})
             elif action == "retry":
+                if s['status'] == 'cancelled':
+                    raise ResearchError('Cancelled runs are terminal; fork to retry')
                 if s.get("worker") or stage not in s["stages"] or s["stages"][stage]["status"] != "failed":
                     raise ResearchError("Retry requires an idle failed stage")
                 if s['stages'][stage].get('cleanup_pending') or s['stages'][stage].get('active_attempt'):
                     raise ResearchError('Recover and verify job cleanup before retrying')
                 history = s['stages'][stage].setdefault('history', [])
-                history.append({k: v for k, v in s['stages'][stage].items() if k != 'history'})
-                s["stages"][stage]["status"] = "pending"
+                item = s['stages'][stage]
+                history.append({k: v for k, v in item.items() if k not in {'history', 'report_history', 'feedback', 'feedback_resolutions'}})
+                retained = {k: item[k] for k in ('history', 'report_history', 'feedback', 'feedback_resolutions', 'capability_pin') if k in item}
+                s['stages'][stage] = {**retained, 'cycle': item.get('cycle', 1) + 1, 'status': 'pending', 'attempts': 0}
                 s["status"] = "ready"
             else:
                 raise ResearchError("Unknown control action")
@@ -398,6 +421,8 @@ class Store:
                 raise ResearchError("Only awaiting_artifact stages can be completed manually")
             if s.get('worker') or s['status'] == 'cancelled':
                 raise ResearchError('Cannot submit while a worker owns the run or after cancellation')
+            from .hci import validate_inputs
+            validate_inputs(self, run, spec, s['stages'][stage])
             for name in spec.get('requires', []) + spec.get('optional', []):
                 p = safe_path(self.work(run), name)
                 expected = s['stages'][stage]['checkpoint'].get(name)
@@ -459,11 +484,12 @@ class Store:
             raise ResearchError("Changes must target the affected branch")
         for spec in m["stages"]:
             if spec["id"] in patches:
-                if set(patches[spec["id"]]) - {"command", "timeout", "requires", "optional", "outputs", "instructions", "milestone", "milestone_id"}:
+                if set(patches[spec["id"]]) - {"command", "timeout", "requires", "optional", "outputs", "instructions", "milestone", "milestone_id", "rationale", "goal", "alternatives", "review_questions"}:
                     raise ResearchError("Unsupported fork patch key")
                 spec.update(patches[spec["id"]])
         validate_manifest(m)
-        child = self.create(m, child)
+        inherited = {sid: item['capability_pin'] for sid, item in s['stages'].items() if item.get('capability_pin')}
+        child = self.create(m, child, _inherited_pins=inherited)
         _, cs = self.get(child)
         # Start from the actual pre-intervention checkpoint, not the final mutated directory.
         base = s["stages"][stage].get("checkpoint", s["inputs"])
@@ -473,6 +499,7 @@ class Store:
             if key not in affected and item["status"] == "completed":
                 self.restore(item["outputs"], self.work(child))
                 cs["stages"][key] = item
+                cs['stages'][key]['inherited_from'] = {'run': run, 'stage': key, 'outputs': item['outputs']}
                 cs["artifacts"].update(item["outputs"])
         cs.update(parent=run, intervention={"stage": stage, "affected": sorted(affected), "changes": patches,
                   "state_fidelity": "workspace_files_only", "external_state": "not_restored"}, inputs=self.files(self.work(child)))
@@ -489,7 +516,8 @@ class Store:
         bundle = read_json(directory / 'archive.json')
         for h in bundle.get('objects', []):
             self.put((directory / 'objects' / h).read_bytes())
-        run = self.create(bundle['manifest'], run)
+        inherited = {sid: item['capability_pin'] for sid, item in bundle['state']['stages'].items() if item.get('capability_pin')}
+        run = self.create(bundle['manifest'], run, _inherited_pins=inherited)
         self.restore(bundle['files'], self.work(run))
         state = bundle['state']
         state.update(worker=None, imported_from=bundle['run'])
@@ -524,6 +552,9 @@ class Store:
             maps = [state.get('inputs', {}), state.get('artifacts', {})]
             for stage in state['stages'].values():
                 maps.extend(stage.get(k, {}) for k in ('checkpoint', 'outputs', 'log_hashes'))
+                for receipt in stage.get('report_history', []):
+                    maps.append({k: receipt[k] for k in ('json', 'markdown')})
+                if stage.get('explanation'): maps.append({'explanation': stage['explanation']['object']})
             for hashes in maps:
                 for key in hashes.values():
                     try: self.blob(key)
@@ -531,6 +562,14 @@ class Store:
         for row in self.db.execute('SELECT snapshot FROM memory_versions'):
             try: self.blob(row['snapshot'])
             except (ResearchError, OSError): errors.append('memory_snapshot:' + row['snapshot'])
+        for row in self.db.execute("SELECT key,value FROM values_store WHERE key LIKE 'capability:%' OR key LIKE 'proposal:%'"):
+            record = json.loads(row['value'])
+            bundles = ([record['active']] + record['history']) if row['key'].startswith('capability:') else [record['candidate']]
+            keys = {key for bundle in bundles for key in bundle['files'].values()}
+            keys.update(source['report_hash'] for source in record.get('sources', []))
+            for key in keys:
+                try: self.blob(key)
+                except (ResearchError, OSError): errors.append('capability_reference:' + row['key'] + ':' + key)
         return {"valid": not errors, "errors": errors, "integrity_only": True, "security_seal": False}
 
     def archive(self, run):

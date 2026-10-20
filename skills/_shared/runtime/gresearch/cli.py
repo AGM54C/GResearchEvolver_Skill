@@ -17,6 +17,9 @@ OPERATIONS = (
     'rsi-freeze', 'rsi-evaluate', 'rsi-rollback', 'rsi-recover', 'rsi-export', 'rsi-compare', 'rsi-status',
     'enqueue', 'queue-next', 'queue-cancel', 'queue-status', 'queue-recover', 'proof', 'grant',
     'environment-lock', 'environment-check', 'memory-put', 'memory-get', 'memory-search', 'memory-neighbors',
+    'stage-report', 'stage-feedback', 'stage-explain', 'stage-revise', 'stage-memory', 'reports-rebuild',
+    'capability-list', 'capability-freeze', 'capability-status', 'capability-propose', 'capability-evaluate',
+    'capability-review', 'capability-activate', 'capability-rollback', 'capability-export', 'proposal-status',
     'memory-invalidate', 'memory-export', 'memory-import', 'memory-sync', 'memory-remote-search', 'memory-pull',
     'model', 'embeddings', 'semantic-review', 'semantic-graph', 'semantic-metrics', 's2-bulk', 'isolated-run',
     'signing-keygen', 'receipt-accept', 'representations', 'critic-fit', 'critic-predict', 'study-plan', 'study-analyze')
@@ -24,6 +27,26 @@ OPERATIONS = (
 
 def operation(store, name, data):
     from . import statistics as st, evidence as ev, literature as lit, review as rv, evolution as rs, projects as pr, retrieval as rt
+    if name.startswith('stage-') or name == 'reports-rebuild':
+        from . import hci
+        if name == 'stage-report': return hci.read(store, data['run'], data['stage'], data.get('report_id'))
+        if name == 'stage-feedback': return hci.feedback(store, **data)
+        if name == 'stage-explain': return hci.explain(store, **data)
+        if name == 'stage-revise': return hci.revise(store, **data)
+        if name == 'stage-memory': return hci.to_memory(store, **data)
+        return hci.rebuild(store, data['run'])
+    if name.startswith('capability-') or name == 'proposal-status':
+        from . import capabilities as cap
+        if name == 'capability-list': return cap.catalog()
+        if name == 'capability-freeze': return cap.freeze(store, **data)
+        if name == 'capability-status': return cap.state(store, data['target'])
+        if name == 'capability-propose': return cap.propose(store, **data)
+        if name == 'capability-evaluate': return cap.evaluate(store, **data)
+        if name == 'capability-review': return cap.review(store, **data)
+        if name == 'capability-activate': return cap.activate(store, **data)
+        if name == 'capability-rollback': return cap.rollback(store, **data)
+        if name == 'capability-export': return cap.export(store, **data)
+        return cap.proposal(store, data['identity'])
     if name.startswith('memory-'):
         from . import memory
         if name == 'memory-put': return memory.put(store, data['project'], data['graph'], data['expected_revision'], actor=data['actor'], reason=data['reason'])

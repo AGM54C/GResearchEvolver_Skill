@@ -12,3 +12,5 @@ description: 按独立分析单位进行数据质量检查、配对效应与区�
 其他领域检验可使用合适的 R/Python 库，在 workflow 记录命令、环境、数据与结果。不得为了使用内置函数改变研究问题。输出机器可读 results ledger 和解释，包含无信号、排除和失败分析。
 
 按需读取 [共享运行规则](../_shared/README.md) 与 [接口示例](../_shared/runtime-guide.md)。旧评分 rubric 是启发式质量清单，不能代替实际证据和独立验收。
+
+受管阶段遵循 [阶段报告、科研讲解与受控进化协议](../_shared/human-guided-research.md)：说明为什么这样做、具体方法与结果；由 runtime 保存版本化 report.md，按需调用 research-explainer，记录研究者的实际反馈并落实到暂停、修改分支或后续执行。改进本技能时使用 `capability-freeze/propose/evaluate/review/activate`，目标为 `skill:statistical-analyst`；未经冻结评估及研究者接受，不把候选标记为已采用或能力提升。

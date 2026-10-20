@@ -14,3 +14,5 @@ description: 检索可追溯的学术元数据与全文来源，保存检索式�
 本地全文用 `local-index/local-search` 做可定位的 BM25 检索，可显式加入跨语言别名；已有实际生成的向量时可做余弦与 RRF 混合排序，固定 embedding_model/version 与生成依据，不伪造语义向量。来源改变后索引会拒绝继续使用，需重建。公开 API 有有界缓存与瞬时错误退避；最新动态检索可设 cache_seconds=0。
 
 按需读取 [共享运行规则](../_shared/README.md) 与 [接口示例](../_shared/runtime-guide.md)。旧评分 rubric 是启发式质量清单，不能代替实际证据和独立验收。
+
+受管阶段遵循 [阶段报告、科研讲解与受控进化协议](../_shared/human-guided-research.md)：说明为什么这样做、具体方法与结果；由 runtime 保存版本化 report.md，按需调用 research-explainer，记录研究者的实际反馈并落实到暂停、修改分支或后续执行。改进本技能时使用 `capability-freeze/propose/evaluate/review/activate`，目标为 `skill:literature-miner`；未经冻结评估及研究者接受，不把候选标记为已采用或能力提升。

@@ -1,5 +1,6 @@
 """Real process failures and storage invariants; no model or remote credentials required."""
 import json
+import errno
 import os
 from pathlib import Path
 import subprocess
@@ -87,6 +88,29 @@ class HarnessTests(Workspace):
         self.assertTrue(receipt['cleanup_verified'])
         self.assertEqual(receipt['supervisor_exit_code'], 0)
         self.assertFalse(marker.exists())
+
+    def test_closed_launch_pipe_still_settles_timeout_and_waits_for_supervisor(self):
+        from gresearch.process_runner import run as managed_run
+        real_popen, launched = subprocess.Popen, []
+        class ClosedPipe:
+            def __init__(self, original): self.original = original
+            def write(self, data): raise OSError(errno.EINVAL, 'fixture: Windows closed launch pipe')
+            def flush(self): raise AssertionError('A failed write must not be flushed')
+            def close(self):
+                self.original.close()
+                raise OSError(errno.EINVAL, 'fixture: closed pipe on close')
+        def launch(*args, **kwargs):
+            process = real_popen(*args, **kwargs)
+            process.stdin = ClosedPipe(process.stdin)
+            launched.append(process)
+            return process
+        with mock.patch('gresearch.process_runner.subprocess.Popen', side_effect=launch):
+            receipt = managed_run([sys.executable, '-c', "open('must-not-run','w').write('unexpected')"],
+                                  self.root, self.root / 'closed-pipe', time.monotonic() + .5)
+        self.assertEqual(receipt['reason'], 'timeout')
+        self.assertTrue(receipt['cleanup_verified'])
+        self.assertIsNotNone(launched[0].poll())
+        self.assertFalse((self.root / 'must-not-run').exists())
 
     def test_successful_parent_cannot_leave_background_process(self):
         code = ("import subprocess,sys,json;"

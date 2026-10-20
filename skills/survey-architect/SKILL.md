@@ -10,3 +10,5 @@ description: 基于证据组织叙述性综述，比较方法、适用条件、�
 输出主题结构、来源矩阵、共识/争议/不足、可验证方向与引用库。写作期间运行 writing-audit，并人工检查跨文献推论是否超出证据。系统性覆盖、PRISMA 或 meta-analysis 要有对应协议和实际执行记录。
 
 按需读取 [共享运行规则](../_shared/README.md) 与 [接口示例](../_shared/runtime-guide.md)。旧评分 rubric 是启发式质量清单，不能代替实际证据和独立验收。
+
+受管阶段遵循 [阶段报告、科研讲解与受控进化协议](../_shared/human-guided-research.md)：说明为什么这样做、具体方法与结果；由 runtime 保存版本化 report.md，按需调用 research-explainer，记录研究者的实际反馈并落实到暂停、修改分支或后续执行。改进本技能时使用 `capability-freeze/propose/evaluate/review/activate`，目标为 `skill:survey-architect`；未经冻结评估及研究者接受，不把候选标记为已采用或能力提升。

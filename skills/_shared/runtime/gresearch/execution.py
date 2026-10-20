@@ -45,13 +45,20 @@ def _run_workflow(store, run):
             raise ResearchError("Run has a worker; use status/control, or recover after confirming that worker exited")
         if any(v.get('active_attempt') or v.get('cleanup_pending') for v in s['stages'].values()):
             raise ResearchError('Recover unsettled attempts before starting more stages')
+        from .hci import pending as pending_reviews
+        if s['status'] in {'cancelled', 'completed'}: return s
+        if pending_reviews(s) or s.get('intervention_hold'):
+            s['status'] = 'awaiting_review'
+            store.save(run, s)
+            return s
         if s["status"] not in {"ready", "blocked"}:
             return s
         observed, check = inspect_run(store, run, m)
+        s.pop('blocker', None)
         s['environment'] = observed
         store.event(run, 'environment_checked', {'observed': observed, 'check': check})
         if m.get('reproducibility', {}).get('mode') == 'strict' and not check['matches']:
-            s.update(status='blocked', environment_error=check)
+            s.update(status='blocked', environment_error=check, blocker={'category': 'environment', 'check': check})
             store.save(run, s)
             return s
         s["worker"] = owner
@@ -70,6 +77,10 @@ def _run_workflow(store, run):
                     raise ResearchError('Worker ownership changed; refusing stale state commit')
                 if s["status"] in {"pause_requested", "cancel_requested"}:
                     s["status"] = "paused" if s["status"] == "pause_requested" else "cancelled"
+                    store.save(run, s)
+                    break
+                if pending_reviews(s) or s.get('intervention_hold'):
+                    s['status'] = 'awaiting_review'
                     store.save(run, s)
                     break
                 pending = [x for x in m["stages"] if s["stages"][x["id"]]["status"] == "pending"]
@@ -95,6 +106,7 @@ def _run_workflow(store, run):
                     allowed = allowed and fingerprint(spec) in m["authorization"].get("approved_stage_digests", [])
                 if not allowed:
                     s["status"] = "blocked"
+                    s['blocker'] = {'category': 'authorization', 'stage': sid, 'effect': effect}
                     store.event(run, "authorization_required", {"stage": sid, "effect": effect, "digest": fingerprint(spec)})
                     store.save(run, s)
                     break
@@ -102,12 +114,21 @@ def _run_workflow(store, run):
                 reservation = spec.get('cost_estimate', 0) * (1 + spec.get('retries', 0))
                 if s["seconds"] >= budget.get("seconds", 3600) or s["reserved_cost"] + reservation > budget.get("cost", 0):
                     s["status"] = "blocked"
+                    s['blocker'] = {'category': 'budget', 'stage': sid, 'budget': budget}
                     store.event(run, "budget_exhausted", {"stage": sid, "budget": budget})
                     store.save(run, s)
                     break
                 missing = [p for p in spec.get("requires", []) if not safe_path(store.work(run), p).is_file()]
                 changed = [p for p in spec.get('requires', []) + spec.get('optional', []) if p in s['artifacts']
                            and (not safe_path(store.work(run), p).is_file() or digest(safe_path(store.work(run), p).read_bytes()) != s['artifacts'][p])]
+                pin = s['stages'][sid].get('capability_pin')
+                if pin:
+                    if store.files(safe_path(store.work(run), pin['directory'])) != pin['bundle']['files']:
+                        changed.append(pin['directory'] + ' (bundle file set)')
+                    for name, expected in pin['bundle']['files'].items():
+                        path = pin['directory'] + '/' + name
+                        if not safe_path(store.work(run), path).is_file() or digest(safe_path(store.work(run), path).read_bytes()) != expected:
+                            changed.append(path)
                 if missing or changed:
                     s["stages"][sid].update(status="failed", error={"missing": missing, "changed_inputs": changed})
                     store.event(run, "input_invalid", {"stage": sid, "missing": missing, "changed": changed})
@@ -176,6 +197,13 @@ def execute_stage(store, run, spec):
     limit = min(spec.get("timeout", 300), m.get("budget", {}).get("seconds", 3600) - state["seconds"])
     deadline = started + limit
     invocation = command_argv(spec)
+    pin = state['stages'][spec['id']].get('capability_pin')
+    bundled_inputs = []
+    if pin:
+        # Commands run in work(run). Relative POSIX paths avoid mixing a Windows
+        # extended-length prefix with a caller's '/agent.py' suffix.
+        invocation = [arg.replace('{bundle}', pin['directory']) for arg in invocation]
+        bundled_inputs = [pin['directory'] + '/' + name for name in pin['bundle']['files']]
     env = os.environ.copy()
     # Host environment is inherited. env_from maps names; the runtime does not persist
     # their values, but trusted subprocesses can read/print them in captured raw logs.
@@ -186,6 +214,8 @@ def execute_stage(store, run, spec):
         env[target] = os.environ[source]
     if 'seed' in spec:
         env.update(GRESEARCH_SEED=str(spec['seed']), PYTHONHASHSEED=str(spec['seed']))
+    if pin:
+        env['PYTHONDONTWRITEBYTECODE'] = '1'
     result = {"status": "failed", "seconds": 0}
     attempts = []
     for attempt in range(spec.get("retries", 0) + 1):
@@ -199,7 +229,7 @@ def execute_stage(store, run, spec):
         logdir = store.work(run) / "logs" / spec["id"] / uuid.uuid4().hex[:12]
         logdir.mkdir(parents=True)
         before = {p: digest(safe_path(store.work(run), p).read_bytes()) if safe_path(store.work(run), p).is_file() else None
-                  for p in spec.get('requires', []) + spec.get('optional', [])}
+                  for p in spec.get('requires', []) + spec.get('optional', []) + bundled_inputs}
         with store.tx():
             store.event(run, "invocation", {"stage": spec["id"], "argv": invocation, "cwd": str(store.work(run)),
                         "input_hashes": before, "env_names": list(spec.get("env_from", {})), "attempt": attempt + 1,
@@ -212,6 +242,8 @@ def execute_stage(store, run, spec):
             timed_out = receipt.get('reason') == 'timeout'
             cancelled = receipt.get('reason') == 'cancelled'
             mutated = [p for p, h in before.items() if (digest(safe_path(store.work(run), p).read_bytes()) if safe_path(store.work(run), p).is_file() else None) != h]
+            if pin and store.files(safe_path(store.work(run), pin['directory'])) != pin['bundle']['files']:
+                mutated.append(pin['directory'] + ' (bundle file set)')
             result = {"status": "failed", "exit_code": rc, "timeout": timed_out, "cancelled": cancelled,
                       "attempts": attempt + 1, "logs": logdir.relative_to(store.work(run)).as_posix(), "mutated_inputs": mutated,
                       'supervisor': receipt, 'cleanup_pending': not receipt.get('cleanup_verified', False),

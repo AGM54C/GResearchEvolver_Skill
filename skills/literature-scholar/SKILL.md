@@ -18,3 +18,5 @@ PDF 用 `tool pdf` 保存原文件哈希、逐页文本和低文本量警告。�
 需要跨会话保存时，将原始证据图通过 `memory-put` 版本化，科研条目仍为节点，支持/反驳/限定等仍为边，完整保留引文、页码、哈希和裁决。来源被撤回或改动时用 `memory-invalidate` 传播复查状态。OpenViking 的摘要与向量命中不能替代此图，接口见 [记忆手册](../_shared/harness-operations.md)。
 
 按需读取 [共享运行规则](../_shared/README.md) 与 [接口示例](../_shared/runtime-guide.md)。旧评分 rubric 是启发式质量清单，不能代替实际证据和独立验收。
+
+受管阶段遵循 [阶段报告、科研讲解与受控进化协议](../_shared/human-guided-research.md)：说明为什么这样做、具体方法与结果；由 runtime 保存版本化 report.md，按需调用 research-explainer，记录研究者的实际反馈并落实到暂停、修改分支或后续执行。改进本技能时使用 `capability-freeze/propose/evaluate/review/activate`，目标为 `skill:literature-scholar`；未经冻结评估及研究者接受，不把候选标记为已采用或能力提升。

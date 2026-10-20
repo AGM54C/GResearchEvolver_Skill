@@ -53,3 +53,11 @@ SQLite 使用 WAL/FULL synchronous；CAS 先写 staging 并 fsync，再发布哈
 哈希正确、引用存在、编译通过、程序成功、模型共识，都不等于结论为真。保留 source→data→code→result→claim 链，独立重算关键结果，语义裁决附证据和反证。负结果、未决、计划中和不适用应分别记录。
 
 语义模型对否定、量词、人群、因果、语气和数字条件分别检查；每个引文绑定原文哈希与字符偏移。模型结果标记为 triage，缺失/冲突/未校准情况拒判，不覆盖人工裁决。真实人工标签试验、领域方法及专家判断是不同证据，不能互相替代。
+
+## 阶段协作与能力进化
+
+每个受管阶段保存版本化 report.md/report.json，记录目标、选择理由、方法、输入输出、解释和真实反馈。新编排建议 every-stage，用户可选择 checkpoints 或 observe；无 hci 字段的旧 manifest 继续按 observe 执行。接受反馈须绑定最新报告，resume 不能绕过待审或修改请求。
+
+注册的科研 skill、工具操作及 runtime 模块均可建立改进提案。候选与基线经过冻结任务/评分器的实际比较，再由研究者审阅采用；现有 run 固定原包，新 run 才能显式绑定新版本。核心调度、权限与评分器不在运行中自动替换。代码级改进需导出、独立审查和发布。
+
+完整协议见源码 skills/_shared/human-guided-research.md，安装后为 _shared/human-guided-research.md。结构核验、软件测试和采用记录不能证明科学结论或人类理解收益。
