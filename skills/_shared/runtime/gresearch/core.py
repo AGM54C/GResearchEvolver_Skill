@@ -75,7 +75,10 @@ def atomic_bytes(path, data):
 def safe_path(root, name):
     root = native_path(root)
     name = str(name)
-    if not name or Path(name).is_absolute() or ':' in name or "\\" in name:
+    # A leading POSIX slash has no Windows drive, and older pathlib versions
+    # differ when resolving '..' under an extended-length prefix. Reject both
+    # lexically before relying on native path resolution.
+    if not name or name.startswith('/') or '..' in name.split('/') or Path(name).is_absolute() or ':' in name or "\\" in name:
         raise ResearchError(f"Expected a relative POSIX path: {name}")
     target = (root / name).resolve()
     if target == root or root not in target.parents:

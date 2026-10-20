@@ -196,8 +196,8 @@ class WorkflowTests(Workspace):
         self.assertTrue(any(x.startswith('event:') for x in self.store.verify()['errors']))
 
     def test_path_escape_and_ssh_quoting(self):
-        for p in ('../outside', 'C:/outside', '/root', '..\\outside'):
-            with self.assertRaises(ResearchError): safe_path(self.root, p)
+        for p in ('../outside', 'C:/outside', '/root', '..\\outside', '//host/share', 'nested/../../outside', 'nested/../alias'):
+            with self.subTest(path=p), self.assertRaises(ResearchError): safe_path(self.root, p)
         argv = command_argv({'command': ['python3', 'analysis.py', 'a; touch bad'], 'ssh': {'host': 'user@example.org', 'cwd': '/tmp/research-1'}})
         self.assertIn("'a; touch bad'", argv[-1])
         with self.assertRaises(ResearchError): command_argv({'command': ['true'], 'ssh': {'host': '-ProxyCommand=bad', 'cwd': '/tmp/test'}})
