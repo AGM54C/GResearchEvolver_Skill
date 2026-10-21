@@ -22,11 +22,25 @@ OPERATIONS = (
     'capability-review', 'capability-activate', 'capability-rollback', 'capability-export', 'proposal-status',
     'memory-invalidate', 'memory-export', 'memory-import', 'memory-sync', 'memory-remote-search', 'memory-pull',
     'model', 'embeddings', 'semantic-review', 'semantic-graph', 'semantic-metrics', 's2-bulk', 'isolated-run',
-    'signing-keygen', 'receipt-accept', 'representations', 'critic-fit', 'critic-predict', 'study-plan', 'study-analyze')
+    'signing-keygen', 'receipt-accept', 'representations', 'critic-fit', 'critic-predict', 'study-plan', 'study-analyze',
+    'long-create', 'long-status', 'long-note', 'long-decide', 'long-review', 'long-track-job', 'long-tick', 'memtx')
 
 
 def operation(store, name, data):
     from . import statistics as st, evidence as ev, literature as lit, review as rv, evolution as rs, projects as pr, retrieval as rt
+    if name.startswith('long-'):
+        from . import long_horizon as horizon
+        if name == 'long-create': return horizon.create(store, **data)
+        if name == 'long-status': return horizon.get(store, data['project'])
+        if name == 'long-note': return horizon.note(store, **data)
+        if name == 'long-decide': return horizon.decide(store, **data)
+        if name == 'long-review': return horizon.review(store, **data)
+        if name == 'long-track-job': return horizon.track_job(store, **data)
+        if name == 'long-tick': return horizon.tick(store, data['project'])
+    if name == 'memtx':
+        from . import memtx
+        if data['operation'] == 'status': return memtx.get(store, data['project'])
+        return memtx.transact(store, **data)
     if name.startswith('stage-') or name == 'reports-rebuild':
         from . import hci
         if name == 'stage-report': return hci.read(store, data['run'], data['stage'], data.get('report_id'))
@@ -158,13 +172,40 @@ def main(argv=None):
     p = commands.add_parser('fork'); p.add_argument('run'); p.add_argument('stage'); p.add_argument('--patch'); p.add_argument('--id')
     p = commands.add_parser('compare'); p.add_argument('left'); p.add_argument('right')
     p = commands.add_parser('serve'); p.add_argument('--port', type=int, default=8765)
+    p = commands.add_parser('agent-create', help='create a full-capability native-tool Agent session'); p.add_argument('request')
+    commands.add_parser('agent-list')
+    p = commands.add_parser('long-watch', help='observe actual DAG receipts without model polling')
+    p.add_argument('project'); p.add_argument('--seconds', type=float, default=60)
+    p.add_argument('--interval', type=float, default=1); p.add_argument('--resume', action='store_true')
+    for name in ('agent-run', 'agent-status', 'agent-events'):
+        p = commands.add_parser(name); p.add_argument('session')
+    p = commands.add_parser('agent-control'); p.add_argument('session'); p.add_argument('action', choices=['pause', 'resume', 'cancel']); p.add_argument('--reason', default='human intervention')
+    p = commands.add_parser('agent-feedback'); p.add_argument('session'); p.add_argument('request')
+    p = commands.add_parser('agent-steer'); p.add_argument('session'); p.add_argument('text'); p.add_argument('--actor', default='researcher')
+    p = commands.add_parser('agent-fork'); p.add_argument('session'); p.add_argument('request', help='new identity/objective/config/budget/policy JSON; original retained')
+    p = commands.add_parser('agent-recover'); p.add_argument('session'); p.add_argument('--reconciliation')
     p = commands.add_parser('tool', help='run a scientific helper using a structured JSON request'); p.add_argument('operation', choices=OPERATIONS); p.add_argument('request')
     args = parser.parse_args(argv)
     store = None
     try:
         store = Store(args.store)
         from .execution import recover, run_workflow
-        if args.command == 'init':
+        if args.command.startswith('agent-'):
+            from . import agent
+            if args.command == 'agent-create': result = agent.create(store, **read_json(args.request))
+            elif args.command == 'agent-list': result = agent.list_sessions(store)
+            elif args.command == 'agent-run': result = agent.run(store, args.session)
+            elif args.command == 'agent-status': result = agent.inspect(store, args.session)
+            elif args.command == 'agent-events': result = store.events('agent:' + args.session)
+            elif args.command == 'agent-control': result = agent.control(store, args.session, args.action, reason=args.reason)
+            elif args.command == 'agent-feedback': result = agent.feedback(store, args.session, **read_json(args.request))
+            elif args.command == 'agent-steer': result = agent.steer(store, args.session, args.text, actor=args.actor)
+            elif args.command == 'agent-fork': result = agent.fork(store, args.session, **read_json(args.request))
+            else: result = agent.recover(store, args.session, read_json(args.reconciliation) if args.reconciliation else None)
+        elif args.command == 'long-watch':
+            from .long_horizon import watch
+            result = watch(store, args.project, seconds=args.seconds, interval=args.interval, resume=args.resume)
+        elif args.command == 'init':
             result = {'run': store.create(read_json(args.manifest), args.id, read_json(args.inputs) if args.inputs else {})}
         elif args.command == 'run': result = run_workflow(store, args.run)
         elif args.command == 'status':
@@ -198,6 +239,7 @@ def main(argv=None):
         # A valid computation with a negative scientific result is still a successful command.
         # Workflow execution failure and integrity/audit failures have distinct nonzero exit status.
         if args.command == 'run' and result.get('status') != 'completed': return 3
+        if args.command == 'agent-run' and result.get('status') != 'completed': return 3
         if args.command in {'verify', 'verify-archive', 'verify-backup'} and not result['valid']: return 2
         if args.command == 'doctor' and not result['integrity']['valid']: return 2
         if args.command == 'tool' and args.operation == 'memory-sync' and result['status'] != 'synced': return 3

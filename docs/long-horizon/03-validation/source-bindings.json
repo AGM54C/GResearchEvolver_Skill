@@ -1,0 +1,15 @@
+{
+  "final_source_lock_hash": "e5dc508e66c1a822c55c8911157efb399ee1eb632e901151a279422149ab37dc",
+  "linux_final_source_mismatches": [],
+  "live_source_lock_hash": "13520e5a401bd333c4fb7e210f55760a88ddaec333693eed012503943e3d329f",
+  "live_matches_final": false,
+  "files_changed_after_live_smoke": [
+    "_shared/long-horizon-guide.md",
+    "_shared/runtime/gresearch/agent.py",
+    "_shared/runtime/gresearch/agent_tools.py",
+    "_shared/runtime/gresearch/agent_ui.py",
+    "_shared/runtime/gresearch/capabilities.py",
+    "_shared/runtime/gresearch/long_horizon.py",
+    "_shared/runtime/gresearch/memtx.py"
+  ]
+}

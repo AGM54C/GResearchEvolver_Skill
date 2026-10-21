@@ -1,6 +1,12 @@
 __pycache__/
 *.py[cod]
 .research-v2/
+.research-agent/
+dist/
 .gresearch-stage-*/
 .gresearch-backup-*/
 tests/.artifacts/
+.dependency-source/
+validation.json
+.env
+.env.*

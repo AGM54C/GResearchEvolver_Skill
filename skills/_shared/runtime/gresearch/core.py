@@ -573,6 +573,34 @@ class Store:
             for key in keys:
                 try: self.blob(key)
                 except (ResearchError, OSError): errors.append('capability_reference:' + row['key'] + ':' + key)
+        for row in self.db.execute("SELECT key,value FROM values_store WHERE key LIKE 'agent:%'"):
+            try:
+                state = json.loads(row['value'])
+                keys = set(state.get('inputs', {}).values())
+                keys.update(c['result_hash'] for c in state.get('calls', {}).values() if c.get('result_hash'))
+                keys.update(t['receipt_hash'] for t in state.get('turns', []))
+                keys.update(a['outcome_hash'] for a in state.get('attempts', []))
+                if state.get('parent', {}).get('archive_hash'): keys.add(state['parent']['archive_hash'])
+                previous_archive = None
+                for archive in state.get('context_archives', []):
+                    keys.add(archive['sha256'])
+                    try:
+                        content = json.loads(self.blob(archive['sha256']))
+                        if content['previous'] != previous_archive or fingerprint(content['packet']) != archive['packet_hash']:
+                            errors.append('context_archive_chain:' + row['key'])
+                        previous_archive = archive['sha256']
+                    except (ResearchError, OSError, ValueError, KeyError): errors.append('context_archive:' + row['key'])
+                for report in state.get('reports', []):
+                    keys.update((report['record_hash'], report['markdown_hash']))
+                    keys.update(report.get('evidence_hashes', {}).values())
+                    if fingerprint({k: v for k, v in report.items() if k != 'record_hash'}) != report['record_hash']:
+                        errors.append('agent_report_binding:' + row['key'] + ':' + report['id'])
+                for key in keys:
+                    try: self.blob(key)
+                    except (ResearchError, OSError): errors.append('agent_reference:' + row['key'] + ':' + str(key))
+            except (TypeError, KeyError, ValueError): errors.append('agent_state:' + row['key'])
+        from .long_horizon import verify_references
+        errors.extend(verify_references(self))
         return {"valid": not errors, "errors": errors, "integrity_only": True, "security_seal": False}
 
     def archive(self, run):

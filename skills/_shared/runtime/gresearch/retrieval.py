@@ -97,22 +97,5 @@ def query_index(index, query, *, aliases=None, top_k=10, vector=None, embedding_
 
 
 def invalidate(graph, source_ids, reason):
-    if not reason: raise ResearchError('Invalidation requires reason')
-    import copy
-    graph = copy.deepcopy(graph)
-    ids = {n['id'] for n in graph['nodes']}
-    if not set(source_ids).issubset(ids): raise ResearchError('Unknown source IDs')
-    affected = set(source_ids)
-    while True:
-        new = affected | {e['to'] for e in graph.get('edges', []) if e['from'] in affected}
-        if new == affected: break
-        affected = new
-    for node in graph['nodes']:
-        if node['id'] in affected:
-            node['previous_status'] = node.get('status')
-            node.update(status='needs_review', invalidation_reason=reason)
-    for edge in graph.get('edges', []):
-        if edge['from'] in affected or edge['to'] in affected:
-            if 'adjudication' in edge: edge['previous_adjudication'] = edge.pop('adjudication')
-            edge['status'] = 'needs_review'
-    return {'graph': graph, 'affected': sorted(affected), 'reason': reason, 'artifacts_deleted': False}
+    from .validity import invalidate as scoped_invalidate
+    return scoped_invalidate(graph, source_ids, reason)

@@ -1,5 +1,9 @@
 MIT License
 
+Scope: this license covers original GResearchEvolver work. It does not relicense
+third-party source. See skills/_shared/THIRD_PARTY.md and vendor manifests;
+the copied MemTX files have no declared upstream license (NOASSERTION).
+
 Copyright (c) 2026 AGM54C
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

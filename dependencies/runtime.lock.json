@@ -1,0 +1,405 @@
+{
+  "commit": "abb8ca980d79b65416e01e2c3a7fbf51f8be6ff0",
+  "files": {
+    "build_agent.py": {
+      "bytes": 5223,
+      "sha256": "398cf6d22592f2b8e64de401787139d314b9fd42c5d32fdf070780ad7a8513d8"
+    },
+    "docs/agent-upgrade/01-design/report.md": {
+      "bytes": 1925,
+      "sha256": "149d8f270f318da68ca35fd1d52e4237dafc088ee80c06f63323a34d7afa2ef0"
+    },
+    "docs/agent-upgrade/02-implementation/report.md": {
+      "bytes": 2232,
+      "sha256": "b4c4e2c440be22e6b4f52a496c5d5adfa9ee4d555e88b09a1fa0803107e077eb"
+    },
+    "docs/agent-upgrade/03-validation/linux-agent-initial.json": {
+      "bytes": 7385,
+      "sha256": "adecdcb7741e99718aa99746513463bce9b969de37d65f0d2fa684acf1096903"
+    },
+    "docs/agent-upgrade/03-validation/linux-agent.json": {
+      "bytes": 6837,
+      "sha256": "36e1bca938ca2d4ef672c08430001f029d4d8717dbbf9ae8ebbffb7cd7f91963"
+    },
+    "docs/agent-upgrade/03-validation/live-agent-initial.json": {
+      "bytes": 2132,
+      "sha256": "9afb642a217da51577a26768d77536100a438f9ac9e107ca42c775dc184aa95a"
+    },
+    "docs/agent-upgrade/03-validation/live-agent-refined.json": {
+      "bytes": 2115,
+      "sha256": "9fce68b525bd10f97d00e163f8b99664116b959ea4d558477f84fbfaa48fca0a"
+    },
+    "docs/agent-upgrade/03-validation/live-result-example.md": {
+      "bytes": 3239,
+      "sha256": "7d4ef95dc689287154ddaf305a915ac298b7020f1cad40d9f380f90dd8e69136"
+    },
+    "docs/agent-upgrade/03-validation/live-stage-report.md": {
+      "bytes": 1966,
+      "sha256": "1c590833aa209d75b16b75ee9a0a3b3e63fbeba1679d348c3f7eadc2e14dc82b"
+    },
+    "docs/agent-upgrade/03-validation/preservation.json": {
+      "bytes": 289,
+      "sha256": "a44f64991d61ddf2423dea585ac0b4d5cf33b1b34bf38f1420a53a52a1f2e154"
+    },
+    "docs/agent-upgrade/03-validation/report.md": {
+      "bytes": 4947,
+      "sha256": "8ca074dfee6cde38796f608709af3b995504bbba3470b7882a74132e777dec6d"
+    },
+    "docs/agent-upgrade/03-validation/windows-initial.json": {
+      "bytes": 6903,
+      "sha256": "8c01141ed90f255a151af692b37077b312eb440a61e6eae18265225e1b92ae17"
+    },
+    "docs/agent-upgrade/03-validation/windows.json": {
+      "bytes": 6903,
+      "sha256": "7ac4172e08f17f41276140fba11602590573953cc9a08597376f479dd8d09048"
+    },
+    "docs/agent-upgrade/03-validation/workbench.png": {
+      "bytes": 211512,
+      "sha256": "abe65549db63c190c5cf00780dc3a8637e73dd5a208f4404cf3ef39969733b3d"
+    },
+    "docs/agent-upgrade/report.md": {
+      "bytes": 993,
+      "sha256": "27b11037a3c2c4073712b85086040433954d68c9a056a44ad53f24e97113893a"
+    },
+    "docs/long-horizon/01-design/report.md": {
+      "bytes": 4975,
+      "sha256": "cbd3698f5859df7d7c9b62e2c4fe1e7035ef8dc80b46609092080e358b22b911"
+    },
+    "docs/long-horizon/02-implementation/report.md": {
+      "bytes": 3649,
+      "sha256": "696c97a6a61a5128beb6cfb47a03edd4384acbe1303791aee7fd790e94842f46"
+    },
+    "docs/long-horizon/03-validation/linux-agent.json": {
+      "bytes": 8541,
+      "sha256": "b4f3b92b30c78cf80d285e925f1c784e62495f69f1de769ee8e25e74113970c5"
+    },
+    "docs/long-horizon/03-validation/linux-long.json": {
+      "bytes": 8540,
+      "sha256": "712ba21329af098eb5f871c53300ca97d4315e49a5944c3292cf94bf933d0e8b"
+    },
+    "docs/long-horizon/03-validation/live-long.json": {
+      "bytes": 1825,
+      "sha256": "ebcb7f2324cc8c08aa1bf80c0e3bd28f3e03d24e15c755b01e8bb3b7acdeb0c2"
+    },
+    "docs/long-horizon/03-validation/live-result-example.md": {
+      "bytes": 2434,
+      "sha256": "f2ba7daac90cb9a5c4c6327262992e3b33bdca8db68382c9986b7953964c35ca"
+    },
+    "docs/long-horizon/03-validation/preservation.json": {
+      "bytes": 404,
+      "sha256": "5cc028194020aab2aaff32e65b0cdea42d26439c2751fcb66a175a6ea7212ef5"
+    },
+    "docs/long-horizon/03-validation/report.md": {
+      "bytes": 5941,
+      "sha256": "f05f15e01c49247001750abf5830aa20bb85fd9de641489303aebe2a72bbcaee"
+    },
+    "docs/long-horizon/03-validation/source-bindings.json": {
+      "bytes": 618,
+      "sha256": "d511b022c9c881734d08b202db25a9c2b0ce9de7d34d550a000993c7ad0ef72f"
+    },
+    "docs/long-horizon/03-validation/ui.json": {
+      "bytes": 234,
+      "sha256": "198772de1d02d1ae4dc116a56b3eb0a211201db74e04c695d7988cf14a37277f"
+    },
+    "docs/long-horizon/03-validation/windows.json": {
+      "bytes": 8606,
+      "sha256": "5f345a3dfadfd2078c7f3a51994c4948d799780b6f62c1ff845105d0322a1aed"
+    },
+    "docs/long-horizon/report.md": {
+      "bytes": 1742,
+      "sha256": "4e29ac11698be2080c13794fba645676e91402d4429263f2278657007b977612"
+    },
+    "launch_agent.py": {
+      "bytes": 547,
+      "sha256": "d42af5446f69d16caee82253be7b31baafb9aafdf6b03c908ba4537d5061905c"
+    },
+    "skills/_shared/THIRD_PARTY.md": {
+      "bytes": 1797,
+      "sha256": "542ff6d178a59bfaf0472676e85af41abad8fd59e55b11f3573b6f9b1174ed4d"
+    },
+    "skills/_shared/agent-workbench.md": {
+      "bytes": 11129,
+      "sha256": "a4b9f432b36847015ac1d114efe06398f0eb8bb4113c16b87ece544af15b5597"
+    },
+    "skills/_shared/examples/agent-session.json": {
+      "bytes": 531,
+      "sha256": "9a06f0653a003b9d0d105c77ccbf9fb23a1ccb5097132da31ae5de81db9b6144"
+    },
+    "skills/_shared/long-horizon-guide.md": {
+      "bytes": 9612,
+      "sha256": "fb9d659c9e796c26f4bdf679476a80ace85cf83bc3356ab1eb53ad9b24fd56d2"
+    },
+    "skills/_shared/runtime/gresearch/__init__.py": {
+      "bytes": 91,
+      "sha256": "e64eee43f7a6ddbf1c8b33aba135cb9f3e26635b21a03264b690dbbdaef0a96d"
+    },
+    "skills/_shared/runtime/gresearch/agent.py": {
+      "bytes": 46160,
+      "sha256": "3e950df95e0de256d6b1c6a19e144b6a795ddba89b5684ab9b28ccc139c160e9"
+    },
+    "skills/_shared/runtime/gresearch/agent_protocol.py": {
+      "bytes": 8527,
+      "sha256": "dd7c82fa7a9acc1e13eac09456a550bf3cd9a776f43fb7d749324f0d342c3e6f"
+    },
+    "skills/_shared/runtime/gresearch/agent_tools.py": {
+      "bytes": 25863,
+      "sha256": "0ca445ba590db75a00915ca8a4a7f35ee8ed511467478fd5a7847164cabe73f2"
+    },
+    "skills/_shared/runtime/gresearch/agent_ui.py": {
+      "bytes": 17635,
+      "sha256": "fc6c132a0d8754f82c55603d1e69bf282a1fdfd61272b8972db32b0c8063dbad"
+    },
+    "skills/_shared/runtime/gresearch/agent_worker.py": {
+      "bytes": 2040,
+      "sha256": "5c6030e244eed2a994c23db3ade23085aa2dc43a38148c0f6da2a120bc6eac23"
+    },
+    "skills/_shared/runtime/gresearch/attestation.py": {
+      "bytes": 5282,
+      "sha256": "ea84d5f72f78461ad861e5470a6cd6804ef7385ea09b3dc4fd937978eb26e760"
+    },
+    "skills/_shared/runtime/gresearch/capabilities.py": {
+      "bytes": 19815,
+      "sha256": "e2fe27f53701f02140b1704454ef53be2cec651ea1c09e2ca4a6e1a16290e5e7"
+    },
+    "skills/_shared/runtime/gresearch/cli.py": {
+      "bytes": 20508,
+      "sha256": "1034520b5216e4254898fbd693868e4d191b2d80be14ac665d2c20bc4877281b"
+    },
+    "skills/_shared/runtime/gresearch/console.py": {
+      "bytes": 23150,
+      "sha256": "1286aad48a19d14956cf9e49042d00fc06950282702cfef94f68776e5c1e7a67"
+    },
+    "skills/_shared/runtime/gresearch/container_worker.py": {
+      "bytes": 1469,
+      "sha256": "8f4c4e1938d207b6a86db30b74ef4645a3f3c1cc807101e0e9189f24d787c5e3"
+    },
+    "skills/_shared/runtime/gresearch/core.py": {
+      "bytes": 37680,
+      "sha256": "114d10d917966b55da6a99f69e4f64e92bb5194d87fff4be9f2481f7f07401e4"
+    },
+    "skills/_shared/runtime/gresearch/evidence.py": {
+      "bytes": 12200,
+      "sha256": "1288de22cca6b10e82c6b6524f9804c00360e896a30dcb65d6866e58af64f4b8"
+    },
+    "skills/_shared/runtime/gresearch/evolution.py": {
+      "bytes": 21899,
+      "sha256": "b79dba83001ee6f5c7b6264a41261186735bd1add98ef37a743086ef44e1d8cc"
+    },
+    "skills/_shared/runtime/gresearch/execution.py": {
+      "bytes": 21684,
+      "sha256": "3a0b662b036e1ccd0927d3e27c0322fa29b311e3d216f1dde49cc9d15e0918e8"
+    },
+    "skills/_shared/runtime/gresearch/explanations.py": {
+      "bytes": 4278,
+      "sha256": "193238b201d20deade97a9355f8cd7f96ba348839b41c7897df0f8c5182aa1a6"
+    },
+    "skills/_shared/runtime/gresearch/hci.py": {
+      "bytes": 21139,
+      "sha256": "697c7b2c2ff5d9c061572ebdbaa308b7eaad79e623e7d844c3b7ef50b0640679"
+    },
+    "skills/_shared/runtime/gresearch/isolation.py": {
+      "bytes": 8006,
+      "sha256": "100d3c62527f248ef4855a9f7a826a389faecff54e250b2842ff6fe447028ef2"
+    },
+    "skills/_shared/runtime/gresearch/literature.py": {
+      "bytes": 25461,
+      "sha256": "c0a21ccb2ad5e61b3fe84389edb95eba114d8a8eb56cf2114d821528639280d3"
+    },
+    "skills/_shared/runtime/gresearch/local_worker.py": {
+      "bytes": 10203,
+      "sha256": "59ee2bcaf1ac85dff4faaa7e5d3027501af597ee651779c3b87ee2051670d975"
+    },
+    "skills/_shared/runtime/gresearch/locking.py": {
+      "bytes": 1411,
+      "sha256": "597550ab324e7208a6d94438127551cf0972bac3d4ac5b4730e315d1ca3a51c7"
+    },
+    "skills/_shared/runtime/gresearch/long_horizon.py": {
+      "bytes": 28467,
+      "sha256": "8eae14b57c4b3c17f6f6cfca784fea73d3172b18d072599000fc23ef7a02f686"
+    },
+    "skills/_shared/runtime/gresearch/maintenance.py": {
+      "bytes": 9510,
+      "sha256": "8cf788a29655631d6959d700fe28d55ee74707115e358d39a163ba6c860be264"
+    },
+    "skills/_shared/runtime/gresearch/memory.py": {
+      "bytes": 11201,
+      "sha256": "be7985a911ef9f471d539cf02417ea36a0cabd560ca3cfd2209ee15c0c717947"
+    },
+    "skills/_shared/runtime/gresearch/memtx.py": {
+      "bytes": 5193,
+      "sha256": "e3ae78667dac93b3932e479a5d382d98ccd0a16993a6e0f3f6236b4cde7e4445"
+    },
+    "skills/_shared/runtime/gresearch/memtx_worker.py": {
+      "bytes": 8542,
+      "sha256": "a64595d901879e855151ccc6e672fadffe71c7ccd5d7554f38cd43f1574b75af"
+    },
+    "skills/_shared/runtime/gresearch/models.py": {
+      "bytes": 12184,
+      "sha256": "fc54b976f14ae0b74a53305744fd17b129d72c4cd7b98558d2b40acf5268af8d"
+    },
+    "skills/_shared/runtime/gresearch/openviking.py": {
+      "bytes": 10749,
+      "sha256": "5e0e0294dec5f64b8673ea0205a5ce8852ceddd218a0358fd741d3be3e033237"
+    },
+    "skills/_shared/runtime/gresearch/process_runner.py": {
+      "bytes": 3576,
+      "sha256": "843bbe399ab9430809d65cd90583ba14fcee01bcc77da7c1de9ff64fd89f24f1"
+    },
+    "skills/_shared/runtime/gresearch/projects.py": {
+      "bytes": 10122,
+      "sha256": "cde6cd0574ca5892c5027bb0ba1a43d2db14ec06f2082f016c9b0d1acdb776fd"
+    },
+    "skills/_shared/runtime/gresearch/remote_worker.py": {
+      "bytes": 3772,
+      "sha256": "6679a9db71975419e0de56a46921348b6fdb0eeb7d07f25a4b17df1a15792b53"
+    },
+    "skills/_shared/runtime/gresearch/representations.py": {
+      "bytes": 7694,
+      "sha256": "4807478cbcfa6159e60b2048d105ac32adf1bc9d409ba156e265a19a274bb71d"
+    },
+    "skills/_shared/runtime/gresearch/reproducibility.py": {
+      "bytes": 3263,
+      "sha256": "75d1e30be2207ea6c4a82fe719f71526268a0b5bcc89cf5732d93fbd4c1f5e6e"
+    },
+    "skills/_shared/runtime/gresearch/retrieval.py": {
+      "bytes": 5444,
+      "sha256": "8c121af87ad60112543bde28fbd8789068a7a31d9d05389216e4b5b7aaf5c214"
+    },
+    "skills/_shared/runtime/gresearch/review.py": {
+      "bytes": 10429,
+      "sha256": "8ad67c7efda273bcc1263b59e837bc58cd92452176cd8b678e303b190d666a5f"
+    },
+    "skills/_shared/runtime/gresearch/semantic.py": {
+      "bytes": 10029,
+      "sha256": "1809ea5e18c29bdd4e6ccb565387ea8eda138501f7418fa07894a8da769be776"
+    },
+    "skills/_shared/runtime/gresearch/ssh_runner.py": {
+      "bytes": 7126,
+      "sha256": "e111ef162c8b4ddfea1362bb9cbfd2d1da596cb6dca029cf37a90dc4ebc90643"
+    },
+    "skills/_shared/runtime/gresearch/statistics.py": {
+      "bytes": 7873,
+      "sha256": "1413acd235e06f5f143e3721a18e9a57f28b643ab6e030c2ed6317a77dbe3c24"
+    },
+    "skills/_shared/runtime/gresearch/study.py": {
+      "bytes": 6544,
+      "sha256": "faf75b44a0d81b378d6aeeeea58998e8a9e0ae2b431c8fc5160858027244c74c"
+    },
+    "skills/_shared/runtime/gresearch/validity.py": {
+      "bytes": 8135,
+      "sha256": "a476c781dec937aee6160889ae644277c026928dcdc4c97901011754e8257e42"
+    },
+    "skills/_shared/runtime/research.py": {
+      "bytes": 182,
+      "sha256": "8df23925016d140c1f81605a2028303f00c85bdd2088a0028f7c091cf4d65fca"
+    },
+    "skills/_shared/vendor/memtx/README.md": {
+      "bytes": 4009,
+      "sha256": "51a94bd2ed36fa40640a50737c31f29b692639031ac02af48aae8ea151050602"
+    },
+    "skills/_shared/vendor/memtx/UPSTREAM.json": {
+      "bytes": 2403,
+      "sha256": "8877e7b486cad88d852896c45218802ada63f617db87f6f3c2c17b513ab907be"
+    },
+    "skills/_shared/vendor/memtx/src/memory_manager.py": {
+      "bytes": 2486,
+      "sha256": "190ac659025aa211e9432bad9cf1ab0382872c1b32bcd7b495a03355ba9e3b58"
+    },
+    "skills/_shared/vendor/memtx/src/memtx/__init__.py": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "skills/_shared/vendor/memtx/src/memtx/conflict_detector.py": {
+      "bytes": 8210,
+      "sha256": "e4ca7de8061fa0d8d3dc9fbc2a3ad69cd7cddcfab300f804770e5a2989aed31f"
+    },
+    "skills/_shared/vendor/memtx/src/memtx/dependency_graph.py": {
+      "bytes": 2808,
+      "sha256": "26b34e1fdf1d05416bcdc5bca365c7baa55987b28a896ae272789bb0b9be09c0"
+    },
+    "skills/_shared/vendor/memtx/src/memtx/memtx_manager.py": {
+      "bytes": 22758,
+      "sha256": "b742036ae5a02615803e8cdec454cfafa390f438479d86a205a7859383a4f660"
+    },
+    "skills/_shared/vendor/memtx/src/memtx/state_machine.py": {
+      "bytes": 1562,
+      "sha256": "fff3a5f2dfaa91a6d001d2809011d57532e0b6d0ef398ad70472100a9bec61ef"
+    },
+    "skills/_shared/vendor/memtx/src/mock_tools.py": {
+      "bytes": 4383,
+      "sha256": "73a38104d7b7c8936a02ed94872630c58964e454fc276aebe5d33e783c722c72"
+    },
+    "skills/_shared/vendor/memtx/src/schema.py": {
+      "bytes": 5955,
+      "sha256": "7dc60d15dc14bed4f6e67b9d175fb1124ba0098d08a76859ad85ca97748c0224"
+    },
+    "tests/live_agent.py": {
+      "bytes": 3749,
+      "sha256": "d9a46135339787fc7d9a7db0f0b8f2089469baccf9c9175739b72bce8f1e3a6f"
+    },
+    "tests/live_capability.py": {
+      "bytes": 4811,
+      "sha256": "3b7fc5ffbc562bdd475e600056843490b9ed4d8f3547fb951d7e3681f9ed171e"
+    },
+    "tests/live_long_horizon.py": {
+      "bytes": 5486,
+      "sha256": "9fe2efeed5fe8b6c9c750e3d9648d2e180b938d099369df025be09c1ca1dd57b"
+    },
+    "tests/live_openviking.py": {
+      "bytes": 10420,
+      "sha256": "bf5a05392a4c1a6b8624a99766db2f0af18f68bcf226f0f5b4c2076cf92ce10c"
+    },
+    "tests/requirements.txt": {
+      "bytes": 465,
+      "sha256": "3079e38e6d889b13541cfff37160eed6a249b76db71284e7291c5604c38770cc"
+    },
+    "tests/run_checks.py": {
+      "bytes": 1905,
+      "sha256": "89f6cc0deae4e83a16ff73a90c8a4037d9655c4da9624c3f0cee0cef8820d350"
+    },
+    "tests/test_agent.py": {
+      "bytes": 31276,
+      "sha256": "c3cfb2237ab0322df9c4d34aa5150765c93e239ac1c2994e7f99202aa5a0a22e"
+    },
+    "tests/test_bundle_sync.py": {
+      "bytes": 5340,
+      "sha256": "6b9a326adf57717807378f5da21c92b60fa6dfe35eb7105e293342458d83d098"
+    },
+    "tests/test_harness.py": {
+      "bytes": 13698,
+      "sha256": "47741108074764c34dabf2fc590d9f5b9e1c05e6f749baa3c88602579f8d402b"
+    },
+    "tests/test_hci.py": {
+      "bytes": 30476,
+      "sha256": "22b4b1705a07f60883a207ed1e115a65b52a14770ee3daa8b9cf46b73530dbfc"
+    },
+    "tests/test_long_horizon.py": {
+      "bytes": 22742,
+      "sha256": "3478d871d7156fc5d45c9de58e78708513ad3491a5b88150bb4234aa950f1ade"
+    },
+    "tests/test_memory.py": {
+      "bytes": 12556,
+      "sha256": "e7de3d2056c778365ef77d34a7e3a8d4ab6a19c7aa98187089ac33c7e089f211"
+    },
+    "tests/test_runtime.py": {
+      "bytes": 38454,
+      "sha256": "8cf2168319e01b2770e3c01389f4aa6f74d0916eaead8309d2eab303b99f2a6c"
+    },
+    "tests/test_v21.py": {
+      "bytes": 15198,
+      "sha256": "fb42372eb1b53da921420a535cd315b6a5eeb1863eb2783e1965071829f47870"
+    },
+    "tests/test_visual.py": {
+      "bytes": 12969,
+      "sha256": "d6a5733295b6ac513fee63c8ef05a02166838e4127ea4fc40f0ce8eda0cc8732"
+    },
+    "tools/bundle_sync.py": {
+      "bytes": 9397,
+      "sha256": "b63c67608aa698871a5eb49369a27830890db5ddea09dd6ea8c2bb7e5b29aa9c"
+    }
+  },
+  "format": 1,
+  "maintenance": "Generated snapshot; modify the owning repository, then sync a reviewed commit.",
+  "profile": "runtime",
+  "repository": "AGM54C/GResearchEvolver_Agent"
+}

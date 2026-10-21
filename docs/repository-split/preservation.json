@@ -1,0 +1,13 @@
+{
+  "baseline_skill_commit": "0e225bead7a136537369aefdf4d195935e9f47d2",
+  "baseline_skill_files": 430,
+  "missing_original_skill_files": [],
+  "skills": 26,
+  "operations": 90,
+  "native_agent_tools": 17,
+  "memtx_original_hashes_match": true,
+  "engine_logic_changes_during_repository_split": [],
+  "engine_pin": "abb8ca980d79b65416e01e2c3a7fbf51f8be6ff0",
+  "skill_regression_python_source_changes_after_test": [],
+  "sync_tool_sha256": "b63c67608aa698871a5eb49369a27830890db5ddea09dd6ea8c2bb7e5b29aa9c"
+}

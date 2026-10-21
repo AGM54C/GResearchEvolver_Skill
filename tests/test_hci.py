@@ -285,6 +285,42 @@ class CapabilityTests(Workspace):
         self.assertTrue(catalog['skill:slides-builder']['in_scope'])
         self.assertEqual(operation(self.store, 'capability-list', {}), cap.catalog())
 
+    def test_agent_report_and_actual_feedback_can_source_a_proposal(self):
+        from gresearch import agent
+        candidate, _, _, _ = self.setup_capability()
+        session = agent.create(self.store, 'Proposal provenance fixture', {'provider': 'responses', 'model': 'fixture', 'base_url': 'https://example.com'})
+        report = agent._stage_report(self.store, session, {'stage': 'analysis', 'why': 'fixture', 'method': 'fixture',
+            'findings': 'fixture only', 'explanation': 'fixture only', 'evidence': [], 'limitations': ['not a real study'], 'questions': ['review fixture?'], 'review_required': True})
+        session.update(status='awaiting_researcher', waiting={'kind': 'report', 'id': report['id']})
+        with self.store.tx(): agent._save(self.store, session, 'fixture_stage_report')
+        session = agent.feedback(self.store, session['id'], reference=report['id'], actor='researcher', decision='approve', reason='fixture feedback')
+        source = {'agent': session['id'], 'report_id': report['id'], 'feedback_id': session['feedback'][-1]['id']}
+        proposal = self.propose(candidate, source)
+        self.assertEqual(proposal['sources'][0]['report_hash'], report['record_hash'])
+        with self.assertRaises(ResearchError): self.propose(candidate, {**source, 'feedback_id': 'invented'})
+        session['reports'][0]['findings'] = 'changed after storage'
+        with self.store.tx(): self.store.set_value('agent:' + session['id'], session)
+        with self.assertRaises(ResearchError): self.propose(candidate, source)
+
+    def test_project_experience_requires_pinned_outcome_evidence_and_still_needs_review(self):
+        from gresearch import long_horizon as horizon
+        candidate, _, _, _ = self.setup_capability()
+        project = horizon.create(self.store, 'long-test', 'Test experience provenance')
+        evidence = self.store.put(b'Actual fixture failure receipt; not scientific evidence')
+        note = horizon.note(self.store, 'long-test', 'experience1', 'experience', 'Retry caused duplication',
+            expected_revision=project['revision'], actor='agent:test', prediction={'expected':'no duplicates'}, evidence=[evidence], outcome={'observed':'duplicate'})
+        current = horizon.get(self.store, 'long-test')
+        source = {'project':'long-test', 'note':'experience1', 'note_hash':fingerprint(note), 'snapshot':current['snapshot']}
+        proposal = self.propose(candidate, source)
+        self.assertEqual(proposal['status'], 'proposed')
+        with self.assertRaises(ResearchError): self.activate(proposal)
+        with self.assertRaises(ResearchError): self.propose(candidate, {**source,'note_hash':'0'*64})
+        forged = {k:v for k,v in current.items() if k!='snapshot'}
+        forged['objective']='fabricated project snapshot never recorded'
+        counterfeit = self.store.put(canonical(forged).encode('utf-8'))
+        with self.assertRaisesRegex(ResearchError,'not recorded'): self.propose(candidate,{**source,'snapshot':counterfeit})
+        self.assertTrue(self.store.verify()['valid'], self.store.verify())
+
     def test_real_adoption_pins_new_runs_and_archive_preserves_old_bundle(self):
         candidate, incumbent, protocol, source = self.setup_capability()
         old = self.bound_run()

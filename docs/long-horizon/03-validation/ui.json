@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "kind": "local_http_ui_integration_fixture",
+  "project_created": true,
+  "session_attached": true,
+  "decision_paused_session": true,
+  "javascript_syntax_check": "node --check passed",
+  "human_study": false
+}

@@ -7,7 +7,7 @@ from pathlib import Path
 import time
 import uuid
 
-from .core import ResearchError, fingerprint, read_json, valid_id
+from .core import ResearchError, canonical, fingerprint, read_json, valid_id
 from .explanations import text
 from .locking import resource_lock
 from . import evolution as rsi
@@ -84,6 +84,35 @@ def propose(store, target, epoch, candidate_dir, candidate_command, *, actor, re
     if not isinstance(sources, list) or not sources: raise ResearchError('Link concrete stage reports or researcher feedback')
     evidence = []
     for source in sources:
+        if isinstance(source, dict) and 'project' in source:
+            if set(source) != {'project', 'note', 'note_hash', 'snapshot'}:
+                raise ResearchError('Project proposal sources require project, note, note_hash and snapshot')
+            from .long_horizon import recorded_snapshot
+            project = recorded_snapshot(store, source['project'], source['snapshot'])
+            note = project.get('notes', {}).get(source['note'])
+            if project.get('id') != source['project'] or not note or fingerprint(note) != source['note_hash']:
+                raise ResearchError('Project experience binding changed')
+            if note.get('outcome') is None or not note.get('evidence'):
+                raise ResearchError('Experience proposals need a recorded outcome and real evidence references')
+            for key in note['evidence']: store.blob(key)
+            record = {'source': source, 'note': note, 'scientific_gain_proven': False}
+            evidence.append({**source, 'report_hash': store.put(canonical(record).encode('utf-8'))})
+            continue
+        if isinstance(source, dict) and 'agent' in source:
+            if not {'agent', 'report_id'}.issubset(source) or set(source) - {'agent', 'report_id', 'feedback_id'}:
+                raise ResearchError('Agent proposal sources need agent, report_id and optional feedback_id')
+            from .agent import get as agent_state
+            session = agent_state(store, source['agent'])
+            report = next((r for r in session['reports'] if r['id'] == source['report_id']), None)
+            if not report: raise ResearchError('Unknown Agent stage report')
+            if fingerprint({k: v for k, v in report.items() if k != 'record_hash'}) != report['record_hash']:
+                raise ResearchError('Agent report binding changed')
+            store.blob(report['record_hash'])
+            store.blob(report['markdown_hash'])
+            if source.get('feedback_id') and not any(f['id'] == source['feedback_id'] and f['reference'] == source['report_id'] for f in session['feedback']):
+                raise ResearchError('Agent feedback does not match the stage report')
+            evidence.append({**source, 'report_hash': report['record_hash']})
+            continue
         if not isinstance(source, dict) or not {'run', 'stage', 'report_id'}.issubset(source) or set(source) - {'run', 'stage', 'report_id', 'feedback_id'}:
             raise ResearchError('Proposal sources need run, stage, report_id and optional feedback_id')
         report = read(store, source['run'], source['stage'], source['report_id'])

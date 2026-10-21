@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hmac
+import base64
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 from pathlib import Path
@@ -20,6 +21,7 @@ button,input,select,textarea{font:inherit;padding:.5rem;margin:.2rem;border:1px 
 button{cursor:pointer;background:white}button:hover{background:#dfeaf4}pre{background:white;padding:1rem;overflow:auto;max-height:32rem;white-space:pre-wrap}
 section{margin:1rem 0}textarea{width:95%;height:5rem}small{color:#465b6e}.grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}@media(max-width:700px){.grid{display:block}}
 </style><h1>GResearch · 研究控制台</h1>
+<p><a href="/agent">进入完整能力 Agent 工作台 →</a></p>
 <p>查看运行、科学阶段与原始记录。暂停在阶段边界生效；取消终止本地进程。远程外部状态需要另行核实。</p>
 <section><label>运行 <select id="run"></select></label><button id="refresh">刷新</button><label>阶段 <select id="stage"></select></label></section>
 <section id="controls"><button data-action="run">执行</button><button data-action="pause">暂停</button><button data-action="resume">继续</button><button data-action="step">单步</button><button data-action="breakpoint">设断点</button><button data-action="retry">重试失败阶段</button><button data-action="cancel">取消</button><button data-action="archive">归档</button></section>
@@ -61,19 +63,31 @@ def make_server(root, port=0):
     root, token = str(Path(root).resolve()), secrets.token_urlsafe(32)
     workers, lock = set(), threading.Lock()
 
-    def start_worker(run):
+    def start_worker(run, *, agent_session=False):
+        worker_key = ('agent:' if agent_session else 'run:') + run
         with lock:
-            if run in workers: return
-            workers.add(run)
+            if worker_key in workers: return
+            workers.add(worker_key)
         def work():
             store = Store(root)
             try:
-                run_workflow(store, run)
+                if agent_session:
+                    from . import agent, long_horizon as horizon
+                    while True:
+                        state = agent.get(store, run)
+                        if state['status'] == 'ready': state = agent.run(store, run)
+                        if state['status'] != 'waiting_external': break
+                        # Durable receipt polling, not model polling. On console
+                        # restart the researcher can restart observation explicitly.
+                        horizon.watch(store, state['long_project'], seconds=1, interval=1)
+                        if agent.get(store, run)['status'] == 'waiting_external':
+                            threading.Event().wait(1)
+                else: run_workflow(store, run)
             except Exception as exc:
-                with store.tx(): store.event(run, 'console_worker_error', {'error': str(exc)})
+                with store.tx(): store.event(worker_key, 'console_worker_error', {'type': type(exc).__name__})
             finally:
                 store.close()
-                with lock: workers.discard(run)
+                with lock: workers.discard(worker_key)
         threading.Thread(target=work, daemon=True).start()
 
     class Handler(BaseHTTPRequestHandler):
@@ -96,10 +110,55 @@ def make_server(root, port=0):
             if not self.valid_host(): return self.respond({'error': 'invalid host'}, 403)
             parsed = urllib.parse.urlparse(self.path)
             if parsed.path == '/': return self.respond(PAGE.replace('__TOKEN__', json.dumps(token)), html=True)
+            if parsed.path == '/agent':
+                from .agent_ui import PAGE as AGENT_PAGE
+                return self.respond(AGENT_PAGE.replace('__TOKEN__', json.dumps(token)), html=True)
             store = Store(root)
             try:
                 query = urllib.parse.parse_qs(parsed.query)
-                if parsed.path == '/api/runs':
+                if parsed.path.startswith('/api/agent/'):
+                    from . import agent, agent_tools
+                    route = parsed.path.removeprefix('/api/agent/')
+                    if route == 'sessions': result = agent.list_sessions(store)
+                    elif route == 'catalog': result = agent_tools.catalog(agent.DEFAULT_POLICY)
+                    else:
+                        identity = query['session'][0]
+                        state = agent.get(store, identity)
+                        if route == 'session': result = agent.inspect(store, identity)
+                        elif route == 'context':
+                            from .long_horizon import read_context
+                            result = read_context(store, identity, int(query['epoch'][0]), int(query.get('offset', ['0'])[0]), 20000)
+                        elif route == 'artifact': result = agent_tools.read_text(agent.workdir(store, identity), query['path'][0], 0, 20000)
+                        elif route == 'download':
+                            path = agent_tools.checked_path(agent.workdir(store, identity), query['path'][0])
+                            if path.stat().st_size > state['policy']['max_workspace_bytes']: raise ResearchError('Artifact exceeds quota')
+                            self.send_response(200)
+                            self.send_header('Content-Type', 'application/octet-stream')
+                            self.send_header('Content-Disposition', "attachment; filename*=UTF-8''" + urllib.parse.quote(path.name))
+                            self.send_header('Content-Length', str(path.stat().st_size))
+                            self.send_header('Cache-Control', 'no-store')
+                            self.send_header('X-Content-Type-Options', 'nosniff')
+                            self.end_headers()
+                            with path.open('rb') as source:
+                                while True:
+                                    chunk = source.read(65536)
+                                    if not chunk: break
+                                    self.wfile.write(chunk)
+                            return
+                        elif route == 'report':
+                            report = next((r for r in state['reports'] if r['id'] == query['reference'][0]), None)
+                            if not report: raise ResearchError('Unknown stage report')
+                            result = {'report': report, 'markdown': store.blob(report['markdown_hash']).decode('utf-8')}
+                        elif route == 'logs':
+                            attempt = next((a for a in state['attempts'] if a['directory'] == query['attempt'][0]), None)
+                            if not attempt: raise ResearchError('Unknown settled attempt')
+                            path = agent.directory(store, identity) / 'attempts' / attempt['directory'] / 'supervisor'
+                            result = {}
+                            for name in ('stdout.txt', 'stderr.txt', 'result.json'):
+                                if (path / name).is_file():
+                                    with (path / name).open('rb') as source: result[name] = source.read(100000).decode('utf-8', errors='replace')
+                        else: return self.respond({'error': 'not found'}, 404)
+                elif parsed.path == '/api/runs':
                     result = [{'run': r[0]} for r in store.db.execute('SELECT id FROM runs ORDER BY rowid')]
                 else:
                     run = query['run'][0]
@@ -116,19 +175,66 @@ def make_server(root, port=0):
                         result = read(store, run, query['stage'][0], query.get('report_id', [None])[0])
                     else: return self.respond({'error': 'not found'}, 404)
                 self.respond(result)
-            except (ResearchError, KeyError, OSError) as exc: self.respond({'error': str(exc)}, 400)
+            except (ResearchError, KeyError, OSError, ValueError, TypeError) as exc: self.respond({'error': str(exc)}, 400)
             finally: store.close()
 
         def do_POST(self):
             expected_origin = f'http://127.0.0.1:{self.server.server_port}'
             if not self.valid_host() or self.headers.get('Origin') != expected_origin or not hmac.compare_digest(self.headers.get('X-Research-Token', ''), token):
                 return self.respond({'error': 'origin/token validation failed'}, 403)
-            if self.path != '/api/action': return self.respond({'error': 'not found'}, 404)
+            if self.path not in {'/api/action', '/api/agent/action'}: return self.respond({'error': 'not found'}, 404)
             store = Store(root)
             try:
                 size = int(self.headers.get('Content-Length', '0'))
-                if not 0 < size <= 100_000: raise ResearchError('invalid request length')
+                if not 0 < size <= (22_000_000 if self.path == '/api/agent/action' else 100_000): raise ResearchError('invalid request length')
                 body = json.loads(self.rfile.read(size))
+                if self.path == '/api/agent/action':
+                    from . import agent, long_horizon as horizon
+                    action = body['action']
+                    if action == 'project-create':
+                        return self.respond(horizon.create(store, body['project'], body['objective'], constraints=body.get('constraints'),
+                            budget=body.get('budget'), actor=body.get('actor', 'researcher')))
+                    if action == 'create':
+                        result = agent.create(store, body['objective'], body['config'], budget=body.get('budget'), policy=body.get('policy'), long_project=body.get('long_project') or None)
+                        return self.respond({'id': result['id'], 'status': result['status']})
+                    identity = body['session']
+                    state = agent.get(store, identity)
+                    if action.startswith('project-'):
+                        if not state.get('long_project'): raise ResearchError('Session has no long-horizon project')
+                        project = state['long_project']
+                        if action == 'project-decide':
+                            return self.respond(horizon.decide(store, project, body['text'], actor=body['actor'],
+                                target=body.get('target') or None, expected_hash=body.get('expected_hash')))
+                        if action == 'project-track':
+                            result = horizon.track_job(store, project, body['run'], actor=body['actor'], cost=body.get('cost', 0))
+                            start_worker(body['run'])
+                            return self.respond(result)
+                        if action == 'project-watch':
+                            horizon.tick(store, project)
+                            state = agent.get(store, identity)
+                            if state['status'] in {'ready', 'waiting_external'}: start_worker(identity, agent_session=True)
+                            return self.respond({'status': state['status']})
+                        raise ResearchError('Unknown project action')
+                    if action == 'fork':
+                        result = agent.fork(store, identity, budget=body.get('budget'))
+                        return self.respond({'id': result['id'], 'status': result['status']})
+                    if action == 'run':
+                        if agent.get(store, identity)['status'] != 'ready': raise ResearchError('Use Continue or resolve the pending request first')
+                        start_worker(identity, agent_session=True); result = {'worker': 'requested'}
+                    elif action in {'pause', 'cancel', 'resume'}:
+                        result = agent.control(store, identity, action, actor=body.get('actor', 'researcher'), reason=body.get('reason', 'human console intervention'))
+                        if action == 'resume': start_worker(identity, agent_session=True)
+                    elif action == 'feedback':
+                        result = agent.feedback(store, identity, **{k: body[k] for k in ('reference', 'actor', 'decision', 'reason')})
+                        if result['status'] == 'ready': start_worker(identity, agent_session=True)
+                    elif action == 'recover': result = agent.recover(store, identity, body.get('reconciliation'))
+                    elif action == 'steer': result = agent.steer(store, identity, body['text'], actor=body.get('actor', 'researcher'))
+                    elif action == 'import':
+                        raw = base64.b64decode(body['base64'], validate=True)
+                        if len(raw) > 16_000_000: raise ResearchError('Browser imports are limited to 16 MB per file')
+                        result = agent.import_material(store, identity, body['path'], raw, actor=body.get('actor', 'researcher'))
+                    else: raise ResearchError('Unknown Agent action')
+                    return self.respond({'status': result.get('status'), 'result': result.get('requested', result.get('path', action))})
                 run, action = body['run'], body['action']
                 store.get(run)
                 if action == 'run': start_worker(run); result = {'worker': 'requested'}
@@ -158,6 +264,7 @@ def make_server(root, port=0):
 def serve(root, port):
     server = make_server(root, port)
     print(f'Research console: http://127.0.0.1:{server.server_port}', flush=True)
+    print(f'Agent workbench: http://127.0.0.1:{server.server_port}/agent', flush=True)
     try: server.serve_forever(poll_interval=.2)
     except KeyboardInterrupt: pass
     finally: server.server_close()

@@ -1,0 +1,62 @@
+{
+  "repository": "https://github.com/lxy1134/MEMTX_",
+  "commit": "4e1124ccd5fd384857463020e3497aa73ec93be6",
+  "license": "NOASSERTION",
+  "license_note": "Upstream has no declared license at this commit; this is not MIT. Original files copied verbatim at user request. Project license does not relicense these files.",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "51a94bd2ed36fa40640a50737c31f29b692639031ac02af48aae8ea151050602",
+      "git_blob": "942e3efa4046827b9564a2f386130dcb681f4ebd",
+      "modified": false
+    },
+    {
+      "path": "src/schema.py",
+      "sha256": "7dc60d15dc14bed4f6e67b9d175fb1124ba0098d08a76859ad85ca97748c0224",
+      "git_blob": "f490401be21b35eade9a9db193fd968cb3e55e4e",
+      "modified": false
+    },
+    {
+      "path": "src/memory_manager.py",
+      "sha256": "190ac659025aa211e9432bad9cf1ab0382872c1b32bcd7b495a03355ba9e3b58",
+      "git_blob": "c9275d8732c83f2c3561016fd75fa307cc88adff",
+      "modified": false
+    },
+    {
+      "path": "src/mock_tools.py",
+      "sha256": "73a38104d7b7c8936a02ed94872630c58964e454fc276aebe5d33e783c722c72",
+      "git_blob": "252a656412713eaf1cd34e1a7d98b2e7e427f9cc",
+      "modified": false
+    },
+    {
+      "path": "src/memtx/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "git_blob": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "modified": false
+    },
+    {
+      "path": "src/memtx/conflict_detector.py",
+      "sha256": "e4ca7de8061fa0d8d3dc9fbc2a3ad69cd7cddcfab300f804770e5a2989aed31f",
+      "git_blob": "c87237b89ce8e3180d4f6ac4302ec38688a8b551",
+      "modified": false
+    },
+    {
+      "path": "src/memtx/dependency_graph.py",
+      "sha256": "26b34e1fdf1d05416bcdc5bca365c7baa55987b28a896ae272789bb0b9be09c0",
+      "git_blob": "95c97aba9da859bce61015c5fae3ba2e2ce31982",
+      "modified": false
+    },
+    {
+      "path": "src/memtx/state_machine.py",
+      "sha256": "fff3a5f2dfaa91a6d001d2809011d57532e0b6d0ef398ad70472100a9bec61ef",
+      "git_blob": "249c9b89eca72110c4f82a9f3200b7d2cff4031c",
+      "modified": false
+    },
+    {
+      "path": "src/memtx/memtx_manager.py",
+      "sha256": "b742036ae5a02615803e8cdec454cfafa390f438479d86a205a7859383a4f660",
+      "git_blob": "79bc539b143b3c46e5f0ca94e24e3751c371847d",
+      "modified": false
+    }
+  ]
+}

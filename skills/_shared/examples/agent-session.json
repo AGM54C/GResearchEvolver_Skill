@@ -1,0 +1,8 @@
+{
+  "identity": "research-agent-demo",
+  "objective": "解释独立实验单位与伪重复，用给定 p 值 0.01、0.03、0.2 实际调用 Holm 校正工具，写出有局限说明的 Markdown 报告。示例数值不是科研实验结果。",
+  "config": {"provider": "codex-config", "max_output_tokens": 2000, "timeout": 120},
+  "policy": {"review_mode": "milestones", "network": false, "project": "agent-demo"},
+  "budget": {"model_calls": 8, "tool_calls": 12, "active_seconds": 300, "output_tokens": 16000},
+  "inputs": {}
+}

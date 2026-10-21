@@ -25,6 +25,14 @@ def backup(store, destination):
                 _, state = store.get(run)
                 if state.get('worker') or any(s.get('active_attempt') or s.get('cleanup_pending') for s in state['stages'].values()):
                     raise ResearchError('Recover outstanding workers before backup')
+            agents = []
+            for row in store.db.execute("SELECT value FROM values_store WHERE key LIKE 'agent:%' ORDER BY key"):
+                session = json.loads(row[0])
+                identity = valid_id(session['id'])
+                locks.enter_context(resource_lock(store, 'agent', identity))
+                if session.get('active') or session.get('status') == 'running':
+                    raise ResearchError('Pause/recover Agent sessions before backup')
+                agents.append(identity)
             if any(q['status'] == 'running' for q in store.get_value('queue', [])):
                 raise ResearchError('Recover running queue entries before backup')
             for row in store.db.execute("SELECT value FROM values_store WHERE key LIKE 'rsi:%'"):
@@ -51,7 +59,7 @@ def backup(store, destination):
                 data = store.blob(obj.name)
                 atomic_bytes(temporary / name, data)
                 files[name] = digest(data)
-            for managed in (store.root / 'runs', store.root / 'rsi'):
+            for managed in (store.root / 'runs', store.root / 'rsi', store.root / 'agents', store.root / 'projects'):
                 for path in managed.rglob('*'):
                     if path.is_symlink() or (getattr(path.lstat(), 'st_file_attributes', 0) & 0x400):
                         raise ResearchError('Backup refuses symlinks/reparse points')
@@ -60,7 +68,8 @@ def backup(store, destination):
                         data = path.read_bytes()
                         atomic_bytes(safe_path(temporary, name), data)
                         files[name] = digest(data)
-            manifest = {'version': 1, 'files': files, 'runs': runs, 'scope': 'local store, graph revisions, CAS and workspaces; no external service state'}
+            manifest = {'version': 1, 'files': files, 'runs': runs, 'agents': agents,
+                        'scope': 'local store, graph revisions, CAS, workflow/Agent workspaces and receipts; no external service state'}
             write_json(temporary / 'backup.json', manifest)
             atomic_bytes(temporary / '.done', fingerprint(manifest).encode())
             os.replace(temporary, destination)
@@ -81,6 +90,10 @@ def backup_manifest(directory):
         valid_id(run)
     if len(set(manifest['runs'])) != len(manifest['runs']):
         raise ResearchError('Duplicate backup run ID')
+    agents = manifest.get('agents', [])
+    if not isinstance(agents, list): raise ResearchError('Invalid backup Agent inventory')
+    for identity in agents: valid_id(identity)
+    if len(set(agents)) != len(agents): raise ResearchError('Duplicate backup Agent ID')
     return manifest
 
 
@@ -119,6 +132,8 @@ def restore_backup(directory, destination):
         atomic_bytes(safe_path(temporary, name), data)
     for run in manifest['runs']:
         (temporary / 'runs' / run / 'work').mkdir(parents=True, exist_ok=True)
+    for identity in manifest.get('agents', []):
+        (temporary / 'agents' / identity / 'work').mkdir(parents=True, exist_ok=True)
     restored = Store(temporary)
     try:
         if not restored.verify()['valid']:
@@ -138,7 +153,17 @@ def health(store):
         state = json.loads(row['state'])
         if state.get('worker') or any(s.get('active_attempt') or s.get('cleanup_pending') for s in state['stages'].values()):
             pending.append({'run': row['id'], 'worker': state.get('worker'), 'heartbeat': state.get('heartbeat')})
+    for row in store.db.execute("SELECT value FROM values_store WHERE key LIKE 'agent:%'"):
+        state = json.loads(row[0])
+        if state.get('active') or state.get('status') == 'running':
+            pending.append({'agent': state['id'], 'status': state['status'], 'active': state.get('active')})
+    projects = []
+    for row in store.db.execute("SELECT value FROM values_store WHERE key LIKE 'long-project:%'"):
+        project = json.loads(row[0])
+        projects.append({'id': project['id'], 'spent': project['spent'],
+                         'reservations_pending': [k for k, v in project['reservations'].items() if v['status'] != 'settled'],
+                         'jobs_pending': [k for k, v in project['jobs'].items() if v['status'] not in {'completed', 'failed', 'cancelled'}]})
     return {'integrity': integrity, 'journal_mode': store.db.execute('PRAGMA journal_mode').fetchone()[0],
-            'synchronous': store.db.execute('PRAGMA synchronous').fetchone()[0], 'workers_or_recovery': pending,
+            'synchronous': store.db.execute('PRAGMA synchronous').fetchone()[0], 'workers_or_recovery': pending, 'long_projects': projects,
             'pending_memory_sync': [json.loads(r[0]) for r in store.db.execute('SELECT body FROM memory_outbox') if json.loads(r[0])['status'] != 'synced'],
             'deployment_scope': 'single host, local filesystem, cooperative trusted workers; no distributed lock or availability SLA'}

@@ -2,7 +2,10 @@
 from __future__ import annotations
 
 import json
+import math
+from email.utils import parsedate_to_datetime
 import os
+import socket
 from pathlib import Path
 import time
 import urllib.error
@@ -10,6 +13,19 @@ import urllib.parse
 import urllib.request
 
 from .core import ResearchError, digest, fingerprint, write_json
+
+
+class ModelTransportError(ResearchError):
+    """Sanitized transport classification; never carry a provider error body."""
+    def __init__(self, category, *, retryable=False, retry_after=0):
+        super().__init__('Model transport: ' + category)
+        self.category, self.retryable = category, retryable
+        self.retry_after = max(0, float(retry_after)) if math.isfinite(float(retry_after)) else 0
+
+
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise ModelTransportError('redirect_refused')
 
 
 def resolve(config):
@@ -56,7 +72,7 @@ def _request(url, body, key, timeout):
     request = urllib.request.Request(url, data=json.dumps(body, ensure_ascii=False).encode('utf-8'), headers=headers)
     started = time.monotonic()
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
+        with urllib.request.build_opener(_NoRedirect()).open(request, timeout=timeout) as response:
             chunks, size = [], 0
             while size <= 16_000_000:
                 remaining = timeout - (time.monotonic() - started)
@@ -72,7 +88,15 @@ def _request(url, body, key, timeout):
             content_type = response.headers.get('Content-Type', '')
     except urllib.error.HTTPError as exc:
         # Provider errors can echo headers or credentials. Persist only the status, not the body.
-        raise ResearchError('Model endpoint HTTP ' + str(exc.code)) from None
+        try: delay = float(exc.headers.get('Retry-After', 0))
+        except (TypeError, ValueError):
+            try: delay = max(0, parsedate_to_datetime(exc.headers['Retry-After']).timestamp() - time.time())
+            except (TypeError, ValueError, KeyError, OverflowError): delay = 0
+        raise ModelTransportError('http_' + str(exc.code), retryable=exc.code in {408, 429, 500, 502, 503, 504}, retry_after=delay) from None
+    except (TimeoutError, socket.timeout):
+        raise ModelTransportError('timeout', retryable=True) from None
+    except (urllib.error.URLError, ConnectionError):
+        raise ModelTransportError('connection', retryable=True) from None
     if len(raw) > 16_000_000: raise ResearchError('Model response exceeded 16 MB')
     if time.monotonic()-started > timeout: raise ResearchError('Model wall-clock timeout')
     return raw, content_type

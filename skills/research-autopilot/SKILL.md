@@ -5,6 +5,10 @@ description: 根据科研目标编排文献、设计、实验、诊断、写作�
 
 从用户的科学问题、已有材料与成功标准出发，按需要执行到可交付结果。读 [注册表](../manifest.yaml)，只加载命中技能；技能名称不是科学进展指标。
 
+独立 Agent 宿主由 [GResearchEvolver Agent 仓库](https://github.com/AGM54C/GResearchEvolver_Agent) 维护，可使用 [完整 Agent 工作台](../_shared/agent-workbench.md)：由原生工具协议驱动全部技能，模型/工具调用通过现有监督器执行，研究者在阶段报告与精确调用上介入。Skill 包内引擎是固定版本的兼容快照。使用 `report_stage` 完成每个科学阶段并提供深入浅出的解释；用 `ask_researcher` 获取实际判断，不以模型自己填写的 actor 代替人工接受。已有显式 DAG、宿主技能调用、CLI 及下列工作流全部保留；复杂实验可通过研究者审阅的 `run_command` 调用原运行器。
+
+跨上下文或需等待长实验时使用 [长程项目协议](../_shared/long-horizon-guide.md)：持久维护目标、约束、路线与预测／真实结果，共享项目预算。MemTX 使用包内复制的上游代码；科研节点／typed edges 与 OpenViking 保留。科学动作先绑定实际前提、版本与条件，默认等待真实人工审阅；源修订后按依赖修复。上下文归档不重放工具，实验等待只观察真实 DAG 回执。经验可提出改进候选，仍经冻结评估与研究者采用。
+
 1. 确定问题、领域、研究单位、可用数据/工具、产物、预算与现有授权。能合理推断的选择直接推进，关键缺失再问。
 2. 将选择的管线实例化为 v2 JSON manifest：具体 stage ID、显式 needs、required/optional 输入、版本化输出、milestone、命令或 host skill。注册表是能力目录，不能把所有 consumes 自动拼成循环 DAG。
 3. 用 runtime 的 `init` 固化输入，`run` 执行。没有 command 的阶段进入 awaiting_artifact；由宿主按对应 SKILL.md 完成后 `finish`，再继续。不要伪造不存在的 agent API、模型调用或工具结果。

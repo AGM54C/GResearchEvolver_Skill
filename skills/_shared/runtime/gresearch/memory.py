@@ -33,6 +33,8 @@ def validate(graph):
         if not isinstance(edge.get('relation'), str) or not edge['relation'].strip():
             raise ResearchError('Every edge needs a relation type')
     canonical(graph)  # reject non-finite / non-JSON values before persistence
+    from .validity import structure
+    structure(graph)
     return graph
 
 
@@ -127,7 +129,8 @@ def search(store, project, query, *, limit=10, revision=None):
 def invalidate_sources(store, project, source_ids, expected_revision, *, actor, reason):
     snapshot = get(store, project, expected_revision)
     result = invalidate(snapshot['graph'], source_ids, reason)
-    return {**put(store, project, result['graph'], expected_revision, actor=actor, reason=reason), 'affected': result['affected']}
+    return {**put(store, project, result['graph'], expected_revision, actor=actor, reason=reason),
+            **{k: v for k, v in result.items() if k != 'graph'}}
 
 
 def export(store, project, destination, revision=None):
